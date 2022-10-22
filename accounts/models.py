@@ -1,4 +1,5 @@
 from email.policy import default
+from enum import unique
 from random import choices
 from trace import Trace
 from django.db import models
@@ -7,7 +8,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
-class MyUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password =None):
         """
         Creates and saves a User with the given  first_name, last_name, username, and email.
@@ -51,7 +52,7 @@ class MyUserManager(BaseUserManager):
         return user
     
     
-class MyUser(AbstractBaseUser):
+class User(AbstractBaseUser):
     WATER_SUPPLIER = 1
     CUSTOMER = 2 
     
@@ -64,7 +65,7 @@ class MyUser(AbstractBaseUser):
     last_name = models.CharField(max_length=45)
     username = models.CharField(max_length=45, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    phone_number = PhoneNumberField(blank=True)
+    phone_number = PhoneNumberField(blank=True, unique=True)
     role = models.PositiveSmallIntegerField(choices = ROLE_CHOICE, blank=True, null=True)
     
     
@@ -78,7 +79,7 @@ class MyUser(AbstractBaseUser):
     is_superadmin = models.BooleanField(default=False)
     
     
-    objects = MyUserManager()
+    objects = UserManager()
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS =  ['username', 'first_name', 'last_name']
