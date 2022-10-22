@@ -1,13 +1,15 @@
 from email.policy import default
+from enum import unique
 from random import choices
 from trace import Trace
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
+from django_countries.fields import CountryField
 
 
 # Create your models here.
-class MyUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password =None):
         """
         Creates and saves a User with the given  first_name, last_name, username, and email.
@@ -51,7 +53,7 @@ class MyUserManager(BaseUserManager):
         return user
     
     
-class MyUser(AbstractBaseUser):
+class User(AbstractBaseUser):
     WATER_SUPPLIER = 1
     CUSTOMER = 2 
     
@@ -64,7 +66,7 @@ class MyUser(AbstractBaseUser):
     last_name = models.CharField(max_length=45)
     username = models.CharField(max_length=45, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    phone_number = PhoneNumberField(blank=True)
+    phone_number = PhoneNumberField(blank=True, unique=True)
     role = models.PositiveSmallIntegerField(choices = ROLE_CHOICE, blank=True, null=True)
     
     
@@ -78,7 +80,7 @@ class MyUser(AbstractBaseUser):
     is_superadmin = models.BooleanField(default=False)
     
     
-    objects = MyUserManager()
+    objects = UserManager()
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS =  ['username', 'first_name', 'last_name']
@@ -92,5 +94,24 @@ class MyUser(AbstractBaseUser):
     def has_module_perms(self, app_label):
         "Return True if the user is an active super user or is an admin"
         return True
-        
     
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True)
+    cover_photo = models.ImageField(upload_to='users/cover_photos', blank=True, null=True) 
+    country = CountryField(blank_label='(select country)')
+    county = models.CharField(max_length=15, blank=True, null=True)
+    town = models.CharField(max_length=15, blank=True, null=True)
+    address = models.CharField(max_length=250, blank=True, null=True)
+    pin_code = models.CharField(max_length=6, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    
+    
+    def __str__(self):
+        return self.user.username
+    
+    
+    
+   
