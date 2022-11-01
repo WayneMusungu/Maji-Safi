@@ -31,8 +31,11 @@ def registerUser(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.CUSTOMER
             user.save()
-            print("The user has been created successfuly")            
+            print('The user has been created successfuly')            
             return redirect('registerUser')
+        else:
+            print('form is invalid')
+            print(form.errors)
     else:
         form = UserForm()
     context = {
