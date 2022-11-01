@@ -1,7 +1,3 @@
-from email.policy import default
-from enum import unique
-from random import choices
-from trace import Trace
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
@@ -66,7 +62,8 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=45)
     username = models.CharField(max_length=45, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    phone_number = PhoneNumberField(blank=True, unique=True)
+    # phone_number = PhoneNumberField(blank=True, unique=True)
+    phone_number = models.CharField(max_length=10, blank=True)
     role = models.PositiveSmallIntegerField(choices = ROLE_CHOICE, blank=True, null=True)
     
     
@@ -110,8 +107,5 @@ class UserProfile(models.Model):
     
     
     def __str__(self):
-        return self.user.username
-    
-    
-    
-   
+        return self.user.email
+ 
