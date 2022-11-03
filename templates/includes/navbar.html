@@ -10,7 +10,7 @@
                         <div class="logo">
                             <figure>
                                 <a href="{% url 'home' %}" class="light-logo">
-                                    <img src="#" alt="MajiSafi" width="250">
+                                    <img src="{% static 'logo/waterlogo.jpg' %}" alt="MajiSafi" width="250">
                                 </a>
                             </figure>
                         </div>
@@ -30,7 +30,9 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="login-option">
-                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in" data-toggle="modal" href="#user-register">Login / Register</a><a class="get-start-btn" href="register-restaurant.html">
+                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in" data-toggle="modal" href="#user-register">Login</a>/
+                            <span><a href="{% url 'registerUser' %}" class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span>
+                            <a class="get-start-btn" href="register-restaurant.html">
                                 Register
                                 Water Shop </a>
                         </div>
