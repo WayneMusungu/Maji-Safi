@@ -5,7 +5,8 @@ from .forms import UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
 from .utils import detectUser
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 
@@ -131,12 +132,33 @@ def myAccount(request):
     return redirect(redirectUrl)
 
 
+"""
+Restricting customer from accessing the supplier's page
+"""
+def check_role_customer(user):
+    if user.role == 2:
+        return True
+    else: 
+        raise PermissionDenied
+    
 @login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def customerDashboard(request):
     return render(request, 'accounts/customerDashboard.html')
 
 
+
+"""
+Restricting Supplier from accessing the customers page
+"""
+def check_role_supplier(user):
+    if user.role == 1:
+        return True
+    else: 
+        raise PermissionDenied
+    
 @login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def supplierDashboard(request):
     return render(request, 'accounts/supplierDashboard.html')
 
