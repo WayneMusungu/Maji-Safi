@@ -25,7 +25,10 @@ class UserManager(BaseUserManager):
         )
         
         user.set_password(password)
+        user.is_active = True
         user.save(using=self._db)
+        
+
         return user
     
     def create_superuser(self, first_name, last_name, username, email, password =None):
@@ -91,6 +94,16 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         "Return True if the user is an active super user or is an admin"
         return True
+    
+    """
+    Detect the type of user and send them to their respective dashboard
+    """
+    def get_role(self):
+        if self.role == 1:
+            user_role = 'Supplier'
+        if self.role == 2:
+            user_role = 'Customer'
+        return user_role
     
     
 class UserProfile(models.Model):

@@ -1,16 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from vendor.forms import VendorForm
+from supplier.forms import SupplierForm
 from .forms import UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
+from .utils import detectUser
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 def registerUser(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in')
-        return redirect ('dashboard')
+        return redirect ('myAccount')
     elif request.method == 'POST':
         print(request.POST)
         form = UserForm(request.POST)
@@ -50,14 +52,14 @@ def registerUser(request):
     return render (request, 'accounts/registerUser.html', context)
 
 
-def registerVendor(request):
+def registerSupplier(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in')
-        return redirect ('dashboard')
+        return redirect ('myAccount')
     elif request.method == 'POST':
         form = UserForm(request.POST)
-        vendor_form = VendorForm(request.POST, request.FILES)
-        if form.is_valid() and vendor_form.is_valid():
+        supplier_form = SupplierForm(request.POST, request.FILES)
+        if form.is_valid() and supplier_form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
@@ -67,36 +69,36 @@ def registerVendor(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.WATER_SUPPLIER
             user.save()
-            vendor = vendor_form.save(commit = False)
-            vendor.user = user
+            supplier = supplier_form.save(commit = False)
+            supplier.user = user
             """
             Get the user profile fom the UserProfile Model.
             When the user.save is trigerred, 
             Signals will create the user profile of the user
             """
             user_profile = UserProfile.objects.get(user=user)
-            vendor.user_profile = user_profile
-            vendor.save()
+            supplier.user_profile = user_profile
+            supplier.save()
             messages.success(request, "Your account has been registered successfully!! Kindly wait for approval from the admin")
-            return redirect('registerVendor')
+            return redirect('registerSupplier')
 
         else:
             print('invalid form')
             print(form.errors)
     else:
         form = UserForm()
-        vendor_form = VendorForm()
+        supplier_form = SupplierForm()
     context ={
         'form':form,
-        'vendor_form': vendor_form,
+        'supplier_form': supplier_form,
     }
-    return render(request, 'accounts/registerVendor.html', context)
+    return render(request, 'accounts/registerSupplier.html', context)
 
 
 def login(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in')
-        return redirect ('dashboard')
+        return redirect ('myAccount')
     elif request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
@@ -109,7 +111,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, "You are logged in")
-            return redirect('dashboard')
+            return redirect('myAccount')
         else:
             messages.error(request, "Invalid Credentials")
             return redirect('login')
@@ -122,6 +124,19 @@ def logout(request):
     return redirect('login')
 
 
-def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+@login_required(login_url='login')
+def myAccount(request):
+    user = request.user
+    redirectUrl = detectUser(user)
+    return redirect(redirectUrl)
+
+
+@login_required(login_url='login')
+def customerDashboard(request):
+    return render(request, 'accounts/customerDashboard.html')
+
+
+@login_required(login_url='login')
+def supplierDashboard(request):
+    return render(request, 'accounts/supplierDashboard.html')
 

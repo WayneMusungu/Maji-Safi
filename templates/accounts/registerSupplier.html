@@ -12,11 +12,11 @@
                         <div class="user-holder">
                     <h4 class="text-center" style="margin-bottom: 0;">PARTNER WITH MAJI SAFI</h4>
                     <p class="text-center">Maji Safi capitalizes and equips emerging market entrepreneurs to create affordable access to drinking water and other necessities.
-                        <br>Come register your business with us
+                        <br>Come register your water business with us
                     </p>
                     <hr>
                     <div id="restaurant-sets-holder">
-                        <form action = "{% url 'registerVendor' %}" class="form-fields-set foodbakery-dev-restaurant-form" method="POST" enctype="multipart/form-data">
+                        <form action = "{% url 'registerSupplier' %}" class="form-fields-set foodbakery-dev-restaurant-form" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
                                 <li>
@@ -37,12 +37,12 @@
                                                         </div>
                                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                             <div class="field-holder">
-                                                                <label>Water Shop Name</label>{{vendor_form.vendor_name}}
+                                                                <label>Water Shop Name</label>{{supplier_form.supplier_name}}
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                             <div class="field-holder">
-                                                                <label>Water Shop License</label>{{vendor_form.vendor_license}}
+                                                                <label>Water Shop License</label>{{supplier_form.supplier_license}}
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
