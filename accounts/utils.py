@@ -4,6 +4,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.conf import settings
 """
 This file will contain any helper function for myAccount
 """
@@ -21,6 +22,7 @@ def detectUser(user):
     
     
 def send_email_verification(request, user):
+    from_email = settings.DEFAULT_FROM_EMAIL
     current_site = get_current_site(request)
     subject = 'Email Activation'
     
@@ -33,7 +35,7 @@ def send_email_verification(request, user):
         'token': default_token_generator.make_token(user),
     })
     to_email = user.email
-    mail = EmailMessage(subject, message, to= [to_email])
+    mail = EmailMessage(subject, message, from_email, to= [to_email])
     mail.send()
     
         

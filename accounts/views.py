@@ -7,6 +7,10 @@ from django.contrib import messages, auth
 from .utils import detectUser, send_email_verification
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+
+
 
 # Create your views here.
 
@@ -111,7 +115,21 @@ def registerSupplier(request):
 
 def activate(request, uidb64, token):
     # Activate the user by setting the is_active status to true
-    return 
+    try:
+        """Get the encoded uid and decode it."""
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+        
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Your account has been activated')
+        return redirect('myAccount')
+    else:  
+        messages.error(request, 'Invalid activation link')  
+        return redirect ('myAccount')    
 
 
 def login(request):
@@ -143,6 +161,9 @@ def logout(request):
     return redirect('login')
 
 
+"""
+This function is responsible for detecting whether the User is a Customer or a Supplier and be taken to the respective dashboard
+"""
 @login_required(login_url='login')
 def myAccount(request):
     user = request.user
@@ -163,7 +184,6 @@ def check_role_customer(user):
 @user_passes_test(check_role_customer)
 def customerDashboard(request):
     return render(request, 'accounts/customerDashboard.html')
-
 
 
 """
