@@ -4,7 +4,7 @@ from supplier.forms import SupplierForm
 from .forms import UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
-from .utils import detectUser
+from .utils import detectUser, send_email_verification
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -39,6 +39,13 @@ def registerUser(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.CUSTOMER
             user.save()
+            
+            # Send Email Verification to the Registered User
+            """
+            Create a helper function to send the verification email to the registered User
+            """
+            send_email_verification(request, user)
+            
             messages.success(request, "Your account has been registered successfully!!")
             print('The user has been created successfuly')            
             return redirect('registerUser')
@@ -69,7 +76,7 @@ def registerSupplier(request):
             
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.WATER_SUPPLIER
-            user.save()
+            user.save()    
             supplier = supplier_form.save(commit = False)
             supplier.user = user
             """
@@ -80,6 +87,13 @@ def registerSupplier(request):
             user_profile = UserProfile.objects.get(user=user)
             supplier.user_profile = user_profile
             supplier.save()
+            
+            # Send Email Verification to the Registered Supplier
+            """
+            Create a helper function to send the verification email to the registered Supplier
+            """
+            send_email_verification(request, user)
+            
             messages.success(request, "Your account has been registered successfully!! Kindly wait for approval from the admin")
             return redirect('registerSupplier')
 
@@ -94,6 +108,10 @@ def registerSupplier(request):
         'supplier_form': supplier_form,
     }
     return render(request, 'accounts/registerSupplier.html', context)
+
+def activate(request, uidb64, token):
+    # Activate the user by setting the is_active status to true
+    return 
 
 
 def login(request):
