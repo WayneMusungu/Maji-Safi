@@ -1,0 +1,15 @@
+{% autoescape off %}
+
+Hi {{user.first_name}},
+
+{% if is_approved %}
+
+Congratulations!! Your Water Business Shop has been approved by Maji Safi.
+
+{% else %}
+
+Sorry you are not eligible to register your Water Shop Business with Maji Safi.
+
+{% endif %}
+
+{% endautoescape %}
