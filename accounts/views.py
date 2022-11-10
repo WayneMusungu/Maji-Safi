@@ -204,11 +204,11 @@ def check_role_supplier(user):
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
 def supplierDashboard(request):
-    supplier = Supplier.objects.get(user=request.user)
-    context = {
-        'supplier': supplier,
-    }
-    return render(request, 'accounts/supplierDashboard.html', context)
+    # supplier = Supplier.objects.get(user=request.user)
+    # context = {
+    #     'supplier': supplier,
+    # }
+    return render(request, 'accounts/supplierDashboard.html')
 
 
 def forgot_password(request):
