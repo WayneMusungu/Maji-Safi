@@ -121,4 +121,7 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return self.user.email
+    
+    def location(self):
+        return f'{self.county}, {self.town}, {self.address}-{self.pin_code}'
  

@@ -1,5 +1,5 @@
 {% load static %}
-<div class="page-section restaurant-detail-image-section" style=" background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat scroll 0 0 / cover;">
+<div class="page-section restaurant-detail-image-section" style=" background: url({{supplier.user_profile.cover_photo.url}}) no-repeat scroll 0 0 / cover;">
     <!-- Container Start -->
     <div class="container">
         <!-- Row Start -->
@@ -10,15 +10,15 @@
                     <div class="company-info">
                         <div class="img-holder">
                             <figure>
-                                <img src="{% static 'extra-images/mineralwater2.jpg' %}" alt="">
+                                <img src="{{supplier.user_profile.profile_picture.url}}" alt="">
                             </figure>
                         </div>
 
                         <div class="text-holder">
-                            <span class="restaurant-title"> </span>
+                            <span class="restaurant-title">{{supplier.supplier_name}}</span>
                             <div class="text">
                                 <i class="icon-location"></i>
-                                <p>Mark ricardo road, lane 27, Austin, Texas, USA.</p>
+                                <p>{{supplier.user_profile.country}}, {{supplier.user_profile.location}}</p>
                             </div>
                         </div>
                     </div>
