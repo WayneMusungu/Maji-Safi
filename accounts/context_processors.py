@@ -1,4 +1,5 @@
 from supplier.models import Supplier
+from django.conf import settings
 """
 Make data accessible to all HTML files
 
@@ -12,3 +13,11 @@ def get_supplier(request):
     except:
         supplier = None
     return dict(supplier=supplier)
+
+
+"""
+Create a function that returns the GOOGLE API KEY
+"""
+
+def get_google_api(request):
+    return{'GOOGLE_API_KEY':settings.GOOGLE_API_KEY}
