@@ -22,7 +22,7 @@ function onPlaceChanged (){
     else{
         console.log('place name=>', place.name)
     }
-    
+
         // get the address components and assign them to the fields
 
 
