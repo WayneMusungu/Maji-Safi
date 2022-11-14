@@ -41,3 +41,6 @@ def supplierProfile(request):
         'supplier':supplier,
     }
     return render(request, 'supplier/supplierProfile.html', context)
+
+def services(request):
+    return render(request, 'supplier/services.html')
