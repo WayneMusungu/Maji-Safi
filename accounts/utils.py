@@ -58,7 +58,7 @@ def send_email_verification(request, user, subject, email_template):
 
 
 """
-Function to send notification to Vendor if their business has been approved by the admin or not
+Function to send notification to Supplier if their business has been approved by the admin or not
 """
 def send_notification(subject, email_template, context):
     from_email = settings.DEFAULT_FROM_EMAIL

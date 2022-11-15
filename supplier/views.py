@@ -4,6 +4,8 @@ from accounts.forms import UserProfileForm
 
 from accounts.models import UserProfile
 from .models import Supplier
+from services.models import Category
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.views import check_role_supplier
@@ -43,4 +45,12 @@ def supplierProfile(request):
     return render(request, 'supplier/supplierProfile.html', context)
 
 def services(request):
-    return render(request, 'supplier/services.html')
+    """
+    Get the logged in Supplier and get multiple queryset of the category of services they offer
+    """
+    supplier = Supplier.objects.get(user=request.user)
+    categories = Category.objects.filter(supplier=supplier)
+    context = {
+        'categories': categories
+    }
+    return render(request, 'supplier/services.html', context)
