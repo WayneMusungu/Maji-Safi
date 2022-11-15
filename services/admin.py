@@ -4,15 +4,15 @@ from .models import Category, Product
 # Register your models here.
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('supplier', 'bottle_size', 'updated_at')
-    prepopulated_fields = {'slug': ('bottle_size',)}
-    search_fields = ('bottle_size', 'supplier__supplier_name')
+    list_display = ('supplier', 'water_type', 'updated_at')
+    prepopulated_fields = {'slug': ('water_type',)}
+    search_fields = ('water_type', 'supplier__supplier_name')
     
     
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('water_type', 'category', 'supplier', 'price', 'is_available', 'updated_at')
-    prepopulated_fields = {'slug': ('water_type',)}
-    search_fields = ('water_type', 'category__bottle_size', 'supplier__supplier_name', 'price')
+    list_display = ('bottle_size', 'category', 'supplier', 'price', 'is_available', 'updated_at')
+    prepopulated_fields = {'slug': ('bottle_size',)}
+    search_fields = ('bottle_size', 'category__water_type', 'supplier__supplier_name', 'price')
     list_filter = ('is_available',)
 
     

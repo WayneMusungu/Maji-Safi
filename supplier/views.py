@@ -4,7 +4,7 @@ from accounts.forms import UserProfileForm
 
 from accounts.models import UserProfile
 from .models import Supplier
-from services.models import Category
+from services.models import Category, Product
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -54,3 +54,15 @@ def services(request):
         'categories': categories
     }
     return render(request, 'supplier/services.html', context)
+
+
+def water_by_category(request, pk=None):
+    supplier = Supplier.objects.get(user=request.user)
+    category = get_object_or_404(Category, pk=pk)
+    products = Product.objects.filter(supplier=supplier, category=category)
+    context = {
+        'products': products,
+        'category': category,
+    }
+    print(products)
+    return render(request, 'supplier/water_by_category.html', context)
