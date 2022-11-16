@@ -132,3 +132,9 @@ def edit_type(request, pk=None):
     return render(request, 'supplier/edit_type.html', context)
 
     
+
+def delete_type(request, pk=None):
+    water_type_name = get_object_or_404(Type, pk=pk)
+    water_type_name.delete()
+    messages.success(request, 'The Water type has been removed from your dashboard')
+    return redirect(services)

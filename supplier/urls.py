@@ -13,6 +13,8 @@ urlpatterns = [
     
     path('services/type/add/', views.add_type, name ='add_type'),
     path('services/type/edit/<int:pk>/', views.edit_type ,name='edit_type'),
+    path('services/type/delete/<int:pk>/', views.delete_type ,name='delete_type'),
+
 
     
 
