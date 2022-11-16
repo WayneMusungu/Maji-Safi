@@ -90,6 +90,8 @@ def add_type(request):
             
             messages.success(request, 'Water Type has been added successfully')
             return redirect('services')
+        else:
+            print(form.errors)
     else:
         form = WaterTypeForm
     context = {

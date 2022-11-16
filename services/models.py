@@ -6,18 +6,25 @@ from supplier.models import Supplier
 class Type(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     # bottle_size = models.CharField(max_length=50, unique=True)
-    water_type = models.CharField(max_length=50)
+    water_type = models.CharField(max_length=50, unique=True)
     """
     A slug field in Django is used to store and generate valid URLs for your dynamically created web pages.
     """
-    slug = models.SlugField(max_length=100, unique=False)
+    slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=250, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     # class Meta:
-    #     verbose_name = 'type'
-    #     verbose_name_plural = "categories"
+    #     verbose_name = 'child'
+    #     verbose_name_plural = "children"
+    
+    
+    """
+    Capitalize the name of the water type
+    """
+    def clean(self):
+        self.water_type = self.water_type.capitalize()
     
     def __str__(self):
         return self.water_type

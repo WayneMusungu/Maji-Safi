@@ -51,6 +51,16 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        {% for field in form %}
+                                            {% if field.errors %}
+                                                {% for error in field.errors %}
+                                                    <li style="color: red;">{{ error }}</li>
+
+                                                {% endfor %}
+
+                                            {% endif %}
+
+                                        {% endfor %}
                                         <!-- {{form}} -->
                                         <button type="submit" class="btn btn-info"><i class="fa fa-check" aria aria-hidden="true"></i>Create</button>
                                     </form>
