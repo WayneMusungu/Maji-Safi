@@ -93,8 +93,42 @@ def add_type(request):
         else:
             print(form.errors)
     else:
-        form = WaterTypeForm
+        form = WaterTypeForm()
     context = {
         'form': form,   
     }
     return render(request, 'supplier/add_type.html', context)
+
+
+def edit_type(request, pk=None):
+    water_type_name = get_object_or_404(Type, pk=pk)
+    if request.method == 'POST':
+        form = WaterTypeForm(request.POST, instance=water_type_name)
+        if form.is_valid():
+            """
+            Assign the supplier before storing the form
+            """
+            water_type_name = form.cleaned_data['water_type']
+            water = form.save(commit=False)
+            water.supplier = Supplier.objects.get(user=request.user)
+            
+            water.save()
+            """
+            Generate a slug based on the water type name
+            """
+            water.slug = slugify(water_type_name)+'-'+str(water.id) 
+            water.save()
+            
+            messages.success(request, 'Water Type has been updated successfully')
+            return redirect('services')
+        else:
+            print(form.errors)
+    else:
+        form = WaterTypeForm(instance=water_type_name)
+    context = {
+        'form': form, 
+        'water_type_name' : water_type_name 
+    }
+    return render(request, 'supplier/edit_type.html', context)
+
+    
