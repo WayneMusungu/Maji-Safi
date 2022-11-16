@@ -25,7 +25,7 @@
                             
                             <h5 class="text-uppercase">Services Offered by {{supplier.supplier_name}}</h5>
                             <hr>
-                            <h6><span class="text-uppercase text-success">{{category}}</span></h6>
+                            <h6><span class="text-uppercase text-success">{{type}}</span></h6>
                            
 									<!-- My Water Shop Form Start -->
                                     {% if products %}
@@ -38,15 +38,15 @@
                                                 <td class="text-left"><img src="{{product.image.url}}" alt="bottle-image" width="100" style="border-radius: 50%;"></td>
                                                 <td class="text-left">
                                                     <a href="#"><p class="mb-0 font-weight-bold">{{ product.bottle_size }}</p>
-                                                    <small class="text-muted">{{cat.description}}</small></a>
+                                                    <small class="text-muted">{{type.description}}</small></a>
                                                 </td>
-                                                <td><a href="#" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="#" onclick="return confirm('Are you sure you want to delete this category?')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
+                                                <td><a href="#" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="#" onclick="return confirm('Are you sure you want to delete this type?')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
                                             </tr>
                                             {% endfor %}
                                             </tbody>
                                         </table>
                                     {% else %}
-                                    <h5 class="text-centre ">You dont have a product for {{category}}</h5>
+                                    <h5 class="text-centre ">You dont have a product for {{type}}</h5>
                                     <div class="text-centre">
                                         <a href="" class="btn btn-success">
                                             <i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Product

@@ -3,7 +3,7 @@ from supplier.models import Supplier
 
 # Create your models here.
 
-class Category(models.Model):
+class Type(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     # bottle_size = models.CharField(max_length=50, unique=True)
     water_type = models.CharField(max_length=50)
@@ -15,16 +15,16 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    class Meta:
-        verbose_name = 'category'
-        verbose_name_plural = "categories"
+    # class Meta:
+    #     verbose_name = 'type'
+    #     verbose_name_plural = "categories"
     
     def __str__(self):
         return self.water_type
     
 class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
     bottle_size = models.CharField(max_length=50)
     # water_type = models.CharField(max_length=50)
     slug = models.SlugField(max_length=100)

@@ -28,20 +28,20 @@
                             <h6>Water Products</h6>
                             <a href="#" class="btn btn-success float-right m-1"><i class="fa fa-plus" aria-hidden="true"></i>
                                 Add Water Type</a>
-                            <a href="#" class="btn btn-info float-right m-1"><i class="fa fa-plus" aria-hidden="true"></i>
-                                Add category</a>
+                            <a href="{% url 'add_type' %}" class="btn btn-info float-right m-1"><i class="fa fa-plus" aria-hidden="true"></i>
+                                Add Water Type</a>
 									<!-- My Water Shop Form Start -->
                                     <table class="table table-hover table-borderless">
                                 
                                         <tbody>
-                                        {% for cat in categories %}
+                                        {% for type in types %}
                                           <tr>
                                             <td class="text-left">{{ forloop.counter }}</td>
                                             <td class="text-left">
-                                                <a href="{% url 'water_by_category' cat.id %}"><p class="mb-0 font-weight-bold">{{ cat }}</p></a>
-                                                <small class="text-muted">{{cat.description}}</small>
+                                                <a href="{% url 'water_by_type' type.id %}"><p class="mb-0 font-weight-bold">{{ type}}</p></a>
+                                                <small class="text-muted">{{type.description}}</small>
                                             </td>
-                                            <td><a href="#" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="#" onclick="return confirm('Are you sure you want to delete this category?')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
+                                            <td><a href="#" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="#" onclick="return confirm('Are you sure you want to delete this type?')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
                                           </tr>
                                         {% endfor %}
                                         </tbody>
