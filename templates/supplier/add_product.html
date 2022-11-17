@@ -27,10 +27,10 @@
                             
                             <h5 class="text-uppercase">Services Offered by {{supplier.supplier_name}}</h5>
                             <hr>
-                            <h6>Add New Water Type</h6>
+                            <h6>Add New Water Product</h6>
                             
 									<!-- Render the form -->
-                                    <form action="{% url 'add_type' %}" method="POST">
+                                    <form action="{% url 'add_product' %}" method="POST">
                                         {% csrf_token %}
                                         <div class="form-fields-set">
                                             <div class="row">

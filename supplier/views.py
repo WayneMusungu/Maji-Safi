@@ -46,6 +46,7 @@ def supplierProfile(request):
     }
     return render(request, 'supplier/supplierProfile.html', context)
 
+
 def services(request):
     """
     Get the logged in Supplier and get multiple queryset of the type of services they offer
@@ -131,10 +132,13 @@ def edit_type(request, pk=None):
     }
     return render(request, 'supplier/edit_type.html', context)
 
-    
-
+   
 def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
     messages.success(request, 'The Water type has been removed from your dashboard')
     return redirect(services)
+
+
+def add_product(request):
+    return render (request, 'supplier/add_product.html')
