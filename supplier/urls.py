@@ -18,6 +18,8 @@ urlpatterns = [
     # SERVICES PRODUCT CRUD
     path('services/product/add/', views.add_product, name ='add_product'),
     path('services/product/edit/<int:pk>/', views.edit_product ,name='edit_product'),
+    path('services/product/ delete_product/<int:pk>/', views. delete_product ,name=' delete_product'),
+
 
 
     

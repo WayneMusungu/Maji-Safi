@@ -198,3 +198,15 @@ def edit_product(request, pk=None):
         'product' : product,
     }
     return render(request, 'supplier/edit_product.html', context)
+
+
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
+def delete_product(request, pk=None):
+    product = get_object_or_404(Product, pk=pk)
+    product.delete()
+    messages.success(request, 'The product has been removed from your dashboard')
+    return redirect('water_by_type', product.type.id)
+
+    
+    
