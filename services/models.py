@@ -18,7 +18,8 @@ class Type(models.Model):
     # class Meta:
     #     verbose_name = 'child'
     #     verbose_name_plural = "children"
-    
+    class Meta:
+        ordering = ('-created_at',)
     
     """
     Capitalize the name of the water type
@@ -41,6 +42,9 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ('-created_at',)
     
     def __str__(self):
         return f'{self.bottle_size}, {self.price}'
