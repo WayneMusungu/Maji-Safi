@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect  
 from .forms import SupplierForm
 from accounts.forms import UserProfileForm
-from services.forms import WaterTypeForm
+from services.forms import WaterProductForm, WaterTypeForm
 
 from accounts.models import UserProfile
 from .models import Supplier
@@ -141,4 +141,31 @@ def delete_type(request, pk=None):
 
 
 def add_product(request):
-    return render (request, 'supplier/add_product.html')
+    if request.method == 'POST':
+        form = WaterProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            """
+            Assign the supplier before storing the form
+            """
+            bottle_size = form.cleaned_data['bottle_size']
+            bttle_water = form.save(commit=False)
+            bttle_water.supplier = Supplier.objects.get(user=request.user)
+            
+            form.save()
+            """
+            Generate a slug based on the water type name
+            """
+            bttle_water.slug = slugify(bottle_size) 
+            form.save()
+            
+            messages.success(request, 'Water Product has been added successfully')
+            return redirect('water_by_type', bttle_water.type.id)
+        else:
+            print(form.errors)
+    else:
+        form = WaterProductForm()
+    
+    context ={
+        'form':form
+    }
+    return render (request, 'supplier/add_product.html', context)
