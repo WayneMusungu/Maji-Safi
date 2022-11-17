@@ -47,6 +47,8 @@ def supplierProfile(request):
     return render(request, 'supplier/supplierProfile.html', context)
 
 
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def services(request):
     """
     Get the logged in Supplier and get multiple queryset of the type of services they offer
@@ -54,11 +56,13 @@ def services(request):
     supplier = Supplier.objects.get(user=request.user)
     types = Type.objects.filter(supplier=supplier)
     context = {
-        'types': types
+        'types': types,
     }
     return render(request, 'supplier/services.html', context)
 
 
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def water_by_type(request, pk=None):
     supplier = Supplier.objects.get(user=request.user)
     type = get_object_or_404(Type, pk=pk)
@@ -71,6 +75,8 @@ def water_by_type(request, pk=None):
     return render(request, 'supplier/water_by_type.html', context)
 
 
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def add_type(request): 
     if request.method == 'POST':
         form = WaterTypeForm(request.POST)
@@ -81,13 +87,11 @@ def add_type(request):
             water_type_name = form.cleaned_data['water_type']
             water = form.save(commit=False)
             water.supplier = Supplier.objects.get(user=request.user)
-            
-            water.save()
             """
             Generate a slug based on the water type name
             """
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
-            water.save()
+            form.save()
             
             messages.success(request, 'Water Type has been added successfully')
             return redirect('services')
@@ -101,6 +105,8 @@ def add_type(request):
     return render(request, 'supplier/add_type.html', context)
 
 
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def edit_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     if request.method == 'POST':
@@ -112,13 +118,11 @@ def edit_type(request, pk=None):
             water_type_name = form.cleaned_data['water_type']
             water = form.save(commit=False)
             water.supplier = Supplier.objects.get(user=request.user)
-            
-            water.save()
             """
             Generate a slug based on the water type name
             """
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
-            water.save()
+            form.save()
             
             messages.success(request, 'Water Type has been updated successfully')
             return redirect('services')
@@ -132,7 +136,9 @@ def edit_type(request, pk=None):
     }
     return render(request, 'supplier/edit_type.html', context)
 
-   
+
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)  
 def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
@@ -140,6 +146,8 @@ def delete_type(request, pk=None):
     return redirect(services)
 
 
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
 def add_product(request):
     if request.method == 'POST':
         form = WaterProductForm(request.POST, request.FILES)
@@ -150,11 +158,6 @@ def add_product(request):
             bottle_size = form.cleaned_data['bottle_size']
             bttle_water = form.save(commit=False)
             bttle_water.supplier = Supplier.objects.get(user=request.user)
-            
-            form.save()
-            """
-            Generate a slug based on the water type name
-            """
             bttle_water.slug = slugify(bottle_size) 
             form.save()
             
@@ -166,6 +169,32 @@ def add_product(request):
         form = WaterProductForm()
     
     context ={
-        'form':form
+        'form':form,
     }
     return render (request, 'supplier/add_product.html', context)
+
+
+@login_required(login_url='login')
+@user_passes_test(check_role_supplier)
+def edit_product(request, pk=None):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        form = WaterProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            bottlesize = form.cleaned_data['bottle_size']
+            product = form.save(commit=False)
+            product.supplier = Supplier.objects.get(user=request.user)
+            product.slug = slugify(bottlesize) 
+            form.save()
+            
+            messages.success(request, 'Water Product has been updated successfully')
+            return redirect('water_by_type', product.type.id)
+        else:
+            print(form.errors)
+    else:
+        form = WaterProductForm(instance=product)
+    context = {
+        'form': form, 
+        'product' : product,
+    }
+    return render(request, 'supplier/edit_product.html', context)
