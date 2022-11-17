@@ -43,6 +43,13 @@
                                                     <a href="#"><p class="mb-0 font-weight-bold">{{ product.bottle_size }}</p>
                                                     <small class="text-muted">{{product.description}}</small></a>
                                                 </td>
+                                                <td>
+                                                    {% if product.is_available %}
+                                                        <span class="badge badge-success">Available</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger">Out of Stock</span>
+                                                    {% endif %}
+                                                </td>
                                                 <td><a href="{% url 'edit_product' product.id %}" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="{% url ' delete_product' product.id %}" onclick="return confirm('Are you sure you want to delete {{ product.bottle_size }}')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
                                             </tr>
                                             {% endfor %}
@@ -51,7 +58,7 @@
                                     {% else %}
                                     <h5 class="text-centre ">You dont have a product for {{type}}</h5>
                                     <div class="text-centre">
-                                        <a href="" class="btn btn-success">
+                                        <a href="{% url 'add_product' %}" class="btn btn-success">
                                             <i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Product
                                         </a>
                                     </div>
