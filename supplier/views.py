@@ -167,7 +167,15 @@ def add_product(request):
             print(form.errors)
     else:
         form = WaterProductForm()
-    
+        """
+        Create a function to modify the form fields to show only the type of water that belongs to a specific logged in Supplier
+        """
+        def get_supplier(request):
+            supplier = Supplier.objects.get(user=request.user)
+            return supplier
+        
+        form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
+          
     context ={
         'form':form,
     }
