@@ -145,7 +145,11 @@ def delete_type(request, pk=None):
     messages.success(request, 'The Water type has been removed from your dashboard')
     return redirect(services)
 
-
+def get_supplier(request):
+            supplier = Supplier.objects.get(user=request.user)
+            return supplier
+        
+        
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
 def add_product(request):
@@ -170,9 +174,9 @@ def add_product(request):
         """
         Create a function to modify the form fields to show only the type of water that belongs to a specific logged in Supplier
         """
-        def get_supplier(request):
-            supplier = Supplier.objects.get(user=request.user)
-            return supplier
+        # def get_supplier(request):
+        #     supplier = Supplier.objects.get(user=request.user)
+        #     return supplier
         
         form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
           
@@ -201,6 +205,8 @@ def edit_product(request, pk=None):
             print(form.errors)
     else:
         form = WaterProductForm(instance=product)
+        form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
+
     context = {
         'form': form, 
         'product' : product,
