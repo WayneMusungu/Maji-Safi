@@ -7,19 +7,17 @@
 <div class="main-section">
 	<!-- Home Pages Elements Strat -->
 	<!-- Main Search Start -->
-	<!-- <div class="page-section nopadding cs-nomargin" style="padding-top: 200px; padding-bottom: 150px; margin-bottom: 0px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover;"> 
+	<div class="page-section nopadding cs-nomargin" style="padding-top: 100px; padding-bottom: 150px; margin-bottom: 0px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover fixed; "> 
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
 					<div class="element-title">
 						<h1 style="font-size: 40px; color: #505050; text-transform: uppercase; line-height: 50px; margin-bottom: 70px; text-align:center;">
 							Maji Safi<br>We offer quality drinking water from our Suppliers to you</h1>
-						<p style="font-size: 18px; letter-spacing: 1px; color: #505050; text-align:center;">
-							Ridiculus sociosqu
-							cursus neque cursus curae ante scelerisque vehicula.</p>
+						
 					</div>
 				</div>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+				<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
 					<div class="main-search fancy bg-holder">
 						<form>
 							<div class="row">
@@ -89,11 +87,11 @@
 							</div>
 						</form>
 					</div>
-				</div>
+				</div> -->
 				
 			</div>
 		</div>
-	</div> -->
+	</div>
 	<!-- Main Search End -->
 	
 	<!-- Top Restarurants Section Start -->
@@ -106,52 +104,24 @@
 						<p>Explore the best fresh water suppliers by locality</p>
 					</div>
 				</div>
-				<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding-right: 0 !important; padding-left: 0 !important;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding-right: 0 !important; padding-left: 0 !important;">
 					<div class="company-logo">
 						<ul>
+							{% for supplier in suppliers %}
 							<li class="has-border">
 								<figure>
-									<a href="#"><img src="{% static 'extra-images/listing-logo18.png' %}" class="attachment-full size-full wp-post-image" alt=""></a>
+									{% if supplier.user_profile.profile_picture %}
+										<a href="#"><img src="{{supplier.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt=""></a>
+
+									{% else %}
+										<a href="#"><img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt=""></a>
+                                	{% endif %}
 								</figure>
 							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="{% static 'extra-images/fb-restaurant-02.jpg' %}" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
-							<li class="has-border">
-								<figure>
-									<a href="#"><img src="" class="attachment-full size-full wp-post-image" alt=""></a>
-								</figure>
-							</li>
+							{% endfor %}
 						</ul>
 					</div>
-				</div> -->
+				</div>
 			</div>
 		</div>
 	</div>
@@ -163,68 +133,51 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="element-title align-center">
 						<h2>Choose From Most Popular Suppliers</h2>
-						<p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
+						
 					</div>
 				</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="listing fancy">
 						<ul class="row">
+							{% for supplier in suppliers %}
 							<li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 								<div class="list-post featured">
 									<div class="img-holder">
-										<figure><a href="#"><img src="assets/extra-images/listing-logo18.png" class="img-thumb wp-post-image" alt=""></a></figure>
+										<figure>
+											{% if supplier.user_profile.profile_picture %}
+											<a href="#">
+												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
+											</a>
+											{% else %}
+											<a href="#">
+												<img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="">
+											</a>
+											{% endif %}
+										</figure>
 										<span class="restaurant-status close">
 											<em class="bookmarkRibbon"></em>Close
 										</span>
 									</div>
 									<div class="text-holder">
-										<div class="list-rating">
+										<!-- <div class="list-rating">
 											<div class="rating-star">
 												<span class="rating-box" style="width: 100%;"></span>
 											</div>
 											<span class="reviews">(1)</span>
-										</div>
+										</div> -->
 										<div class="post-title">
 											<h5>
-												<a href="listing-detail.html">Jibu Fresh Water</a>
-												<span class="sponsored text-color">Sponsored</span>
+												<a href="listing-detail.html">{{supplier.supplier_name}}</a>
 											</h5>
 										</div>
-										<address> <span>Type of Water : </span> Mineral Water</address>
+										{% if supplier.user_profile.county and supplier.user_profile.town and supplier.user_profile.address and supplier.user_profile.pin_code %}
+											<span>{{supplier.user_profile.county}}, {{supplier.user_profile.town}}, {{supplier.user_profile.address}}-{{supplier.user_profile.pin_code}}</span>
+										{% endif %}
 									</div>
 									
 								</div>
 							</li>
-							
-							
-							
-							
-							<li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-								<div class="list-post featured">
-									<div class="img-holder">
-										<figure><a href="#"><img src="assets/extra-images/listing-logo09.png" class="img-thumb wp-post-image" alt=""></a></figure>
-										<span class="restaurant-status open">
-											<em class="bookmarkRibbon"></em>open
-										</span>
-									</div>
-									<div class="text-holder">
-										<div class="list-rating">
-											<div class="rating-star">
-												<span class="rating-box" style="width: 100%;"></span>
-											</div>
-											<span class="reviews">(1)</span>
-										</div>
-										<div class="post-title">
-											<h5>
-												<a href="listing-detail.html">New Water</a>
-												<span class="sponsored text-color">Sponsored</span>
-											</h5>
-										</div>
-										<address> <span>Type of Water : </span> Alkaline Water</address>
-									</div>
-									
-								</div>
-							</li>
+							{% endfor %}
 						</ul>
 					</div>
 				</div>
