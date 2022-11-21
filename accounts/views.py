@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
+from django.template.defaultfilters import slugify
 
 
 
@@ -86,6 +87,8 @@ def registerSupplier(request):
             user.save()    
             supplier = supplier_form.save(commit = False)
             supplier.user = user
+            supplier_name = supplier_form.cleaned_data['supplier_name']
+            supplier.supplier_slug = slugify(supplier_name) +'-'+str(user.id)
             """
             Get the user profile fom the UserProfile Model.
             When the user.save is trigerred, 
