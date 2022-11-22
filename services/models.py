@@ -32,7 +32,7 @@ class Type(models.Model):
     
 class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    type = models.ForeignKey(Type, on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='products')
     bottle_size = models.CharField(max_length=50)
     # water_type = models.CharField(max_length=50)
     slug = models.SlugField(max_length=100)

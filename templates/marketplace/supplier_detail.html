@@ -71,16 +71,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 sticky-sidebar">
-                    <div class="filter-toggle">
-                        <span class="filter-toggle-text">Categories By</span><i class="icon-chevron-down"></i>
-                    </div>
+                   
                     <div class="filter-wrapper">
                         <div class="categories-menu">
-                            <h6><i class="icon-restaurant_menu"></i>Categories</h6>
+                            <h6><i class="fa fa-tint"></i>Water Type</h6>
                             <ul class="menu-list">
-                                <li class="active"><a href="#" class="menu-category-link"> Pizzas </a></li>
-                                <li class=""><a href="#" class="menu-category-link"> Garlic Bread </a></li>
-                                <li class=""><a href="#" class="menu-category-link"> Kebabs </a></li>
+                                {% for type in water_type %}
+                                    <li class="active"><a href="#" class="menu-category-link"> {{type}} </a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -88,7 +86,7 @@
                 <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
                     <div class="tabs-holder horizontal">
                         <ul class="stickynav-tabs nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Menu</a></li>
+                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Products</a></li>
                             
                         </ul>
                         <div class="tab-content">
@@ -97,41 +95,30 @@
                                     
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         
-                                        
+                                        {% for type in water_type %}
                                         <div class="element-title" id="menu-category-2">
-                                            <h5 class="text-color">Garlic Bread</h5>
-                                            <span>Garlic bread also garlic toast consists of bread usually a
-                                                baguette or
-                                                sour dough like a ciabatta</span>
+                                            <h5 class="text-color">{{type}}</h5>
+                                            <span>{{type.description}}</span>
                                         </div>
                                         <ul>
+                                            {% for product in type.products.all %}
                                             <li>
-                                                <div class="image-holder"> <a href="assets/extra-images/cover-photo12-1024x187.jpg"><img src="assets/extra-images/cover-photo12-150x150.jpg" alt=""></a></div>
+                                                <div class="image-holder"><img src="{{product.image.url}}" alt=""></div>
                                                 <div class="text-holder">
-                                                    <h6>Garlic Pizza Bread 9 " Thin</h6>
-                                                    <span>Butter and crushed garlic, then spread a little over
-                                                        the
-                                                        pizza</span>
+                                                    <h6>{{product.bottle_size}}</h6>
+                                                    <span>{{product.description}}</span>
                                                 </div>
                                                 <div class="price-holder">
-                                                    <span class="price">£2.50</span>
+                                                    <span class="price">Ksh {{product.price}}</span>
                                                     <a href="#" class="restaurant-add-menu-btn"><i class="icon-plus4 text-color"></i></a>
                                                     <span id="add-menu-loader-10"></span>
                                                 </div>
                                             </li>
-                                            <li>
-                                                <div class="image-holder"> <a href="assets/extra-images/cover-photo10-1024x187.jpg"><img src="assets/extra-images/cover-photo10-150x150.jpg" alt=""></a></div>
-                                                <div class="text-holder">
-                                                    <h6>Garlic Bread 12" Deep</h6>
-                                                    <span>Pizza bread made with extra virgin olive oil</span>
-                                                </div>
-                                                <div class="price-holder">
-                                                    <span class="price">£3.50</span>
-                                                    <a href="#" class="restaurant-add-menu-btn"><i class="icon-plus4 text-color"></i></a>
-                                                    <span id="add-menu-loader-11"></span>
-                                                </div>
-                                            </li>
+                                            {% endfor %}
+                                            
                                         </ul>
+
+                                        {% endfor %}
                                         
                                     </div>
                                 </div>
