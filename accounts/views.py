@@ -256,7 +256,7 @@ def reset_password_validate(request, uidb64, token):
         Store the uid inside the session because we need the pk to reset the password
         """
         request.session['uid'] = uid
-        messages.info(request, 'A password reset link has been sent to your email')
+        messages.info(request, 'Enter new password')
         return redirect('reset_password')
         
     else:
