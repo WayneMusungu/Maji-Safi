@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from supplier.models import Supplier
 from services.models import Type, Product
@@ -31,3 +32,11 @@ def supplier_detail(request, supplier_slug):
         "water_type":water_type,
     }
     return render(request, 'marketplace/supplier_detail.html', context)
+
+
+def add_to_cart(request, product_id):
+    """
+    Use httpresponse to avoid reloading the page
+    """
+    return HttpResponse('Testing')
+    
