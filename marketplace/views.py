@@ -38,5 +38,5 @@ def add_to_cart(request, product_id):
     """
     Use httpresponse to avoid reloading the page
     """
-    return HttpResponse('Testing')
+    return HttpResponse(product_id)
     

@@ -31,6 +31,25 @@ function onPlaceChanged (){
 $(document).ready(function(){
     $('.add_to_cart').on('click', function(e){
         e.preventDefault();
-        alert('testing cart')
+        
+        product_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+
+        data = {
+            product_id: product_id,
+        }
+        
+
+        //  Send the product_id to add to cart view using the Ajax Request
+        // alert(product_id)
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: data,
+            success: function(response){
+                alert(response)
+            }
+
+        })
     })
 })
