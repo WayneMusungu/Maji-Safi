@@ -10,13 +10,13 @@
                         <div class="logo">
                             <figure>
                                 <a href="{% url 'home' %}" class="light-logo">
-                                    <!-- <img src="{% static 'logo/waterlogo.jpg' %}" alt="MajiSafi" width="250"> -->
+                                    <img src="{% static 'logo/waterlogo.jpg' %}" alt="MajiSafi" width="250">
                                 </a>
                             </figure>
                         </div>
                         
                         
-                        <!-- <div class="main-location ml-5">
+                        <div class="main-location ml-5">
                             <ul>
                                 <li class="location-has-children choose-location">
                                     <form action="#">
@@ -26,13 +26,13 @@
                                     
                                 </li>
                             </ul>
-                            </div> -->
+                            </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="login-option">
                             <a href="{% url 'marketplace' %}" class="btn btn-outline-info text-uppercase font-weight-bold">Water Market</a>
                             {% if user.is_authenticated %}
-                            <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'myAccount' %}">My Account</a>
+                            <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'myAccount' %}">Profile</a>
                             <a class="cs-color cs-popup-joinus-btn login-popup text-danger" href="{% url 'logout' %}">Logout</a>
                             {% else %}
                             <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'login' %}">Login</a>/
