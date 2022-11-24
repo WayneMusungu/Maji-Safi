@@ -1,7 +1,8 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from supplier.models import Supplier
 from services.models import Type, Product
+from .models import Cart
 from django.db.models import Prefetch
 
 # Create your views here.
@@ -35,8 +36,32 @@ def supplier_detail(request, supplier_slug):
 
 
 def add_to_cart(request, product_id):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Check if the Product exist
+            try:
+                product = Product.objects.get(id=product_id)
+                """
+                Check if the user has already addded food to the cart, and increase the cart quantity otherwise create a new cart for the Product
+                
+                """
+                try:
+                    checkCart = Cart.objects.get(user=request.user, product=product)
+                    checkCart.quantity += 1
+                    checkCart.save()
+                    return JsonResponse({'status': 'Success', 'message': 'Increased the Cart Quantity'})
+                except:
+                    checkCart = Cart.objects.create(user=request.user, product=product, quantity=1)
+                    return JsonResponse({'status': 'Success', 'message': 'This Product has been added to your Cart!'})     
+
+            except:
+                return JsonResponse({'status': 'Failed', 'message': 'This Product does not exist!'})     
+        else:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
+    else:
+        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
     """
     Use httpresponse to avoid reloading the page
     """
-    return HttpResponse(product_id)
+    # return HttpResponse(product_id)
     
