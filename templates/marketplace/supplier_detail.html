@@ -101,18 +101,18 @@
                                             <span>{{type.description}}</span>
                                         </div>
                                         <ul>
-                                            {% for product in type.products.all %}
+                                            {% for prod in type.products.all %}
                                             <li>
-                                                <div class="image-holder"><img src="{{product.image.url}}" alt=""></div>
+                                                <div class="image-holder"><img src="{{prod.image.url}}" alt=""></div>
                                                 <div class="text-holder">
-                                                    <h6>{{product.bottle_size}}</h6>
-                                                    <span>{{product.description}}</span>
+                                                    <h6>{{prod.bottle_size}}</h6>
+                                                    <span>{{prod.description}}</span>
                                                 </div>
                                                 <div class="price-holder">
-                                                    <span class="price">Ksh {{product.price}}</span>
+                                                    <span class="price">Ksh {{prod.price}}</span>
                                                     <a href="#" class="decrease_cart" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
-                                                    <label id="qty">0</label>
-                                                    <a href="#" class="add_to_cart" data-id="{{ product.id }}" data-url="{% url 'add_to_cart' product.id %}"><i class="icon-plus text-color"></i></a>
+                                                    <label id="qty-{{prod.id}}">0</label>
+                                                    <a href="#" class="add_to_cart" data-id="{{ prod.id }}" data-url="{% url 'add_to_cart' prod.id %}"><i class="icon-plus text-color"></i></a>
 
                                                 </div>
                                             </li>
@@ -123,6 +123,14 @@
                                         {% endfor %}
                                         
                                     </div>
+
+                                    {% for item in cart_items %}
+                                    <span id="qty-{{item.product.id}}" class="item_qty" data-qty="{{item.quantity}}"></span>
+
+
+                                    {% endfor %}
+
+
                                 </div>
                             </div>
                             
