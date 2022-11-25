@@ -49,12 +49,16 @@ $(document).ready(function(){
             success: function(response){
                 // alert(response)
                 console.log(response)
+                // console.log(response.cart_counter['cart_count'])
+                $('#cart_counter').html(response.cart_counter['cart_count']);
+                $('#qty-'+product_id).html(response.qty);
+
             }
 
         })
     })
 
-    // PLace the cart item quantity on load
+    // Place the Quantity on Each Product
 
     $('.item_qty').each(function(){
         var the_id = $(this).attr('id')
