@@ -29,15 +29,19 @@ function onPlaceChanged (){
 }
 
 $(document).ready(function(){
+    // Add  to Cart
     $('.add_to_cart').on('click', function(e){
         e.preventDefault();
         
         product_id = $(this).attr('data-id');
         url = $(this).attr('data-url');
 
-        data = {
-            product_id: product_id,
-        }
+
+        // No need to pass the data dictionary because by default the url will contain the product_id
+
+        // data = {
+        //     product_id: product_id,
+        // }
         
 
         //  Send the product_id to add to cart view using the Ajax Request
@@ -45,7 +49,7 @@ $(document).ready(function(){
         $.ajax({
             type: 'GET',
             url: url,
-            data: data,
+            // data: data,
             success: function(response){
                 // alert(response)
                 console.log(response)
@@ -65,6 +69,31 @@ $(document).ready(function(){
         var qty = $(this).attr('data-qty')
         console.log(qty)
         $('#'+the_id).html(qty)
+    })
+
+
+    // Decrease Cart
+
+    $('.decrease_cart').on('click', function(e){
+        e.preventDefault();
+        
+        product_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+
+      
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+                // alert(response)
+                console.log(response)
+                // console.log(response.cart_counter['cart_count'])
+                $('#cart_counter').html(response.cart_counter['cart_count']);
+                $('#qty-'+product_id).html(response.qty);
+
+            }
+
+        })
     })
 
  

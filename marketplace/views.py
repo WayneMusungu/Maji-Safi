@@ -67,7 +67,38 @@ def add_to_cart(request, product_id):
             return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
     else:
         return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
-    """
-    Use httpresponse to avoid reloading the page
-    """
-    # return HttpResponse(product_id)
+     
+    
+def decrease_cart(request, product_id):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Check if the Product exist
+            try:
+                product = Product.objects.get(id=product_id)
+                """
+                Check if the user has already added Product to the cart, if the number of Products is greater than one,
+                then we decrease the quantity and if it is less than one we simply delete the Product
+                
+                """
+                try:
+                    checkCart = Cart.objects.get(user=request.user, product=product)
+                    if checkCart.quantity > 1:
+                        checkCart.quantity -= 1
+                        checkCart.save()
+                    else:
+                        checkCart.delete()
+                        checkCart.quantity = 0
+                    return JsonResponse({'status': 'Success', 'cart_counter': get_cart_counter(request), 'qty': checkCart.quantity})
+                except:
+                    return JsonResponse({'status': 'Success', 'message': 'You do not have this item in your Cart!'})     
+
+            except:
+                return JsonResponse({'status': 'Failed', 'message': 'This Product does not exist!'})     
+        else:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
+    else:
+        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+   
+
+    
+        

@@ -9,4 +9,11 @@ urlpatterns = [
     # ADD TO CART
     
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    
+    
+    # DECREASE CART
+    
+    path('decrease_cart/<int:product_id>/', views.decrease_cart, name='decrease_cart'),
+
+    
 ]
