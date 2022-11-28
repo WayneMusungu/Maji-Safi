@@ -53,11 +53,17 @@ $(document).ready(function(){
             success: function(response){
                 // alert(response)
                 console.log(response)
-                if(response.status == 'Failed'){
-                    console.log(response)
+                if(response.status == 'login_required'){
+                    // console.log(response)
 
+                    // Implement SweetAlert Function
+                    swal(response.message, '', 'info').then(function(){
+                        window.location = '/login';
+                    })
                 }
-                else{
+                if(response.status == 'Failed'){
+                    swal(response.message, '', 'error')
+                }else{
                      // console.log(response.cart_counter['cart_count'])
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 $('#qty-'+product_id).html(response.qty);
@@ -94,8 +100,16 @@ $(document).ready(function(){
             success: function(response){
                 // alert(response)
                 console.log(response)
-                if(response.status == 'Failed'){
-                    console.log(response)
+                if(response.status == 'login_required'){
+                    // console.log(response)
+
+                    // Implement SweetAlert Function
+                    swal(response.message, '', 'info').then(function(){
+                        window.location = '/login';
+                    })
+                }
+                else if(response.status == 'Failed'){
+                    swal(response.message, '', 'error')
 
                 }
                 else{
