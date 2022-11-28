@@ -53,9 +53,16 @@ $(document).ready(function(){
             success: function(response){
                 // alert(response)
                 console.log(response)
-                // console.log(response.cart_counter['cart_count'])
+                if(response.status == 'Failed'){
+                    console.log(response)
+
+                }
+                else{
+                     // console.log(response.cart_counter['cart_count'])
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 $('#qty-'+product_id).html(response.qty);
+
+                }
 
             }
 
@@ -87,9 +94,17 @@ $(document).ready(function(){
             success: function(response){
                 // alert(response)
                 console.log(response)
-                // console.log(response.cart_counter['cart_count'])
+                if(response.status == 'Failed'){
+                    console.log(response)
+
+                }
+                else{
+                     // console.log(response.cart_counter['cart_count'])
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 $('#qty-'+product_id).html(response.qty);
+
+                }
+               
 
             }
 
