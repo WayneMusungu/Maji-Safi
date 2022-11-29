@@ -21,33 +21,35 @@
                                     
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         
-                                        {% for type in water_type %}
-                                        <div class="element-title" id="menu-category-2">
-                                            <h5 class="text-color">{{type}}</h5>
-                                            <span>{{type.description}}</span>
-                                        </div>
+                                       
+                                       
                                         <ul>
-                                            {% for prod in type.products.all %}
-                                            <li>
-                                                <div class="image-holder"><img src="{{prod.image.url}}" alt=""></div>
-                                                <div class="text-holder">
-                                                    <h6>{{prod.bottle_size}}</h6>
-                                                    <span>{{prod.description}}</span>
-                                                </div>
-                                                <div class="price-holder">
-                                                    <span class="price">Ksh {{prod.price}}</span>
-                                                    <a href="#" class="decrease_cart" data-id="{{ prod.id }}" data-url="{% url 'decrease_cart' prod.id %}" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
-                                                    <label id="qty-{{prod.id}}">0</label>
-                                                    <a href="#" class="add_to_cart" data-id="{{ prod.id }}" data-url="{% url 'add_to_cart' prod.id %}"><i class="icon-plus text-color"></i></a>
+                                            {% if cart_items %}
+                                                {% for item in cart_items %}
+                                                <li>
+                                                    <div class="image-holder"><img src="{{item.product.image.url}}" alt=""></div>
+                                                    <div class="text-holder">
+                                                        <h6>{{item.product.bottle_size}}</h6>
+                                                        <span>{{item.product.description}}</span>
+                                                    </div>
+                                                    <div class="price-holder">
+                                                        <span class="price">Ksh {{item.product.price}}</span>
+                                                        <a href="#" class="decrease_cart" data-id="{{ item.product.id }}" data-url="{% url 'decrease_cart' item.product.id %}" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
+                                                        <label id="qty-{{item.product.id}}">0</label>
+                                                        <a href="#" class="add_to_cart" data-id="{{ item.product.id }}" data-url="{% url 'add_to_cart' item.product.id %}"><i class="icon-plus text-color"></i></a>
+                                                        <a href="#" class="delete_cart" data-id="{{ item.id }}" data-url="{% url 'delete_cart' item.id %}"><i class="fa fa-trash-o" style="color: red;"></i></a>
 
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="text-centre p-5">
+                                                    <h3>Cart is Empty</h3>
                                                 </div>
-                                            </li>
-                                            {% endfor %}
-                                            
+                                            {% endif %}  
                                         </ul>
-
-                                        {% endfor %}
                                         
+
                                     </div>
 
                                     {% for item in cart_items %}

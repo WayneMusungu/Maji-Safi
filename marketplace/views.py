@@ -5,6 +5,7 @@ from services.models import Type, Product
 from .models import Cart
 from django.db.models import Prefetch
 from .context_processors import get_cart_counter
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -98,9 +99,34 @@ def decrease_cart(request, product_id):
             return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
     else:
         return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
-    
+   
+
+@login_required(login_url='login')
 def cart(request):
-    return render(request, 'marketplace/cart.html')
+    cart_items = Cart.objects.filter(user=request.user)
+    context = {
+        "cart_items": cart_items,
+    }
+    return render(request, 'marketplace/cart.html', context)
+
+
+@login_required(login_url='login')
+def delete_cart(request, cart_id):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                # Check if the Cart Item Exist
+                cart_item = Cart.objects.get(user=request.user, id=cart_id)
+                if cart_item:
+                    cart_item.delete()
+                    return JsonResponse({'status': 'Success', 'message': 'Cart Item has been deleted!', 'cart_counter': get_cart_counter(request)}) 
+            except:
+                return JsonResponse({'status': 'Failed', 'message': 'Cart Item does not exist!'})  
+                
+                    
+        else:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
+            
    
 
     
