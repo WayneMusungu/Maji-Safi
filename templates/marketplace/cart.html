@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<!-- Main Section Start -->
+<div class="main-section pt-5">
+       <div class="page-section">
+        <div class="container">
+            <div class="row">
+               
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                    <div class="tabs-holder horizontal">
+                        <ul class="stickynav-tabs nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#home"> <i class="fa fa-shopping-cart"></i>Cart Items</a></li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane in active">
+                                <div class="menu-itam-holder">
+                                    
+                                    <div id="menu-item-list-6272" class="menu-itam-list">
+                                        
+                                        {% for type in water_type %}
+                                        <div class="element-title" id="menu-category-2">
+                                            <h5 class="text-color">{{type}}</h5>
+                                            <span>{{type.description}}</span>
+                                        </div>
+                                        <ul>
+                                            {% for prod in type.products.all %}
+                                            <li>
+                                                <div class="image-holder"><img src="{{prod.image.url}}" alt=""></div>
+                                                <div class="text-holder">
+                                                    <h6>{{prod.bottle_size}}</h6>
+                                                    <span>{{prod.description}}</span>
+                                                </div>
+                                                <div class="price-holder">
+                                                    <span class="price">Ksh {{prod.price}}</span>
+                                                    <a href="#" class="decrease_cart" data-id="{{ prod.id }}" data-url="{% url 'decrease_cart' prod.id %}" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
+                                                    <label id="qty-{{prod.id}}">0</label>
+                                                    <a href="#" class="add_to_cart" data-id="{{ prod.id }}" data-url="{% url 'add_to_cart' prod.id %}"><i class="icon-plus text-color"></i></a>
+
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                            
+                                        </ul>
+
+                                        {% endfor %}
+                                        
+                                    </div>
+
+                                    {% for item in cart_items %}
+                                    <span id="qty-{{item.product.id}}" class="item_qty" data-qty="{{item.quantity}}"></span>
+
+
+                                    {% endfor %}
+
+
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Order Section -->
+
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="tabs-holder horizontal">
+                        <ul class="stickynav-tabs nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Your Order</a></li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            <div id="home" class="tab-pane in active">
+                                <div class="menu-itam-holder">
+
+                                    <div>
+                                        <ul>
+                                            <li style="list-style-type: none;">
+                                                Subtotal
+                                                <span class="price float-right">
+                                                    <span class="currency" >Ksh</span>
+                                                    <span id="subtotal">0</span>
+                                                </span>
+                                            </li>
+                                            <li style="list-style-type: none;">
+                                                Tax
+                                                <span class="price float-right">
+                                                    <span class="currency" >Ksh</span>
+                                                    <span id="tax">0</span>
+                                                </span>
+                                            </li>
+                                            <li style="list-style-type: none; font-weight: 700;">
+                                                TOTAL
+                                                <span class="price float-right">
+                                                    <span class="currency" >Ksh</span>
+                                                    <span id="total">0</span>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                              
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Main Section End -->
+
+
+{% endblock %}

@@ -14,6 +14,9 @@ urlpatterns = [
     # DECREASE CART
     
     path('decrease_cart/<int:product_id>/', views.decrease_cart, name='decrease_cart'),
+    
+    
+   
 
     
 ]

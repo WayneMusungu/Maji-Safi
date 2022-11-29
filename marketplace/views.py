@@ -98,6 +98,9 @@ def decrease_cart(request, product_id):
             return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
     else:
         return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+    
+def cart(request):
+    return render(request, 'marketplace/cart.html')
    
 
     
