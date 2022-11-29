@@ -26,7 +26,7 @@
                                         <ul>
                                             {% if cart_items %}
                                                 {% for item in cart_items %}
-                                                <li>
+                                                <li id= "cart-item-{{item.id}}">
                                                     <div class="image-holder"><img src="{{item.product.image.url}}" alt=""></div>
                                                     <div class="text-holder">
                                                         <h6>{{item.product.bottle_size}}</h6>

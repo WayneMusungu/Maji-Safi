@@ -151,6 +151,8 @@ $(document).ready(function(){
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 swal(response.status, response.message, "success")
 
+                removeCartItem(0, cart_id)
+
                 }
                
 
@@ -158,7 +160,15 @@ $(document).ready(function(){
 
         })
     })
-    
+
+    // delete cart element if the quantity is 0
+
+    function removeCartItem(cartItemQty, cart_id){
+        if(cartItemQty <= 0){
+            // remove the cart item element
+            document.getElementById("cart-item-"+cart_id).remove()
+        }
+    }
 
 
 
