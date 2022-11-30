@@ -24,8 +24,6 @@ function onPlaceChanged (){
     }
 
         // get the address components and assign them to the fields
-
-
 }
 
 $(document).ready(function(){
@@ -69,9 +67,7 @@ $(document).ready(function(){
                 $('#qty-'+product_id).html(response.qty);
 
                 }
-
             }
-
         })
     })
 
@@ -116,12 +112,8 @@ $(document).ready(function(){
                      // console.log(response.cart_counter['cart_count'])
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 $('#qty-'+product_id).html(response.qty);
-
                 }
-               
-
             }
-
         })
     })
 
@@ -152,12 +144,9 @@ $(document).ready(function(){
                 swal(response.status, response.message, "success")
 
                 removeCartItem(0, cart_id)
-
+                checkEmptyCart();
                 }
-               
-
             }
-
         })
     })
 
@@ -170,7 +159,12 @@ $(document).ready(function(){
         }
     }
 
-
-
- 
+     // Check if Cart is Empty and Display Cart is Empty 
+     
+     function checkEmptyCart(){
+        var cart_counter = document.getElementById('cart_counter').innerHTML
+        if(cart_counter == 0){
+            document.getElementById("empty-cart").style.display = "block";
+        }
+     }
 })
