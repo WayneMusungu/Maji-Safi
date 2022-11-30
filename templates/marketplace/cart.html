@@ -34,7 +34,7 @@
                                                     </div>
                                                     <div class="price-holder">
                                                         <span class="price">Ksh {{item.product.price}}</span>
-                                                        <a href="#" class="decrease_cart" data-id="{{ item.product.id }}" data-url="{% url 'decrease_cart' item.product.id %}" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
+                                                        <a href="#" class="decrease_cart" data-id="{{ item.product.id }}" data-url="{% url 'decrease_cart' item.product.id %}" id = "{{item.id}}" style="margin-right: 28px;"><i class="icon-minus" style="color: red;"></i></a>
                                                         <label id="qty-{{item.product.id}}">0</label>
                                                         <a href="#" class="add_to_cart" data-id="{{ item.product.id }}" data-url="{% url 'add_to_cart' item.product.id %}"><i class="icon-plus text-color"></i></a>
                                                         <a href="#" class="delete_cart" data-id="{{ item.id }}" data-url="{% url 'delete_cart' item.id %}"><i class="fa fa-trash-o" style="color: red;"></i></a>

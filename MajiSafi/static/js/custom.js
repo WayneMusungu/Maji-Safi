@@ -88,6 +88,7 @@ $(document).ready(function(){
         
         product_id = $(this).attr('data-id');
         url = $(this).attr('data-url');
+        cart_id = $(this).attr('id');
 
       
         $.ajax({
@@ -112,6 +113,12 @@ $(document).ready(function(){
                      // console.log(response.cart_counter['cart_count'])
                 $('#cart_counter').html(response.cart_counter['cart_count']);
                 $('#qty-'+product_id).html(response.qty);
+
+                if(window.location.pathname == '/cart/'){
+                    removeCartItem(response.qty, cart_id);
+                    checkEmptyCart();
+                }
+               
                 }
             }
         })
@@ -153,10 +160,10 @@ $(document).ready(function(){
     // delete cart element if the quantity is 0
 
     function removeCartItem(cartItemQty, cart_id){
-        if(cartItemQty <= 0){
-            // remove the cart item element
-            document.getElementById("cart-item-"+cart_id).remove()
-        }
+            if(cartItemQty <= 0){
+                // remove the cart item element
+                document.getElementById("cart-item-"+cart_id).remove()
+            }
     }
 
      // Check if Cart is Empty and Display Cart is Empty 
