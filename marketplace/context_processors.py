@@ -33,6 +33,6 @@ def get_cart_amounts(request):
             subtotal += (product.price * item.quantity)
             
         grand_total = subtotal + tax
-        print(subtotal)
-        print(grand_total)
+        # print(subtotal)
+        # print(grand_total)
         return dict(subtotal=subtotal, tax=tax, grand_total=grand_total)
