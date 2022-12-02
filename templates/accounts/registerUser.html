@@ -14,7 +14,7 @@
                     <p class="text-center">Please fill in the form to get the most out of Maji Safi.</p>
                     <hr>
                     <div id="restaurant-sets-holder">
-                        <form action = "{% url 'registerUser' %}" class="form-fields-set foodbakery-dev-restaurant-form" method="POST" action="register-select-package.html">
+                        <form action = "{% url 'registerUser' %}" class="form-fields-set foodbakery-dev-restaurant-form" method="POST">
                             {% csrf_token %}
                             <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
                                 <li>
@@ -70,6 +70,16 @@
                                     </div>
                                 </li>
                                 <li>
+                                    <ul class="errorlist">
+                                        {% for field in form %}
+                                            {% if field.errors %}
+                                                {% for error in field.errors %}
+                                                    <li style="color:red;">{{error}}</li>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li style="color:red;">{{form.non_field_errors}}</li>
+                                    </ul>
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="field-holder">
@@ -79,6 +89,14 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <!-- LOAD MESSAGE -->
+                                            {% include 'includes/alerts.html' %}
+                                        </div>
+                                    </div>
+
                                 </li>
                             </ul>
                         </form>
