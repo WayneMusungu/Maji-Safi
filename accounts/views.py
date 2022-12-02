@@ -4,9 +4,13 @@ from supplier.forms import SupplierForm
 from .forms import UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
-from .utils import detectUser
+from .utils import detectUser, send_email_verification
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+
+
 
 # Create your views here.
 
@@ -39,6 +43,13 @@ def registerUser(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.CUSTOMER
             user.save()
+            
+            # Send Email Verification to the Registered User
+            """
+            Create a helper function to send the verification email to the registered User
+            """
+            send_email_verification(request, user)
+            
             messages.success(request, "Your account has been registered successfully!!")
             print('The user has been created successfuly')            
             return redirect('registerUser')
@@ -69,7 +80,7 @@ def registerSupplier(request):
             
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.WATER_SUPPLIER
-            user.save()
+            user.save()    
             supplier = supplier_form.save(commit = False)
             supplier.user = user
             """
@@ -80,6 +91,13 @@ def registerSupplier(request):
             user_profile = UserProfile.objects.get(user=user)
             supplier.user_profile = user_profile
             supplier.save()
+            
+            # Send Email Verification to the Registered Supplier
+            """
+            Create a helper function to send the verification email to the registered Supplier
+            """
+            send_email_verification(request, user)
+            
             messages.success(request, "Your account has been registered successfully!! Kindly wait for approval from the admin")
             return redirect('registerSupplier')
 
@@ -94,6 +112,24 @@ def registerSupplier(request):
         'supplier_form': supplier_form,
     }
     return render(request, 'accounts/registerSupplier.html', context)
+
+def activate(request, uidb64, token):
+    # Activate the user by setting the is_active status to true
+    try:
+        """Get the encoded uid and decode it."""
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+        
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Your account has been activated')
+        return redirect('myAccount')
+    else:  
+        messages.error(request, 'Invalid activation link')  
+        return redirect ('myAccount')    
 
 
 def login(request):
@@ -125,6 +161,9 @@ def logout(request):
     return redirect('login')
 
 
+"""
+This function is responsible for detecting whether the User is a Customer or a Supplier and be taken to the respective dashboard
+"""
 @login_required(login_url='login')
 def myAccount(request):
     user = request.user
@@ -147,9 +186,8 @@ def customerDashboard(request):
     return render(request, 'accounts/customerDashboard.html')
 
 
-
 """
-Restricting Supplier from accessing the customer's page
+Restricting Supplier from accessing the customers page
 """
 def check_role_supplier(user):
     if user.role == 1:
