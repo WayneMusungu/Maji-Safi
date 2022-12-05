@@ -4,12 +4,25 @@
     80% {bottom: 100px}
     100% {bottom: -100%}
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3d26152800e219bd396f0c103cfeec166979cb49
 .display-notification{
     position: fixed;
     bottom: 100%;
     right:20px;
     animation-name: show-toast;
     animation-duration: 10s;
+<<<<<<< HEAD
 
 } */
+=======
+} */
+
+.btn{
+    padding: 2px 1.75em;
+    font-size: 12px;
+    cursor: pointer;
+}
+>>>>>>> 3d26152800e219bd396f0c103cfeec166979cb49
