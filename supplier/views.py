@@ -185,7 +185,7 @@ def edit_product(request, pk=None):
             product.slug = slugify(bottlesize) 
             form.save()
             
-            messages.success(request, 'Water Product has been updated successfully')
+            messages.success(request, f'{bottlesize} has been updated successfully')
             return redirect('water_by_type', product.type.id)
         else:
             print(form.errors)
