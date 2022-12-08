@@ -87,7 +87,7 @@ def add_type(request):
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
             water.save()
             
-            messages.success(request, 'Water Type has been added successfully')
+            messages.success(request, f'{water_type_name} has been added to your dashboard')
             return redirect('services')
         else:
             print(form.errors)
@@ -118,7 +118,7 @@ def edit_type(request, pk=None):
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
             water.save()
             
-            messages.success(request, 'Water Type has been updated successfully')
+            messages.success(request, f'{water_type_name} has been updated successfully')
             return redirect('services')
         else:
             print(form.errors)
@@ -134,7 +134,7 @@ def edit_type(request, pk=None):
 def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
-    messages.success(request, 'The Water type has been removed from your dashboard')
+    messages.success(request,f'{water_type_name} has been removed from your dashboard')
     return redirect(services)
 
 
@@ -156,7 +156,7 @@ def add_product(request):
             bttle_water.slug = slugify(bottle_size) 
             form.save()
             
-            messages.success(request, 'Water Product has been added successfully')
+            messages.success(request, f'{bottle_size} Water Product has been added successfully')
             return redirect('water_by_type', bttle_water.type.id)
         else:
             print(form.errors)
