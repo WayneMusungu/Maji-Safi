@@ -14,8 +14,6 @@ from django.template.defaultfilters import slugify
 
 # Create your views here.
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
 def supplierProfile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
     supplier = get_object_or_404(Supplier, user=request.user)
@@ -93,7 +91,7 @@ def add_type(request):
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
             form.save()
             
-            messages.success(request, 'Water Type has been added successfully')
+            messages.success(request, f'{water_type_name} has been added to your dashboard')
             return redirect('services')
         else:
             print(form.errors)
@@ -124,7 +122,7 @@ def edit_type(request, pk=None):
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
             form.save()
             
-            messages.success(request, 'Water Type has been updated successfully')
+            messages.success(request, f'{water_type_name} has been updated successfully')
             return redirect('services')
         else:
             print(form.errors)
@@ -142,7 +140,7 @@ def edit_type(request, pk=None):
 def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
-    messages.success(request, 'The Water type has been removed from your dashboard')
+    messages.success(request,f'{water_type_name} has been removed from your dashboard')
     return redirect(services)
 
 
@@ -161,7 +159,7 @@ def add_product(request):
             bttle_water.slug = slugify(bottle_size) 
             form.save()
             
-            messages.success(request, 'Water Product has been added successfully')
+            messages.success(request, f'{bottle_size} Water Product has been added successfully')
             return redirect('water_by_type', bttle_water.type.id)
         else:
             print(form.errors)
@@ -195,7 +193,7 @@ def edit_product(request, pk=None):
             product.slug = slugify(bottlesize) 
             form.save()
             
-            messages.success(request, 'Water Product has been updated successfully')
+            messages.success(request, f'{bottlesize} has been updated successfully')
             return redirect('water_by_type', product.type.id)
         else:
             print(form.errors)
@@ -213,7 +211,7 @@ def edit_product(request, pk=None):
 def delete_product(request, pk=None):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
-    messages.success(request, 'The product has been removed from your dashboard')
+    messages.success(request, f'{product} has been removed from your dashboard')
     return redirect('water_by_type', product.type.id)
 
     
