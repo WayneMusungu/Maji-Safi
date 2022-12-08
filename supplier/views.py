@@ -203,7 +203,7 @@ def edit_product(request, pk=None):
 def delete_product(request, pk=None):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
-    messages.success(request, 'The product has been removed from your dashboard')
+    messages.success(request, f'{product} has been removed from your dashboard')
     return redirect('water_by_type', product.type.id)
 
     
