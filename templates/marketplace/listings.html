@@ -30,11 +30,11 @@
                                             <figure>
                                                 {% if supplier.user_profile.profile_picture %}
 											<a href="#">
-												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
+												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="profile-picture" height="95px" width="95px">
 											</a>
 											{% else %}
 											<a href="#">
-												<img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="">
+												<img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="profile-picture" height="95px" width="95px">
 											</a>
 											{% endif %}
                                             </figure>
