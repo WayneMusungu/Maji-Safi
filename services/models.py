@@ -48,7 +48,7 @@ class Product(models.Model):
         # ordering = ('-created_at',)
     
     def __str__(self):
-        return f'{self.bottle_size}, {self.price}ksh'
+        return f'{self.bottle_size}, for {self.price} ksh'
     
 
 

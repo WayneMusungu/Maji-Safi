@@ -22,7 +22,7 @@ def marketplace(request):
 def supplier_detail(request, supplier_slug):
     supplier = get_object_or_404(Supplier, supplier_slug=supplier_slug)
     """
-    Type class model we have no access to Product class model therefore we use Pref etch to reverse look up Product class model
+    Type class model we have no access to Product class model therefore we use Prefetch to reverse look up Product class model
     """
     water_type = Type.objects.filter(supplier=supplier).prefetch_related(
         Prefetch(
