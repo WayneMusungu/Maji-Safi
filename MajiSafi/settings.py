@@ -75,7 +75,6 @@ TEMPLATES = [
                 'accounts.context_processors.get_supplier',
                 'accounts.context_processors.get_google_api',
                 'marketplace.context_processors.get_cart_counter',
-                'marketplace.context_processors.get_cart_amounts',
             ],
         },
     },
@@ -87,25 +86,12 @@ WSGI_APPLICATION = 'MajiSafi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': config('DB_NAME'),
-           'USER': config('DB_USER'),
-           'PASSWORD': config('DB_PASSWORD'),
-           'HOST': config('DB_HOST'),
-           'PORT': '5432',
-       }
-
-   }
-
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
