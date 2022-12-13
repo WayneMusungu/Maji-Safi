@@ -129,7 +129,10 @@ def delete_cart(request, cart_id):
         
         
 def search(request):
-    return HttpResponse('search page')
+    address = request.GET['address']
+    s_name = request.GET['supplier_name']
+    print(address, s_name)
+    return render(request, 'marketplace/listings.html')
             
    
 

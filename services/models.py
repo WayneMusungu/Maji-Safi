@@ -6,7 +6,7 @@ from supplier.models import Supplier
 class Type(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     # bottle_size = models.CharField(max_length=50, unique=True)
-    water_type = models.CharField(max_length=50, unique=True)
+    water_type = models.CharField(max_length=50)
     """
     A slug field in Django is used to store and generate valid URLs for your dynamically created web pages.
     """

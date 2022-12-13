@@ -85,11 +85,12 @@ def add_type(request):
             water_type_name = form.cleaned_data['water_type']
             water = form.save(commit=False)
             water.supplier = Supplier.objects.get(user=request.user)
+            water.save()
             """
             Generate a slug based on the water type name
             """
             water.slug = slugify(water_type_name)+'-'+str(water.id) 
-            form.save()
+            water.save()
             
             messages.success(request, f'{water_type_name} has been added to your dashboard')
             return redirect('services')
