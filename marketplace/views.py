@@ -6,6 +6,7 @@ from .models import Cart
 from django.db.models import Prefetch
 from .context_processors import get_cart_counter, get_cart_amounts
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 # Create your views here.
 
@@ -131,11 +132,21 @@ def delete_cart(request, cart_id):
 def search(request):
     address = request.GET['address']
     keyword = request.GET['keyword']
+    # print(address, keyword)
    
+    """
+    Get Supplier ids that has the water type that a user is looking for
+    """
+    fetch_supplier_by_product = Product.objects.filter(bottle_size__icontains=keyword, is_available=True).values_list('supplier', flat=True)# Get the list of Supplier ids 
+    # print(fetch_supplier_by_product)
     
-    suppliers = Supplier.objects.filter(supplier_name__icontains=keyword, is_approved=True, user__is_active=True)
-    print(address, keyword)
-    print(suppliers)
+    fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=keyword).values_list('supplier', flat=True)
+    # print(fetch_supplier_by_water_type)
+    
+    suppliers = Supplier.objects.filter(Q(id__in=fetch_supplier_by_product) | Q(id__in=fetch_supplier_by_water_type) | Q(supplier_name__icontains=keyword, is_approved=True, user__is_active=True))
+    
+    # suppliers = Supplier.objects.filter(supplier_name__icontains=keyword, is_approved=True, user__is_active=True)
+        # print(suppliers)
     supplier_count = suppliers.count()
     
     context = {
