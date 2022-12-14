@@ -130,9 +130,19 @@ def delete_cart(request, cart_id):
         
 def search(request):
     address = request.GET['address']
-    s_name = request.GET['supplier_name']
-    print(address, s_name)
-    return render(request, 'marketplace/listings.html')
+    keyword = request.GET['keyword']
+   
+    
+    suppliers = Supplier.objects.filter(supplier_name__icontains=keyword, is_approved=True, user__is_active=True)
+    print(address, keyword)
+    print(suppliers)
+    supplier_count = suppliers.count()
+    
+    context = {
+        'suppliers': suppliers,
+        'supplier_count': supplier_count,
+    }
+    return render(request, 'marketplace/listings.html', context)
             
    
 
