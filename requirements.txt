@@ -4,7 +4,7 @@ Django==4.1.2
 django-countries==7.4.2
 django-phonenumber-field==7.0.0
 phonenumberslite==8.12.57
-Pillow==9.2.0
+Pillow==9.3.0
 python-decouple==3.6
 sqlparse==0.4.3
 typing-extensions==4.4.0
