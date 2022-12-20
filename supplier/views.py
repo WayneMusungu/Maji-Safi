@@ -231,3 +231,6 @@ def opening_hours(request):
     }
     return render(request, 'supplier/opening_hours.html', context)
     
+
+def add_opening_hours(request):
+    return

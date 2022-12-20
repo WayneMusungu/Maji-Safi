@@ -23,6 +23,7 @@ urlpatterns = [
     
     # OPENING HOUR CRUD
     path('opening-hours/', views.opening_hours, name='opening_hours'),
+    path('opening-hous/add/', views.add_opening_hours, name='add_opening_hours'),
 
 
 

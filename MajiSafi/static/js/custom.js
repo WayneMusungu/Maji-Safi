@@ -185,10 +185,10 @@ $(document).ready(function(){
     // delete cart element if the quantity is 0
 
     function removeCartItem(cartItemQty, cart_id){
-            if(cartItemQty <= 0){
-                // remove the cart item element
-                document.getElementById("cart-item-"+cart_id).remove()
-            }
+        if(cartItemQty <= 0){
+            // remove the cart item element
+            document.getElementById("cart-item-"+cart_id).remove()
+        }
     }
 
      // Check if Cart is Empty and Display Cart is Empty 
@@ -208,8 +208,25 @@ $(document).ready(function(){
             $('#subtotal').html(subtotal)
             $('#tax').html(tax)
             $('#total').html(grand_total)
+        }
+
     }
 
-        }
+    $('.add_hour').on('click', function(e){
+        e.preventDefault();
+        // alert('test');
+        var day = document.getElementById('id_day').value
+        var from_hour = document.getElementById('id_from_hour').value
+        var to_hour = document.getElementById('id_to_hour').value
+        var is_closed = document.getElementById('id_is_closed').checked
+        var csrf_token = $('input[name="csrfmiddlewaretoken]').val()
+
+        console.log(day, from_hour, to_hour, is_closed, csrf_token)
+
+
+
+    })
+
+    // document ready close
         
 })
