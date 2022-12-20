@@ -221,5 +221,7 @@ def delete_product(request, pk=None):
     messages.success(request, f'{product} has been removed from your dashboard')
     return redirect('water_by_type', product.type.id)
 
-    
+
+def opening_hours(request): 
+    return render(request, 'supplier/opening_hours.html')
     
