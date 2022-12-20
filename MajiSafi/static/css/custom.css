@@ -18,3 +18,7 @@
     font-size: 12px;
     cursor: pointer;
 }
+
+table > tbody > tr > td{
+    border: none !important;
+}

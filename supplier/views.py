@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect  
-from .forms import SupplierForm
+from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 
 from accounts.models import UserProfile
-from .models import Supplier
+from .models import Supplier, OpeningHour
 from services.models import Type, Product
 
 from django.contrib import messages
@@ -223,5 +223,11 @@ def delete_product(request, pk=None):
 
 
 def opening_hours(request): 
-    return render(request, 'supplier/opening_hours.html')
+    opening_hours = OpeningHour.objects.filter(supplier=get_supplier(request))
+    form = OpeningHourForm()
+    context = {
+        'form': form,
+        'opening_hours': opening_hours,
+    }
+    return render(request, 'supplier/opening_hours.html', context)
     
