@@ -220,10 +220,41 @@ $(document).ready(function(){
         var to_hour = document.getElementById('id_to_hour').value
         var is_closed = document.getElementById('id_is_closed').checked
         var csrf_token = $('input[name="csrfmiddlewaretoken]').val()
+        var url = document.getElementById('add_hour_url').value
 
         console.log(day, from_hour, to_hour, is_closed, csrf_token)
 
+        // Use dynamic condition
 
+        if(is_closed){
+            is_closed = 'True'
+            condition = "day != ''"
+        }else{
+            is_closed = 'False'
+            condition = "day != '' && from_hour != '' && to_hour != ''"
+        }
+
+
+        if(eval(condition)){
+            // seend ajax request
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    'day': day,
+                    'from_hour': from_hour,
+                    'to_hour': to_hour,
+                    'is_closed': is_closed,
+                    'csrfmiddlewaretoken':csrf_token,
+                },
+                success: function(response){
+                    console.log(response)
+                }
+            })
+            console.log('add the entry')
+        }else{
+            swal('Please fill all the fields', '', 'info');
+        }
 
     })
 
