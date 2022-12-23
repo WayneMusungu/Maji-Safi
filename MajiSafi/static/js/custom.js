@@ -219,7 +219,7 @@ $(document).ready(function(){
         var from_hour = document.getElementById('id_from_hour').value
         var to_hour = document.getElementById('id_to_hour').value
         var is_closed = document.getElementById('id_is_closed').checked
-        var csrf_token = $('input[name="csrfmiddlewaretoken]').val()
+        var csrf_token = $('input[name=csrfmiddlewaretoken]').val()
         var url = document.getElementById('add_hour_url').value
 
         console.log(day, from_hour, to_hour, is_closed, csrf_token)
@@ -236,7 +236,7 @@ $(document).ready(function(){
 
 
         if(eval(condition)){
-            // seend ajax request
+            // s   end ajax request
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -248,7 +248,21 @@ $(document).ready(function(){
                     'csrfmiddlewaretoken':csrf_token,
                 },
                 success: function(response){
-                    console.log(response)
+                    if(response.status == 'success'){
+                        if(response.is_closed == 'Closed'){
+                            html = '<tr><td><b>'+response.day+'</b></td><td>Closed</td><td><a href="#">Remove</a></td></tr>'
+                        }
+                        else{
+                            // Append the opening hours time to be automatically updated when a vendor enters a day and use Javascript dynamic value we will be getting from the response
+                            html = '<tr><td><b>'+response.day+'</b></td><td>'+response.from_hour+' - '+response.to_hour+'</td><td><a href="#">Remove</a></td></tr>'
+                        }
+                        
+                        $('.opening_hours').append(html)
+                        document.getElementById('opening_hours').reset();
+                    }else{
+                        swal(response.message, '', "error")
+                    }
+                    // console.log(response)
                 }
             })
             console.log('add the entry')
