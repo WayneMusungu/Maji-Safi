@@ -72,7 +72,7 @@ class OpeningHour(models.Model):
     
     
     class Meta:
-        ordering = ('day', 'from_hour')
+        ordering = ('day', '-from_hour')
         unique_together = ('day', 'from_hour', 'to_hour')
         
     def __str__(self):

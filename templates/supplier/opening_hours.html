@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
+
 {% load static %}
 
 {% block content %}
-
 {% include 'includes/alerts.html' %}
-<p>My Water Shop Page</p>
+
 <!-- Main Section Start -->
 <div class="main-section">
     {% include 'includes/cover.html' %}
@@ -12,34 +12,25 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-
-                    <!-- LOAD SIDEBAR -->
-
-                    {% include 'includes/supplier_sidebar.html' %}
-
-                    
-                </div>
+                    <!-- Load the sidebar here -->
+                    {% include 'includes/supplier_sidebar.html' %}                </div>
                 <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
-                            
                             <h5 class="text-uppercase">Opening Hours</h5>
-                            <hr>
-                        
-                            <table class="table opening_hours" style="width: 500px;">
+							<hr>
+                          
+                            <table class="table opening_hours" style="width: 500px; border: none !important;">
                                 <tbody>
                                     {% for hour in opening_hours %}
-                                        <tr>
+                                        <tr id="hour-{{hour.id}}">
                                             <td><b>{{ hour }}</b></td>
                                             <td>{% if hour.is_closed %}Closed{% else %}{{ hour.from_hour }} - {{ hour.to_hour }}{% endif %}</td>
-                                            <td><a href="#">Remove</a></td>
+                                            <td><a href="#" class="remove_hour" data-url="{% url 'remove_opening_hours' hour.id %}">Remove</a></td>
                                         </tr>
-
                                     {% endfor %}
                                 </tbody>
                             </table>
-
-                            <br>
 
                             <br>
 
@@ -59,13 +50,11 @@
                                         {{ form.is_closed }} Set as Closed
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="hidden" value = "{% url 'add_opening_hours' %}" id="add_hour_url">
+                                        <input type="hidden" value="{% url 'add_opening_hours' %}" id="add_hour_url">
                                         <button class="btn btn-success add_hour">Add Hours</button>
                                     </div>
                                 </div>
                             </form>
-                                                             
-                         
                             
                         </div>
                     </div>

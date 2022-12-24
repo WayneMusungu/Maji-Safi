@@ -212,6 +212,7 @@ $(document).ready(function(){
 
     }
 
+    // ADD OPENING HOURS
     $('.add_hour').on('click', function(e){
         e.preventDefault();
         // alert('test');
@@ -250,11 +251,11 @@ $(document).ready(function(){
                 success: function(response){
                     if(response.status == 'success'){
                         if(response.is_closed == 'Closed'){
-                            html = '<tr><td><b>'+response.day+'</b></td><td>Closed</td><td><a href="#">Remove</a></td></tr>'
+                            html = '<tr id="hour-'+response.id+'"><td><b>'+response.day+'</b></td><td>Closed</td><td><a href="#" class="remove_hour" data-url="/supplier/opening-hours/remove/'+response.id+'/">Remove</a></td></tr>';
                         }
                         else{
                             // Append the opening hours time to be automatically updated when a vendor enters a day and use Javascript dynamic value we will be getting from the response
-                            html = '<tr><td><b>'+response.day+'</b></td><td>'+response.from_hour+' - '+response.to_hour+'</td><td><a href="#">Remove</a></td></tr>'
+                            html = '<tr id="hour-'+response.id+'"><td><b>'+response.day+'</b></td><td>'+response.from_hour+' - '+response.to_hour+'</td><td><a href="#" class="remove_hour" data-url="/supplier/opening-hours/remove/'+response.id+'/">Remove</a></td></tr>';
                         }
                         
                         $('.opening_hours').append(html)
@@ -270,7 +271,24 @@ $(document).ready(function(){
             swal('Please fill all the fields', '', 'info');
         }
 
+    });
+
+    // REMOVE OPENING HOURS
+    $(document).on('click', '.remove_hour', function(e){
+        e.preventDefault();
+        url = $(this).attr('data-url');
+        
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+                if(response.status == 'success'){
+                    document.getElementById('hour-'+response.id).remove()
+                }
+            }
+        })
     })
+
 
     // document ready close
         
