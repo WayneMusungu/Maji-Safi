@@ -1,12 +1,13 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
-from supplier.models import Supplier
+from supplier.models import OpeningHour, Supplier
 from services.models import Type, Product
 from .models import Cart
 from django.db.models import Prefetch
 from .context_processors import get_cart_counter, get_cart_amounts
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from datetime import date
 
 # Create your views here.
 
@@ -32,6 +33,19 @@ def supplier_detail(request, supplier_slug):
         )
     )
     
+    opening_hours = OpeningHour.objects.filter(supplier=supplier).order_by('day','from_hour')
+    
+    """
+    Check current day's opening hours
+    """
+    today_date = date.today()
+    today = today_date.isoweekday()
+    # print(today)
+    # print(today_date)
+    current_opening_hours = OpeningHour.objects.filter(supplier=supplier, day=today)
+    print(current_opening_hours)
+    
+    
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -40,6 +54,8 @@ def supplier_detail(request, supplier_slug):
         "supplier":supplier,
         "water_type":water_type,
         "cart_items":cart_items,
+        "opening_hours":opening_hours,
+        "current_opening_hours": current_opening_hours,
     }
     return render(request, 'marketplace/supplier_detail.html', context)
 
