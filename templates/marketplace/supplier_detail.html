@@ -27,7 +27,7 @@
                                 </figure>
                             </div>
                             <div class="text-holder">
-                                <span class="restaurant-title">{{supplier.supplier_name}} {% if not is_open %}[Closed]{% endif %}</span>
+                                <span class="restaurant-title">{{ supplier.supplier_name }} {% if not supplier.is_open %}[Closed]{% endif %}</span>
                                
                             </div>
                         </div>
@@ -39,9 +39,8 @@
                                 <li>
                                     <a href="#" class="reviews-sortby-active">
                                         <span>Today :</span>
-                                        {% for current in current_opening_hours %}
-                                        <span>{% if current.is_closed %}Closed{% else %}{{ current.from_hour }} - {{ current.to_hour }} {% endif %}</span>
-                                        {% endfor %}
+                                        {% for i in current_opening_hours %}
+                                        {% if i.is_closed %}Closed{% else %}{{ i.from_hour }} - {{ i.to_hour }}{% endif %}                                        {% endfor %}
                                         <i class="icon-chevron-small-down"></i>
                                     </a>
                                     <ul class="delivery-dropdown">

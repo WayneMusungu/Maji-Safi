@@ -40,32 +40,8 @@ def supplier_detail(request, supplier_slug):
     """
     today_date = date.today()
     today = today_date.isoweekday()
-    # print(today)
-    # print(today_date)
+    
     current_opening_hours = OpeningHour.objects.filter(supplier=supplier, day=today)
-    
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    # print(current_time)
-    # print(now)
-    """
-    Check if there is multiple opening hours in the same day and determine whether the water shop is opened/closed during a specific time frame
-    """
-    is_open = None
-    for current in current_opening_hours:
-        start = str(datetime.strptime(current.from_hour, "%I:%M %p").time())
-        end = str(datetime.strptime(current.to_hour, "%I:%M %p").time())
-        print(start, end)
-        if current_time > start and current_time < end:
-            is_open = True
-            break
-        else:
-            is_open = False
-        # print(is_open)
-    
-    # print(current_opening_hours)
-    
-    
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -76,7 +52,7 @@ def supplier_detail(request, supplier_slug):
         "cart_items":cart_items,
         "opening_hours":opening_hours,
         "current_opening_hours": current_opening_hours,
-        "is_open": is_open,
+        
     }
     return render(request, 'marketplace/supplier_detail.html', context)
 
