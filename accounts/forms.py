@@ -1,6 +1,9 @@
 from django import forms
 from .models import User, UserProfile
 from .validators import allow_only_images_valdators
+from phonenumber_field.formfields import PhoneNumberField
+from phonenumber_field.widgets import PhoneNumberPrefixWidget
+
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -31,3 +34,17 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_picture', 'cover_photo', 'country', 'county', 'town', 'address', 'pin_code']
+        
+        
+class UserInfoForm(forms.ModelForm):  
+    phone_number = PhoneNumberField(
+        widget = PhoneNumberPrefixWidget(initial='KE')
+    )
+    
+    class Meta:
+       
+        model = User
+        fields = ['first_name', 'last_name', 'phone_number']
+        
+        
+        
