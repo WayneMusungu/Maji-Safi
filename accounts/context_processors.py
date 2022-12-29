@@ -1,3 +1,4 @@
+from .models import UserProfile
 from supplier.models import Supplier
 from django.conf import settings
 """
@@ -13,6 +14,14 @@ def get_supplier(request):
     except:
         supplier = None
     return dict(supplier=supplier)
+
+
+def get_user_profile(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except:
+        user_profile = None
+    return dict(user_profile=user_profile)
 
 
 """
