@@ -167,8 +167,11 @@ def search(request):
         'supplier_count': supplier_count,
     }
     return render(request, 'marketplace/listings.html', context)
+
+
+def checkout(request):
+    return render(request, 'marketplace/checkout.html')
             
    
 
-    
         
