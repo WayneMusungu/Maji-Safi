@@ -1,6 +1,10 @@
 from django.db import models
 from accounts.models import User
 from services.models import Product
+from phonenumber_field.modelfields import PhoneNumberField
+from django_countries.fields import CountryField
+
+
 
 # Create your models here.
 
@@ -34,12 +38,12 @@ class Order(models.Model):
     order_number = models.CharField(max_length=20)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15, blank=True)
+    phone = PhoneNumberField(blank=True)
     email = models.EmailField(max_length=50)
     address = models.CharField(max_length=200)
-    country = models.CharField(max_length=15, blank=True)
-    state = models.CharField(max_length=15, blank=True)
-    city = models.CharField(max_length=50)
+    country = CountryField(blank_label='(select country)')
+    county = models.CharField(max_length=15, blank=True)
+    town = models.CharField(max_length=50)
     pin_code = models.CharField(max_length=10)
     total = models.FloatField()
     tax_data = models.JSONField(blank=True, help_text = "Data format: {'tax_type':{'tax_percentage':'tax_amount'}}")

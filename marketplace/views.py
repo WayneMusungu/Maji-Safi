@@ -1,5 +1,5 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from supplier.models import OpeningHour, Supplier
 from services.models import Type, Product
 from .models import Cart
@@ -8,6 +8,7 @@ from .context_processors import get_cart_counter, get_cart_amounts
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import date, datetime
+from orders.forms import OrderForm
 
 # Create your views here.
 
@@ -170,7 +171,17 @@ def search(request):
 
 
 def checkout(request):
-    return render(request, 'marketplace/checkout.html')
+    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+    cart_count = cart_items.count()
+    # If cart count is 0 redirect user to the market place page
+    if cart_count <= 0:
+        return redirect('marketplace')
+    form = OrderForm()
+    context = {
+        'form': form,
+        'cart_items': cart_items,
+    }
+    return render(request, 'marketplace/checkout.html', context)
             
    
 
