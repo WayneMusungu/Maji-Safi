@@ -141,16 +141,15 @@
                                             <div class="payment-method">
                                                 <label>
                                                     <input type="radio" name="payment_method" value="M-PESA">
-                                                    <img src="{% static 'images/M-PESA_LOGO-01.svg.png' %}" alt="M-PESA" width="100">
-                                                   
+                                                    <img src="{% static 'images/M-PESA_LOGO-01.svg.png' %}" alt="M-PESA" width="100"> 
                                                 </label>
                                                 <label>
                                                     <input type="radio" name="payment_method" value="PayPal">
                                                     <img src="{% static 'images/PayPal.png' %}" alt="PayPal" width="100">
-                                                    
                                                 </label>
                                             </div>
-                                            <button type="submit" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
+                                            <span class="text-danger" id="payment-method-error"></span>
+                                            <button onclick="return payMethodConfirm();" type="submit" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
                                         </ul>
 
                                          </form>
@@ -170,6 +169,29 @@
     </div>
 </div>
 <!-- Main Section End -->
+
+<script>
+    function payMethodConfirm(){
+        // alert('test');
+        var payMethod = $("input[name = 'payment_method']:checked").val()
+        if(!payMethod){
+            // alert('nothing selected');
+            $('#payment-method-error').html("Select Payment Method!")
+            return false;
+        }else{
+            var conf = confirm('You have selected '+payMethod+' as your preferred payment method.\nClick "OK" to continue')
+            if(conf == true){
+                return true;
+            }else{
+                return false;
+            }
+        }    
+    }
+    // Hide 'Select Payment Method' once a payment method has been selected 
+    $('input[name=payment_method]').on('change', function(){
+        $('#payment-method-error').html("");
+    })
+</script>
 
 
 {% endblock %}
