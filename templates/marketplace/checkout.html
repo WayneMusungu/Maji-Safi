@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 
 {% block content %}
 
@@ -79,34 +81,25 @@
                                 <div class="menu-itam-holder">
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         <ul>
-                                            {% if cart_items %}
-                                                {% for item in cart_items %}
-                                                <li id= "cart-item-{{item.id}}">
-                                                    <div class="image-holder"><img src="{{item.product.image.url}}" width="65" height="65" alt=""></div>
-                                                    <div class="text-holder">
-                                                        <h6>{{item.product.bottle_size}}</h6>
-                                                        <span>{{item.product.description}}</span>
-                                                        <a href="{% url 'supplier_detail' item.product.supplier.supplier_slug %}" class="badge badge-warning">{{item.product.supplier}}</a>
-                                                    </div>
-                                                    
-                                                    <div class="quantity" >
-                                                        <span>QUANTITY ({{ item.quantity }})</span>
-                                                    </div>
-                                                    <div class="price-holder">
-                                                        <span class="price">Ksh{{ item.product.price }}</span>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
-                                            
-                                        </ul>
-                                               
-                                            {% else %}
-                                                <div class="text-centre p-5">
-                                                    <h3>Cart is Empty</h3>
+                                            {% for item in cart_items %}
+                                            <li id= "cart-item-{{item.id}}">
+                                                <div class="image-holder"><img src="{{item.product.image.url}}" width="65" height="65" alt=""></div>
+                                                <div class="text-holder">
+                                                    <h6>{{item.product.bottle_size}}</h6>
+                                                    <span>{{item.product.description}}</span>
+                                                    <a href="{% url 'supplier_detail' item.product.supplier.supplier_slug %}" class="badge badge-warning">{{item.product.supplier}}</a>
                                                 </div>
-                                            {% endif %}  
-                                        </ul>
-                                        
+                                                
+                                                <div class="quantity" >
+                                                    <span>QUANTITY ({{ item.quantity }})</span>
+                                                </div>
+                                                <div class="price-holder">
+                                                    <span class="price">Ksh{{ item.product.price }}</span>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                            
+                                        </ul>                                        
 
                                     </div>
                                     
@@ -142,6 +135,21 @@
                                                     <span id="total">{{grand_total}}</span>
                                                 </span>
                                             </li>
+
+                                            <!-- Select Payment Method -->
+                                            <h5>SELECT PAYMENT METHOD</h5>
+                                            <div class="payment-method">
+                                                <label>
+                                                    <input type="radio" name="payment_method" value="M-PESA">
+                                                    <img src="{% static 'images/M-PESA_LOGO-01.svg.png' %}" alt="M-PESA" width="100">
+                                                   
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="payment_method" value="PayPal">
+                                                    <img src="{% static 'images/PayPal.png' %}" alt="PayPal" width="100">
+                                                    
+                                                </label>
+                                            </div>
                                             <button type="submit" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
                                         </ul>
 

@@ -30,3 +30,21 @@ table > tbody > tr > td{
 .btn-success.add_hour{
     padding: 7px 15px 7px 15px;
 }
+
+/* Payment Selection [Hide Radio Button]*/
+/* .payment-method [type=radio]{
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+} */
+
+/* Payment Selection Image Style */
+/* .payment-method [type=radio] +img{
+    cursor: pointer;
+} */
+
+/* Payment Selection Checked Style */
+/* .payment-method [type=radio]:checked + img{
+    outline: 2px solid #7DE5ED !important;
+} */
