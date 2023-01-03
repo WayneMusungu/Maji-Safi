@@ -20,6 +20,18 @@
                                 <div class="menu-itam-holder">
                                 
                                     <div id="menu-item-list-6272" class="menu-itam-list">
+                                        <div class="billing-address">
+                                            <div><b>{{order.name}}</b></div>
+                                            <div>{{order.address}}</div>
+                                            <div>{{order.town}}- {{order.pin_code}}</div>
+                                            <div>{{order.county}}, {{order.country}}</div>
+                                            <div><b>Phone:</b> {{order.phone}}</div>
+                                            <div><b>Email:</b> {{order.email}}</div>
+                                            <div><b>Payment:</b> {{order.payment_method}}</div>
+                                            <br>
+                                            <div><a href="{% url 'checkout' %}" class="btn btn-outline-danger">Edit</a></div>
+                                            <br>
+                                        </div>
                                         
 
                                     </div>
@@ -45,6 +57,18 @@
                                 <div class="menu-itam-holder">
 
                                     <div>
+                                        <table class="table">
+                                            <tbody>
+                                                {% for item in cart_items %}
+                                                <tr>
+                                                    <td><img src="{{item.product.image.url}}" width="40" alt="Product Image"></td>
+                                                    <td>{{item.product.bottle_size}}</td>
+                                                    <td>{{item.quantity}}</td>
+                                                    <td>{{item.product.price}}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
                                         <ul>
                                             <li style="list-style-type: none;">
                                                 Subtotal
