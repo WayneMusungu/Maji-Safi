@@ -30,3 +30,9 @@ Create a function that returns the GOOGLE API KEY
 
 def get_google_api(request):
     return{'GOOGLE_API_KEY':settings.GOOGLE_API_KEY}
+
+"""
+Create a Function that gets the client id and access it in the base template
+"""
+def get_paypal_client_id(request):
+    return{'PAYPAL_CLIENT_ID':settings.PAYPAL_CLIENT_ID}

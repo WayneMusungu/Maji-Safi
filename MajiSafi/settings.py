@@ -79,6 +79,8 @@ TEMPLATES = [
                 'accounts.context_processors.get_google_api',
                 'marketplace.context_processors.get_cart_counter',
                 'marketplace.context_processors.get_cart_amounts',
+                'accounts.context_processors.get_paypal_client_id',
+
                 
             ],
         },
@@ -188,3 +190,6 @@ GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeogdal303.dll
 
 # Paypal Configuration
 PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
+
+# Block pop-ups using 3rd party services
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
