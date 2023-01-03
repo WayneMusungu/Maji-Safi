@@ -185,3 +185,6 @@ GOOGLE_API_KEY=config('GOOGLE_API_KEY')
 os.environ['PATH'] = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeo') + ';' + os.environ['PATH']
 os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeodataproj') + ';' + os.environ['PATH']
 GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeogdal303.dll')
+
+# Paypal Configuration
+PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
