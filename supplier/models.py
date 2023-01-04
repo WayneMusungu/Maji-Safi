@@ -60,7 +60,9 @@ class Supplier(models.Model):
                 email_template = 'accounts/emails/admin_approval_email.html'
                 context = {
                     'user': self.user,
-                    'is_approved': self.is_approved
+                    'is_approved': self.is_approved,
+                    # Explicitly assign the to_email
+                    'to_email': self.user.email,
                 }
                 if self.is_approved == True:
                     # Send notification email that their account has been approved to post their water business

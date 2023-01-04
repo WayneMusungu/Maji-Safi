@@ -6,9 +6,11 @@ from .forms import OrderForm
 from .models import Order, OrderedProduct, Payment
 import simplejson as json
 from .utils import generate_order_number
+from accounts.utils import send_notification
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-
+@login_required(login_url='login')
 def place_order(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
@@ -54,6 +56,7 @@ def place_order(request):
     return render(request, 'orders/place_order.html')
 
 
+@login_required(login_url='login')
 def payments(request):
     # Check if the request is ajax or not
     if request.headers.get('x-requested-with')  == 'XMLHttpRequest' and request.method == 'POST':
@@ -96,9 +99,21 @@ def payments(request):
             ordered_product.amount = item.product.price * item.quantity # total amount
             ordered_product.save()
             
-        return HttpResponse('Saved ordered food')
+        # return HttpResponse('Saved ordered food')
         
         # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
+        subject = 'Thank you for making an order'
+        email_template = 'orders/order_confirmation_email.html'
+        context = {
+            'user': request.user,
+            'order': order,
+            # The to_email need not to be the logged in user email address it can be billing email address
+            'to_email': order.email,
+            
+        }
+        send_notification(subject, email_template, context)
+        return HttpResponse('Data Saved and email sent')
+        
         
         # SEND ORDER RECEIVED EMAIL TO THE SUPPLIER
         
