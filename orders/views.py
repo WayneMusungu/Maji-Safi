@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from marketplace.models import Cart
 from marketplace.context_processors import get_cart_amounts
 from .forms import OrderForm
-from .models import Order, Payment
+from .models import Order, OrderedProduct, Payment
 import simplejson as json
 from .utils import generate_order_number
 
@@ -57,8 +57,6 @@ def place_order(request):
 def payments(request):
     # Check if the request is ajax or not
     if request.headers.get('x-requested-with')  == 'XMLHttpRequest' and request.method == 'POST':
-        
-        
     
         # STORE THE PAYMENT DETAILS IN THE PAYMENT MODEL
         order_number = request.POST.get('order_number') #order_number is coming from ajax which is request.post in place_order.html
@@ -83,7 +81,28 @@ def payments(request):
         order.payment = payment
         order.is_ordered = True
         order.save()
-        return HttpResponse('Saved!')
+        # return HttpResponse('Saved!')
         
-       
+        # MOVE THE CART ITEMS TO ORDERED PRODUCT MODEL
+        cart_items = Cart.objects.filter(user=request.user)
+        for item in cart_items:
+            ordered_product = OrderedProduct()
+            ordered_product.order = order
+            ordered_product.payment = payment
+            ordered_product.user = request.user
+            ordered_product.productitem = item.product
+            ordered_product.quantity = item.quantity
+            ordered_product.price = item.product.price
+            ordered_product.amount = item.product.price * item.quantity # total amount
+            ordered_product.save()
+            
+        return HttpResponse('Saved ordered food')
+        
+        # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
+        
+        # SEND ORDER RECEIVED EMAIL TO THE SUPPLIER
+        
+        # CLEAR CART IF THE PAYMENT IS SUCCESS
+        
+        # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
     return HttpResponse('Payments view')
