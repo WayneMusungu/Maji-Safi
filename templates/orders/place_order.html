@@ -146,6 +146,7 @@
     var order_number = "{{ order.order_number }}"
     var csrftoken = getCookie('csrftoken');
     console.log('csrftoken==>', csrftoken)
+    var order_complete = "{% url 'order_complete' %}"
     // Render the PayPal button into #paypal-button-container
     paypal.Buttons({
 
@@ -202,6 +203,8 @@
             },
             success: function(response){
                 console.log('response==>', response)
+                // redirect to order_complete page once the payment is successful
+                window.location.href = order_complete + '?order_no='+response.order_number+'&trans_id='+response.transaction_id
             }
         })
     }

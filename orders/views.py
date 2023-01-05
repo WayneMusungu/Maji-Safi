@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from marketplace.models import Cart
 from marketplace.context_processors import get_cart_amounts
@@ -70,6 +70,7 @@ def payments(request):
         
         order = Order.objects.get(user=request.user, order_number=order_number)
         
+        
             #Create payment Object and initialize it
         payment = Payment(
             user = request.user,
@@ -133,9 +134,19 @@ def payments(request):
         
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
-        cart_items.delete()
+        # cart_items.delete()
         # return HttpResponse('Data Saved and email sent')
        
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
-        return HttpResponse('Success')
+        response = {
+            'order_number': order_number,
+            'transaction_id': transaction_id
+        }
+        return JsonResponse(response)
     return HttpResponse('Payments view')
+
+
+@login_required(login_url='login')
+
+def order_complete(request):
+    return render(request, 'orders/order_complete.html')
