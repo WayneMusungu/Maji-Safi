@@ -103,7 +103,7 @@ def payments(request):
         
         # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
         subject = 'Thank you for making an order'
-        email_template = 'orders/order_confirmation_email.html'
+        email_template = 'orders/emails/order_confirmation_email.html'
         context = {
             'user': request.user,
             'order': order,
@@ -112,10 +112,25 @@ def payments(request):
             
         }
         send_notification(subject, email_template, context)
-        return HttpResponse('Data Saved and email sent')
+        # return HttpResponse('Data Saved and email sent')
         
         
         # SEND ORDER RECEIVED EMAIL TO THE SUPPLIER
+        subject = 'You have received a new order'
+        email_template = 'orders/emails/new_order_received_email.html'
+        to_emails = []
+        for i in cart_items:
+            if i.product.supplier.user.email not in to_emails:
+                to_emails.append(i.product.supplier.user.email)
+        print('to_emails=>',to_emails)
+        context = {
+            'order': order,
+            # to_email can be a list, and send the email to the list of suppliers
+            'to_email':to_emails,
+        }
+        send_notification(subject, email_template, context)
+        return HttpResponse('Data Saved and email sent')
+        
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
         
