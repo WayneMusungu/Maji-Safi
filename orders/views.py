@@ -129,10 +129,13 @@ def payments(request):
             'to_email':to_emails,
         }
         send_notification(subject, email_template, context)
-        return HttpResponse('Data Saved and email sent')
+        # return HttpResponse('Data Saved and email sent')
         
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
-        
+        cart_items.delete()
+        # return HttpResponse('Data Saved and email sent')
+       
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
+        return HttpResponse('Success')
     return HttpResponse('Payments view')
