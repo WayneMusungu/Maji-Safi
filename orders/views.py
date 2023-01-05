@@ -149,4 +149,20 @@ def payments(request):
 @login_required(login_url='login')
 
 def order_complete(request):
-    return render(request, 'orders/order_complete.html')
+    # Get the response from place_order url parameter and fetch order and ordered product:
+        # window.location.href = order_complete + '?order_no='+response.order_number+'&trans_id='+response.transaction_id
+    order_number = request.GET.get('order_no')
+    transaction_id = request.GET.get('trans_id')
+    
+    try:
+        order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
+        ordered_product = OrderedProduct.objects.filter(order=order)
+        
+        context = {
+            'order': order,
+            'ordered_product': ordered_product,
+        }
+        return render(request, 'orders/order_complete.html', context)
+
+    except:
+        return redirect('home')
