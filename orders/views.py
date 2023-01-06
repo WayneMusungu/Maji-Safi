@@ -158,9 +158,18 @@ def order_complete(request):
         order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
         ordered_product = OrderedProduct.objects.filter(order=order)
         
+        subtotal = 0
+        for item in ordered_product:
+            subtotal += (item.price * item.quantity)
+            
+        tax_data = json.loads(order.tax_data)
+        print(tax_data)
+        
         context = {
             'order': order,
             'ordered_product': ordered_product,
+            'subtotal': subtotal,
+            'tax_data': tax_data,
         }
         return render(request, 'orders/order_complete.html', context)
 

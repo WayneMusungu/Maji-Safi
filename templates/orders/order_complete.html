@@ -47,8 +47,51 @@
                         <img src="{% static 'images/paid.png' %}" width="200" alt="Paid">
                     </div>
                     <div class="col-md-6">
-                        
+                        <ul>
+                            <li style="list-style-type: none;">
+                                Subtotal
+                                <span class="price float-right">
+                                    <span class="currency" >Ksh</span>
+                                    <span id="subtotal">{{subtotal}}</span>
+                                </span>
+                            </li>
+
+                            <!-- Loop Through The Tax Dictionary Items -->
+
+                            {% for key, value in tax_data.items %}
+                                {% for i, j in value.items %}
+                                    <li style="list-style-type: none;">
+                                        {{ key }} <small>({{ i }}%)</small>
+                                        <span class="price float-right">
+                                            <span class="currency" >Ksh</span>
+                                            <span id="tax-{{ key }}">{{ j }}</span>
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+
+
+                            <li style="list-style-type: none; font-weight: 700;">
+                                TOTAL
+                                <span class="price float-right">
+                                    <span class="currency" >Ksh</span>
+                                    <span id="total">{{order.total}}</span>
+                                </span>
+                            </li>
+                        </ul>
                     </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="d-block font-weight-bold">Thank you for ordering with us</span>
+                    </div> 
+                </div>
+                <div class="d-flex justify-content-end align-items-end">
+                    <div>
+                        <span class="d-block font-weight-bold">Need Help?</span>
+                        <span>Contact majisafi@gmail.com</span>
+                    </div> 
                 </div>
             </div>
         </div>
