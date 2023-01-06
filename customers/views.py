@@ -43,3 +43,8 @@ def my_orders(request):
       'orders': orders,
    }
    return render( request, 'customers/my_orders.html', context)
+
+
+@login_required(login_url='login') 
+def order_detail(request, order_number):
+   return render(request, 'customers/order_detail.html')
