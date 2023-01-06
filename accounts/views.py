@@ -198,7 +198,7 @@ def customerDashboard(request):
     context = {
         'orders': orders,
         'orders_count': orders.count(),  # count the number of orders made by the customer
-        'recent_orders': recent_orders
+        'recent_orders': recent_orders,
     }
     return render(request, 'accounts/customerDashboard.html', context)
 
