@@ -178,9 +178,9 @@
                 // alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
 
                 // Replace the above to show a success message within this page, e.g.
-                // const element = document.getElementById('paypal-button-container');
-                // element.innerHTML = '';
-                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                const element = document.getElementById('paypal-button-container');
+                element.innerHTML = '';
+                element.innerHTML = '<h4 class="text-centre"><i class="fa fa-spinner fa-spin"></i>Please wait payment is being processed</h4>';
                 // Or go to another URL:  actions.redirect('thank_you.html');
             });
         }
