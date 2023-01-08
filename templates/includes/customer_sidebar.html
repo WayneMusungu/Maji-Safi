@@ -6,7 +6,7 @@
             <!-- <li><a href="restaurant-menu-builder.html"><i class="icon-menu5"></i>Menu Builder</a></li> -->
             <li class="{% if '/profile/' in request.path %} active {% endif %}"><a href="{% url 'customerProfile' %}"><i class="icon-build"></i>Settings</a></li>
             <li><a href="restaurant-change-password.html"><i class="icon-unlock-alt"></i>Change Password</a></li>
-            <li><a class="logout-btn" href="registration.html"><i class="icon-log-out"></i>Signout</a></li>
+            <li><a class="logout-btn" href="{% url 'logout' %}"><i class="icon-log-out"></i>Signout</a></li>
         </ul>
     </div>
 </div>
