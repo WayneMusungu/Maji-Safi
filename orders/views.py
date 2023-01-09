@@ -18,6 +18,13 @@ def place_order(request):
     if cart_count <= 0:
         return redirect('marketplace')
     
+    
+    suppliers_ids = []
+    for i in cart_items:
+        if i.product.supplier.id not in suppliers_ids:
+            suppliers_ids.append(i.product.supplier.id)
+    print(suppliers_ids)
+    
     subtotal = get_cart_amounts(request)['subtotal']
     total_tax = get_cart_amounts(request)['tax']
     grand_total = get_cart_amounts(request)['grand_total']
@@ -43,6 +50,7 @@ def place_order(request):
             order.payment_method = request.POST['payment_method'] 
             order.save() #order id/pk is generated
             order.order_number = generate_order_number(order.id)
+            order.suppliers.add(*suppliers_ids) #Recursively add the data to ManyToMany Field
             order.save()
             context = {
                 'order': order,
