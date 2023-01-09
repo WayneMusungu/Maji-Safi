@@ -217,11 +217,13 @@ def check_role_supplier(user):
 def supplierDashboard(request):
     supplier = Supplier.objects.get(user=request.user)
     orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
+    recent_orders = orders[:5]
     # print(orders)
     # supplier = Supplier.objects.get(user=request.user)
     context = {
         'orders': orders,
-        'orders_count': orders.count()
+        'orders_count': orders.count(),
+        'recent_orders': recent_orders,
     }
     return render(request, 'accounts/supplierDashboard.html', context)
 
