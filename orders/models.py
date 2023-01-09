@@ -3,6 +3,7 @@ from accounts.models import User
 from services.models import Product
 from phonenumber_field.modelfields import PhoneNumberField
 from django_countries.fields import CountryField
+from supplier.models import Supplier
 
 
 
@@ -35,6 +36,7 @@ class Order(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
+    suppliers = models.ManyToManyField(Supplier, blank=True)
     order_number = models.CharField(max_length=20) #To generate order_number take the current date time and concatenate it with the pk
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -47,6 +49,7 @@ class Order(models.Model):
     pin_code = models.CharField(max_length=10)
     total = models.FloatField()
     tax_data = models.JSONField(blank=True, help_text = "Data format: {'tax_type':{'tax_percentage':'tax_amount'}}")
+    total_data = models.JSONField(blank=True, null=True)
     total_tax = models.FloatField()
     payment_method = models.CharField(max_length=25)
     status = models.CharField(max_length=15, choices=STATUS, default='New')
@@ -57,6 +60,9 @@ class Order(models.Model):
     @property
     def name(self):
         return f'{self.first_name} {self.last_name}'
+    
+    def ordered_placed_to(self):
+        return ", ".join([str(i) for i in self.suppliers.all()])
 
     def __str__(self):
         return self.order_number
