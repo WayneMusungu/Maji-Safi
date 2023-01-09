@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.views import check_role_supplier
 from django.template.defaultfilters import slugify
+from orders.models import Order, OrderedProduct
 
 # Create your views here.
 
@@ -268,3 +269,18 @@ def remove_opening_hours(request, pk=None):
             hour = get_object_or_404(OpeningHour, pk=pk)
             hour.delete()
             return JsonResponse({'status': 'success', 'id': pk})
+
+
+def order_detail(request, order_number):
+    try:
+        order = Order.objects.get(order_number=order_number,is_ordered=True)
+        ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request)) 
+        # print(ordered_product)
+        # print(order)
+        context = {
+            'order':order,
+            'ordered_product':ordered_product,
+        }
+    except:
+        return redirect('supplier')
+    return render(request, 'supplier/order_detail.html', context)
