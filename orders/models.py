@@ -4,8 +4,10 @@ from services.models import Product
 from phonenumber_field.modelfields import PhoneNumberField
 from django_countries.fields import CountryField
 from supplier.models import Supplier
+import simplejson as json
 
 
+request_object = ''
 
 # Create your models here.
 
@@ -63,6 +65,15 @@ class Order(models.Model):
     
     def ordered_placed_to(self):
         return ", ".join([str(i) for i in self.suppliers.all()])
+    
+    # Create a custom middleware to access the request object in orders.models.py
+    def get_total_by_supplier(self):
+        supplier = Supplier.objects.get(user=request_object.user)
+        if self.total_data:
+            total_data = json.loads(self.total_data)
+            data = total_data.get(str(supplier.id))
+            print(data)
+        return supplier
 
     def __str__(self):
         return self.order_number
