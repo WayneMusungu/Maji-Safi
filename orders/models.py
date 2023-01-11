@@ -69,11 +69,45 @@ class Order(models.Model):
     # Create a custom middleware to access the request object in orders.models.py
     def get_total_by_supplier(self):
         supplier = Supplier.objects.get(user=request_object.user)
+        
+        subtotal = 0
+        tax = 0
+        tax_dict = {}
+        
         if self.total_data:
             total_data = json.loads(self.total_data)
             data = total_data.get(str(supplier.id))
-            print(data)
-        return supplier
+            # print(data)
+            
+            for key, val in data.items():
+                subtotal += float(key)
+                val = val.replace("'", '"')
+                # print(val)
+                val = json.loads(val)
+                tax_dict.update(val)
+            # print(subtotal)
+            # print(tax_dict)
+            
+            
+            # Calculate tax
+            # {"Excise-Duty": {"3.50": "1.40"}, "Delivery": {"0.25": "0.10"}}
+            for i in val:
+                print(i)
+                for j in val[i]:
+                    # print(val[i][j])
+                    tax += float(val[i][j])
+        
+        grand_total = float(subtotal) + float(tax)
+        print('subtotal==>', subtotal)
+        print('tax==>', tax)
+        print('tax_dict==>', tax_dict)
+        print('grand_total==>', grand_total)
+        context = {
+            'subtotal':subtotal,
+            'tax_dict': tax_dict,
+            'grand_total': grand_total
+        }
+        return context
 
     def __str__(self):
         return self.order_number

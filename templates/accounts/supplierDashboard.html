@@ -81,7 +81,7 @@
                                                         <tr>
                                                             <td>{{ order.order_number }}</td>
                                                             <td>{{ order.name }}</td>
-                                                            <td>{{ order.get_total_by_supplier }}</td>
+                                                            <td>{{ order.get_total_by_supplier.grand_total }}</td>
                                                             <td>{{ order.status }}</td>
                                                             <td>{{ order.created_at }}</td>
                                                             <td><a href="{% url 'supplier_order_detail' order.order_number %}" class="btn btn-danger" >Details</a></td>
