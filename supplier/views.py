@@ -280,6 +280,9 @@ def order_detail(request, order_number):
         context = {
             'order':order,
             'ordered_product':ordered_product,
+            'subtotal': order.get_total_by_supplier()['subtotal'],
+            'tax_data':order.get_total_by_supplier()['tax_dict'],
+            'grand_total':order.get_total_by_supplier()['grand_total'],
         }
     except:
         return redirect('supplier')
