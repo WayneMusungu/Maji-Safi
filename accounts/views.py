@@ -1,3 +1,4 @@
+import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from supplier.forms import SupplierForm
@@ -219,6 +220,16 @@ def supplierDashboard(request):
     orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
     recent_orders = orders[:10]
     
+    # Get The Current Month's Revenue
+    current_month = datetime.datetime.now().month
+    current_month_orders = orders.filter(suppliers__in=[supplier.id], created_at__month=current_month)
+    # print(current_month_orders)
+    
+    current_month_revenue = 0
+    for i in current_month_orders:
+        current_month_revenue += i.get_total_by_supplier()['grand_total']
+    # print(current_month_revenue)
+        
     # Total Revenue
     total_revenue = 0
     for i in orders:
@@ -231,6 +242,7 @@ def supplierDashboard(request):
         'orders_count': orders.count(),
         'recent_orders': recent_orders,
         'total_revenue':total_revenue,
+        'current_month_revenue':current_month_revenue,
     }
     return render(request, 'accounts/supplierDashboard.html', context)
 

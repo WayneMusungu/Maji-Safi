@@ -92,7 +92,7 @@ def place_order(request):
         else:
             print(form.errors)
     
-    print(subtotal,total_tax,grand_total,tax_data)
+    # print(subtotal,total_tax,grand_total,tax_data)
     return render(request, 'orders/place_order.html')
 
 
@@ -106,7 +106,7 @@ def payments(request):
         transaction_id = request.POST.get('transaction_id')
         payment_method = request.POST.get('payment_method')
         status = request.POST.get('status')
-        print(order_number,transaction_id,payment_method,status)
+        # print(order_number,transaction_id,payment_method,status)
         
         order = Order.objects.get(user=request.user, order_number=order_number)
         
@@ -203,7 +203,7 @@ def order_complete(request):
             subtotal += (item.price * item.quantity)
             
         tax_data = json.loads(order.tax_data)
-        print(tax_data)
+        # print(tax_data)
         
         context = {
             'order': order,
