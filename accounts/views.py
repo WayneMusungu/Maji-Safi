@@ -218,12 +218,19 @@ def supplierDashboard(request):
     supplier = Supplier.objects.get(user=request.user)
     orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
     recent_orders = orders[:10]
+    
+    # Total Revenue
+    total_revenue = 0
+    for i in orders:
+        total_revenue += i.get_total_by_supplier()['grand_total']
+    
     # print(orders)
     # supplier = Supplier.objects.get(user=request.user)
     context = {
         'orders': orders,
         'orders_count': orders.count(),
         'recent_orders': recent_orders,
+        'total_revenue':total_revenue,
     }
     return render(request, 'accounts/supplierDashboard.html', context)
 
