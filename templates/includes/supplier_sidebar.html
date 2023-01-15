@@ -5,7 +5,7 @@
             <li class="{% if 'profile' in request.path %} active {% endif %}"><a href="{% url 'supplierProfile' %}"><i class="icon-building"></i>My Water Shop</a></li>
             <li class="{% if 'services' in request.path %} active {% endif %}" ><a href="{% url 'services' %}"><i class="icon-menu5"></i>Services</a></li>
             <li class="{% if 'opening-hour' in request.path %} active {% endif %}" ><a href="{% url 'opening_hours' %}"><i class="icon-menu5"></i>Opening Hours</a></li>
-            <li><a href="restaurant-orders.html"><i class="icon-add_shopping_cart"></i>Orders</a></li>
+            <li><a href="{% url 'supplier_my_orders' %}"><i class="icon-add_shopping_cart"></i>Orders</a></li>
             <li><a href="restaurant-earnings.html"><i class="icon-money"></i>Earnings</a></li>
             <li><a href="restaurant-statement.html"><i class="icon-file-text22"></i>Statement</a></li>
             <li><a href="restaurant-change-password.html"><i class="icon-unlock-alt"></i>Change Password</a></li>
