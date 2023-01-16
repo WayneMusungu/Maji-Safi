@@ -38,6 +38,7 @@ def send_email_verification(request, user, subject, email_template):
     })
     to_email = user.email
     mail = EmailMessage(subject, message, from_email, to= [to_email])
+    mail.content_subtype = 'html' # send the HTML content inside the email
     mail.send()
     
     
@@ -70,6 +71,7 @@ def send_notification(subject, email_template, context):
     else:
         to_email = to_email = context['to_email']  # Explicitly assign to_email to the Supplier models    
     mail = EmailMessage(subject, message, from_email, to= to_email)
+    mail.content_subtype = 'html'
     mail.send()
 
 
