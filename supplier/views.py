@@ -290,4 +290,10 @@ def order_detail(request, order_number):
 
 
 def my_orders(request):
-    return render(request, 'supplier/my_orders.html')
+    supplier = Supplier.objects.get(user=request.user)
+    orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
+    
+    context ={
+        'orders':orders,
+    }
+    return render(request, 'supplier/my_orders.html', context)
