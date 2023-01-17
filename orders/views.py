@@ -9,6 +9,7 @@ import simplejson as json
 from .utils import generate_order_number
 from accounts.utils import send_notification
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 
 # Create your views here.
 @login_required(login_url='login')
@@ -145,11 +146,25 @@ def payments(request):
         # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
         subject = 'Thank you for making an order'
         email_template = 'orders/emails/order_confirmation_email.html'
+        
+        # Create access to Ordered Products and display it on order_confirmation_email.html
+        ordered_product = OrderedProduct.objects.filter(order=order)
+        
+        customer_subtotal = 0
+        for item in ordered_product:
+            customer_subtotal += (item.price * item.quantity)
+        tax_data = json.loads(order.tax_data)
+        
+        
         context = {
             'user': request.user,
             'order': order,
             # The to_email need not to be the logged in user email address it can be billing email address
             'to_email': order.email,
+            'ordered_product':ordered_product,
+            'domain': get_current_site(request),
+            'customer_subtotal': customer_subtotal,
+            'tax_data': tax_data,
             
         }
         send_notification(subject, email_template, context)
