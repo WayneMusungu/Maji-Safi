@@ -98,10 +98,10 @@ class Order(models.Model):
                     tax += float(val[i][j])
         
         grand_total = float(subtotal) + float(tax)
-        print('subtotal==>', subtotal)
-        print('tax==>', tax)
-        print('tax_dict==>', tax_dict)
-        print('grand_total==>', grand_total)
+        # print('subtotal==>', subtotal)
+        # print('tax==>', tax)
+        # print('tax_dict==>', tax_dict)
+        # print('grand_total==>', grand_total)
         context = {
             'subtotal':subtotal,
             'tax_dict': tax_dict,

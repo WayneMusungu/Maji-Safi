@@ -6,7 +6,7 @@ from services.models import Product
 from .forms import OrderForm
 from .models import Order, OrderedProduct, Payment
 import simplejson as json
-from .utils import generate_order_number
+from .utils import generate_order_number, order_total_by_supplier
 from accounts.utils import send_notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
@@ -178,13 +178,23 @@ def payments(request):
         for i in cart_items:
             if i.product.supplier.user.email not in to_emails:
                 to_emails.append(i.product.supplier.user.email)
-        print('to_emails=>',to_emails)
-        context = {
-            'order': order,
-            # to_email can be a list, and send the email to the list of suppliers
-            'to_email':to_emails,
-        }
-        send_notification(subject, email_template, context)
+                
+                # Get the Supplier's Specific Ordered Product
+                ordered_product_to_supplier = OrderedProduct.objects.filter(order=order, productitem__supplier=i.product.supplier)
+                print(ordered_product_to_supplier)
+                
+                
+                # print('to_emails=>',to_emails)
+                context = {
+                    'order': order,
+                    # to_email can be a list, and send the email to the list of suppliers
+                    'to_email':i.product.supplier.user.email,
+                    'ordered_product_to_supplier':ordered_product_to_supplier,
+                    'supplier_subtotal':order_total_by_supplier(order, i.product.supplier.id)['subtotal'],
+                    'tax_data':order_total_by_supplier(order, i.product.supplier.id)['tax_dict'],
+                    'supplier_grand_total':order_total_by_supplier(order, i.product.supplier.id)['grand_total'],
+                }
+                send_notification(subject, email_template, context)
         # return HttpResponse('Data Saved and email sent')
         
         
