@@ -60,5 +60,7 @@ table > tbody > tr > td{
         padding-bottom: 120px !important;
         background-position: right !important;
     }
-
+    .user-dashboard{
+        width: 100% !important;
+    }
 }
