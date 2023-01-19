@@ -63,9 +63,21 @@ table > tbody > tr > td{
     .user-dashboard{
         width: 100% !important;
     }
+    .add-products-type{
+        display: flex;
+        flex-direction: row-reverse;
+    }
 }
 
 /* Set the Line Height for Mobile and Desktop View */
 table td, table th{
     line-height: 1rem !important;
 }
+
+@media screen  and (max-width: 300px){
+    .add-products-type{
+        display: flex;
+        flex-direction: column-reverse;
+    }   
+}
+
