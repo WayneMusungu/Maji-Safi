@@ -64,3 +64,8 @@ table > tbody > tr > td{
         width: 100% !important;
     }
 }
+
+/* Set the Line Height for Mobile and Desktop View */
+table td, table th{
+    line-height: 1rem !important;
+}
