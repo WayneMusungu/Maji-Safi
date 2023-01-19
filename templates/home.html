@@ -7,7 +7,7 @@
 <div class="main-section">
 	<!-- Home Pages Elements Strat -->
 	<!-- Main Search Start -->
-	<div class="page-section nopadding cs-nomargin" style="padding-top: 150px; padding-bottom: 850px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover fixed;"> 
+	<div class="page-section nopadding cs-nomargin main-search-bar" style="padding-top: 150px; padding-bottom: 850px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover fixed;"> 
 
 		<div class="container">
 			<div class="row">
@@ -83,10 +83,10 @@
 							<li class="has-border">
 								<figure>
 									{% if supplier.user_profile.profile_picture %}
-										<a href="#"><img src="{{supplier.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt="profile-picture" height="125px" width="125px"></a>
+										<a href="#"><img src="{{supplier.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt="profile-picture" height="125px"></a>
 
 									{% else %}
-										<a href="#"><img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="profile-picture" height="125px" width="125px"></a>
+										<a href="#"><img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="profile-picture" height="125px" ></a>
                                 	{% endif %}
 								</figure>
 							</li>

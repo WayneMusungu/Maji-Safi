@@ -48,3 +48,17 @@ table > tbody > tr > td{
 /* .payment-method [type=radio]:checked + img{
     outline: 2px solid #7DE5ED !important;
 } */
+
+@media only screen and (max-width: 480px){
+    a.get-start-btn {
+        display: block;
+        margin-top: 10px ! important;
+        margin-left: 0 !important;
+    }
+    .main-search-bar{
+        padding-top: 20px !important;
+        padding-bottom: 120px !important;
+        background-position: right !important;
+    }
+
+}
