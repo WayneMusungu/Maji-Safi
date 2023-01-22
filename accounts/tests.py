@@ -30,3 +30,8 @@ class ModelTest(TestCase):
         """Test that creating a user without an email raises a ValueError."""
         with self.assertRaises(ValueError):
             get_user_model().objects.create_user('John','Doe','john_doe', '','test123')
+
+    def test_new_user_without_username_raise_error(self):
+        """Test that creating a user without a username raises a ValueError."""
+        with self.assertRaises(ValueError):
+            get_user_model().objects.create_user('John','Doe','', 'john@gmail.com','test123')
