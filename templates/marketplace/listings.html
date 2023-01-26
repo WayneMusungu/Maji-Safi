@@ -12,7 +12,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="row">
                         <aside class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                            
+
                         </aside>
                         <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
                             <div class="listing-sorting-holder">
@@ -29,11 +29,11 @@
                                         <div class="img-holder">
                                             <figure>
                                                 {% if supplier.user_profile.profile_picture %}
-											<a href="#">
-												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
+											<a href="{% url 'supplier_detail' supplier.supplier_slug %}">
+												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="" width="95px" height="95px">
 											</a>
 											{% else %}
-											<a href="#">
+											<a href="{% url 'supplier_detail' supplier.supplier_slug %}">
 												<img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="">
 											</a>
 											{% endif %}
@@ -46,8 +46,8 @@
                                         </div>
                                         <div class="text-holder">
                                             <div class="list-rating">
-                                               
-                                               
+
+
                                             </div>
                                             <div class="post-title">
                                                 <h5>
@@ -57,8 +57,8 @@
                                             {% if supplier.user_profile.county and supplier.user_profile.town and supplier.user_profile.address and supplier.user_profile.pin_code %}
 											<span><small class="text-muted">{{supplier.user_profile.county}}, {{supplier.user_profile.town}}, {{supplier.user_profile.address}}-{{supplier.user_profile.pin_code}}</small></span>
 										{% endif %}
-                                            
-                                            
+
+
                                         </div>
                                         <div class="list-option">
 
@@ -68,7 +68,7 @@
                                     {% endfor %}
                                 </ul>
                             </div>
-                            
+
                         </div>
                         <div class="section-sidebar col-lg-3 col-md-3 col-sm-12 col-xs-12">
                             <div class="message-box" style="background-color: #00E7FF;">

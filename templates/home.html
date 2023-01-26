@@ -7,7 +7,7 @@
 <div class="main-section">
 	<!-- Home Pages Elements Strat -->
 	<!-- Main Search Start -->
-	<div class="page-section nopadding cs-nomargin main-search-bar" style="padding-top: 150px; padding-bottom: 850px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover fixed;"> 
+	<div class="page-section nopadding cs-nomargin main-search-bar" style="padding-top: 150px; padding-bottom: 850px; background: url({% static 'extra-images/mineralwater2.jpg' %}) no-repeat center / cover fixed;">
 
 		<div class="container">
 			<div class="row">
@@ -15,7 +15,7 @@
 					<div class="element-title">
 						<h1 style="font-size: 40px; color: #505050; text-transform: uppercase; line-height: 50px; margin-bottom: 70px; text-align:center;">
 							Maji Safi<br>We offer quality drinking water from our Suppliers to you</h1>
-						
+
 					</div>
 				</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
@@ -35,7 +35,7 @@
 													<span class="foodbakery-search-location-icon"><i class="icon-location"></i></span>
 													<input type="text" name="address" class="location-field-text filter" id ="id_address" required placeholder="All Locations">
 												</div>
-												
+
 											</li>
 										</ul>
 									</div>
@@ -60,12 +60,12 @@
 						</form>
 					</div>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
 	<!-- Main Search End -->
-	
+
 	<!-- Top Restarurants Section Start -->
 	<div class="page-section nopadding cs-nomargin" style="margin-top: 0px;padding-top: 60px;padding-bottom: 0px;margin-bottom: 0px;background: #ffffff;">
 		<div class="container">
@@ -105,7 +105,7 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="element-title align-center">
 						<h2>Available Suppliers</h2>
-						
+
 					</div>
 				</div>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -118,7 +118,7 @@
 										<figure>
 											{% if supplier.user_profile.profile_picture %}
 											<a href="#">
-												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="" height="72px" width="72px">
+												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="" height="72px" width="72px" >
 											</a>
 											{% else %}
 											<a href="#">
@@ -152,7 +152,7 @@
 											<span>{{supplier.user_profile.county}}, {{supplier.user_profile.town}}, {{supplier.user_profile.address}}-{{supplier.user_profile.pin_code}}</span>
 										{% endif %}
 									</div>
-									
+
 								</div>
 							</li>
 							{% endfor %}
