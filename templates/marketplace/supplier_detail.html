@@ -19,22 +19,22 @@
                             <div class="img-holder">
                                 <figure>
                                     {% if supplier.user_profile.profile_picture %}
-                                        <img src="{{ supplier.user_profile.profile_picture.url }}" alt="profile-picture"> 
+                                        <img src="{{ supplier.user_profile.profile_picture.url }}" alt="profile-picture">
                                     {% else %}
                                         <img src="{% static 'logo/waterlogo.jpg' %}" alt="profile-picture">
                                     {% endif %}
-                                        
+
                                 </figure>
                             </div>
                             <div class="text-holder">
                                 <span class="restaurant-title">{{ supplier.supplier_name }} {% if not supplier.is_open %}[Closed]{% endif %}</span>
-                               
+
                             </div>
                         </div>
 
                         {% if opening_hours %}
                         <div class="delivery-timing reviews-sortby">
-                            
+
                             <ul>
                                 <li>
                                     <a href="#" class="reviews-sortby-active">
@@ -47,7 +47,7 @@
                                         {% for hour in opening_hours %}
                                         <li><a href="#"><span class="opend-day">{{hour}}</span> <span class="opend-time"><small>:</small> {% if hour.is_closed %}Closed{% else %}{{hour.from_hour}} - {{hour.to_hour}}{% endif %}</span></a></li>
                                         {% endfor %}
-                                        
+
                                     </ul>
                                 </li>
                             </ul>
@@ -67,7 +67,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 sticky-sidebar">
-                   
+
                     <div class="filter-wrapper">
                         <div class="categories-menu">
                             <h6><i class="fa fa-tint"></i>Water Type</h6>
@@ -83,14 +83,14 @@
                     <div class="tabs-holder horizontal">
                         <ul class="stickynav-tabs nav nav-tabs">
                             <li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Products</a></li>
-                            
+
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane in active">
                                 <div class="menu-itam-holder">
-                                    
+
                                     <div id="menu-item-list-6272" class="menu-itam-list">
-                                        
+
                                         {% for type in water_type %}
                                         <div class="element-title" id="menu-category-2">
                                             <h5 class="text-color">{{type}}</h5>
@@ -99,7 +99,7 @@
                                         <ul>
                                             {% for prod in type.products.all %}
                                             <li>
-                                                <div class="image-holder"><img src="{{prod.image.url}}" alt=""></div>
+                                                <div class="image-holder"><img src="{{prod.image.url}}" width="65px" height="65px"  style="border-radius: 50%;" alt=""></div>
                                                 <div class="text-holder">
                                                     <h6>{{prod.bottle_size}}</h6>
                                                     <span>{{prod.description}}</span>
@@ -113,11 +113,11 @@
                                                 </div>
                                             </li>
                                             {% endfor %}
-                                            
+
                                         </ul>
 
                                         {% endfor %}
-                                        
+
                                     </div>
 
                                     {% for item in cart_items %}
@@ -129,11 +129,11 @@
 
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     </div>
