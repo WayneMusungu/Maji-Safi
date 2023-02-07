@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     #Other Installations
     "phonenumber_field",
     "django_countries",
@@ -82,7 +82,7 @@ TEMPLATES = [
                 'marketplace.context_processors.get_cart_amounts',
                 'accounts.context_processors.get_paypal_client_id',
 
-                
+
             ],
         },
     },
