@@ -1,5 +1,3 @@
-from django.test import TestCase
-
 # Create your tests here.
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -93,4 +91,7 @@ class UserModelTestCase(TestCase):
         self.assertEqual(user.get_role(), 'Supplier')
         user.role = 2
         self.assertEqual(user.get_role(), 'Customer')
+
+
+
 
