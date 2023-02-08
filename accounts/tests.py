@@ -56,3 +56,41 @@ class ModelTest(TestCase):
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superadmin)
 
+
+
+class UserModelTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            first_name='Test',
+            last_name='User',
+            username='testuser',
+            email='test@example.com',
+            password='password'
+        )
+
+    def test_create_user(self):
+        self.assertEqual(get_user_model().objects.count(), 1)
+        self.assertEqual(get_user_model().objects.get(email='test@example.com').username, 'testuser')
+
+    def test_create_superuser(self):
+        superuser = get_user_model().objects.create_superuser(
+            first_name='Test',
+            last_name='Superuser',
+            username='testsuperuser',
+            email='superuser@example.com',
+            password='password'
+        )
+
+        self.assertEqual(get_user_model().objects.count(), 2)
+        self.assertTrue(superuser.is_admin)
+        self.assertTrue(superuser.is_active)
+        self.assertTrue(superuser.is_staff)
+        self.assertTrue(superuser.is_superadmin)
+
+    def test_get_role(self):
+        user = get_user_model().objects.get(email='test@example.com')
+        user.role = 1
+        self.assertEqual(user.get_role(), 'Supplier')
+        user.role = 2
+        self.assertEqual(user.get_role(), 'Customer')
+
