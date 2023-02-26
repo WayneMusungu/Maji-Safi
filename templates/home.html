@@ -117,11 +117,11 @@
 									<div class="img-holder">
 										<figure>
 											{% if supplier.user_profile.profile_picture %}
-											<a href="#">
+											<a href="{% url 'supplier_detail' supplier.supplier_slug %}">
 												<img src="{{supplier.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="" height="72px" width="72px" >
 											</a>
 											{% else %}
-											<a href="#">
+											<a href="{% url 'supplier_detail' supplier.supplier_slug %}">
 												<img src="{% static 'extra-images/mineralwater2.jpg' %}" class="attachment-full size-full wp-post-image" alt="" height="72px" width="72px">
 											</a>
 											{% endif %}
