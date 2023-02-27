@@ -1,12 +1,12 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect  
-from .forms import SupplierForm, OpeningHourForm
-from accounts.forms import UserProfileForm
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import SupplierForm, OpeningHourForm, SupplierPhoneNumber
+from accounts.forms import UserProfileForm, UserInfoForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
 
 
-from accounts.models import UserProfile
+from accounts.models import UserProfile, User
 from .models import Supplier, OpeningHour
 from services.models import Type, Product
 
@@ -21,30 +21,38 @@ from orders.models import Order, OrderedProduct
 def supplierProfile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
     supplier = get_object_or_404(Supplier, user=request.user)
-    
+    # phone = get_object_or_404(Supplier, user=request.user)
+
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         supplier_form = SupplierForm(request.POST, request.FILES, instance=supplier)
-        
-        if profile_form.is_valid() and supplier_form.is_valid():
+        sup_form = SupplierPhoneNumber(request.POST, instance=request.user)
+        # sup_form = SupplierPhoneNumber(request.POST, instance=phone)
+
+        if profile_form.is_valid() and supplier_form.is_valid() and sup_form.is_valid():
             profile_form.save()
             supplier_form.save()
+            sup_form.save()
             messages.success(request, 'Settings updated.')
             return redirect('supplierProfile')
-        
+
         else:
             print(profile_form.errors)
             print(supplier_form.errors)
-            
+            print(sup_form.errors)
+
     else:
         profile_form = UserProfileForm(instance = profile)
         supplier_form = SupplierForm(instance = supplier)
-    
+        sup_form = SupplierPhoneNumber(instance = request.user)
+
     context = {
         'profile_form':profile_form,
         'supplier_form':supplier_form,
+        'sup_form':sup_form,
         'profile':profile,
         'supplier':supplier,
+        # 'phone':phone,
     }
     return render(request, 'supplier/supplierProfile.html', context)
 
@@ -79,7 +87,7 @@ def water_by_type(request, pk=None):
 
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
-def add_type(request): 
+def add_type(request):
     if request.method == 'POST':
         form = WaterTypeForm(request.POST)
         if form.is_valid():
@@ -95,7 +103,7 @@ def add_type(request):
             """
             water.slug = slugify(water_type_name)+'-'+str(water.id) # mineral-water-15
             water.save()
-            
+
             messages.success(request, f'{water_type_name} has been added to your dashboard')
             return redirect('services')
         else:
@@ -103,7 +111,7 @@ def add_type(request):
     else:
         form = WaterTypeForm()
     context = {
-        'form': form,   
+        'form': form,
     }
     return render(request, 'supplier/add_type.html', context)
 
@@ -124,9 +132,9 @@ def edit_type(request, pk=None):
             """
             Generate a slug based on the water type name
             """
-            water.slug = slugify(water_type_name)+'-'+str(water.id) 
+            water.slug = slugify(water_type_name)+'-'+str(water.id)
             form.save()
-            
+
             messages.success(request, f'{water_type_name} has been updated successfully')
             return redirect('services')
         else:
@@ -134,14 +142,14 @@ def edit_type(request, pk=None):
     else:
         form = WaterTypeForm(instance=water_type_name)
     context = {
-        'form': form, 
-        'water_type_name' : water_type_name 
+        'form': form,
+        'water_type_name' : water_type_name
     }
     return render(request, 'supplier/edit_type.html', context)
 
 
 @login_required(login_url='login')
-@user_passes_test(check_role_supplier)  
+@user_passes_test(check_role_supplier)
 def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
@@ -151,8 +159,8 @@ def delete_type(request, pk=None):
 def get_supplier(request):
             supplier = Supplier.objects.get(user=request.user)
             return supplier
-        
-        
+
+
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
 def add_product(request):
@@ -165,9 +173,9 @@ def add_product(request):
             bottle_size = form.cleaned_data['bottle_size']
             bttle_water = form.save(commit=False)
             bttle_water.supplier = Supplier.objects.get(user=request.user)
-            bttle_water.slug = slugify(bottle_size) 
+            bttle_water.slug = slugify(bottle_size)
             form.save()
-            
+
             messages.success(request, f'{bottle_size} Water Product has been added successfully')
             return redirect('water_by_type', bttle_water.type.id)
         else:
@@ -180,9 +188,9 @@ def add_product(request):
         # def get_supplier(request):
         #     supplier = Supplier.objects.get(user=request.user)
         #     return supplier
-        
+
         form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
-          
+
     context ={
         'form':form,
     }
@@ -199,9 +207,9 @@ def edit_product(request, pk=None):
             bottlesize = form.cleaned_data['bottle_size']
             product = form.save(commit=False)
             product.supplier = Supplier.objects.get(user=request.user)
-            product.slug = slugify(bottlesize) 
+            product.slug = slugify(bottlesize)
             form.save()
-            
+
             messages.success(request, f'{bottlesize} has been updated successfully')
             return redirect('water_by_type', product.type.id)
         else:
@@ -211,7 +219,7 @@ def edit_product(request, pk=None):
         form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
 
     context = {
-        'form': form, 
+        'form': form,
         'product' : product,
     }
     return render(request, 'supplier/edit_product.html', context)
@@ -226,7 +234,7 @@ def delete_product(request, pk=None):
     return redirect('water_by_type', product.type.id)
 
 
-def opening_hours(request): 
+def opening_hours(request):
     opening_hours = OpeningHour.objects.filter(supplier=get_supplier(request))
     form = OpeningHourForm()
     context = {
@@ -234,7 +242,7 @@ def opening_hours(request):
         'opening_hours': opening_hours,
     }
     return render(request, 'supplier/opening_hours.html', context)
-    
+
 
 def add_opening_hours(request):
     """
@@ -248,7 +256,7 @@ def add_opening_hours(request):
             is_closed = request.POST.get('is_closed')
             # print(day,from_hour,to_hour,is_closed )
             try:
-                hour = OpeningHour.objects.create(supplier=get_supplier(request), day=day, from_hour=from_hour, to_hour=to_hour, is_closed=is_closed)  
+                hour = OpeningHour.objects.create(supplier=get_supplier(request), day=day, from_hour=from_hour, to_hour=to_hour, is_closed=is_closed)
                 day = OpeningHour.objects.get(id=hour.id)
                 if day.is_closed:
                     response = {'status': 'success', 'id':hour.id, 'day': day.get_day_display(), 'is_closed':'Closed'}
@@ -258,11 +266,11 @@ def add_opening_hours(request):
             except IntegrityError as e:
                 response = {'status': 'failed', 'message':from_hour+'-'+to_hour+' already exists for this day!'}
                 return JsonResponse(response)
-            
+
         else:
             HttpResponse('Invalid request')
-            
-            
+
+
 def remove_opening_hours(request, pk=None):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -274,7 +282,7 @@ def remove_opening_hours(request, pk=None):
 def order_detail(request, order_number):
     try:
         order = Order.objects.get(order_number=order_number,is_ordered=True)
-        ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request)) 
+        ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
         # print(ordered_product)
         # print(order)
         context = {
@@ -292,7 +300,7 @@ def order_detail(request, order_number):
 def my_orders(request):
     supplier = Supplier.objects.get(user=request.user)
     orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
-    
+
     context ={
         'orders':orders,
     }
