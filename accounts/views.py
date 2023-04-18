@@ -69,6 +69,8 @@ def registerUser(request):
     }
     return render (request, 'accounts/registerUser.html', context)
 
+# Class Based View of Register User
+
 
 def registerSupplier(request):
     if request.user.is_authenticated:
