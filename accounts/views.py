@@ -69,8 +69,6 @@ def registerUser(request):
     }
     return render (request, 'accounts/registerUser.html', context)
 
-# Class Based View of Register User
-
 
 def registerSupplier(request):
     if request.user.is_authenticated:
@@ -316,3 +314,7 @@ def reset_password(request):
             messages.error(request, 'Password do not match!')
             return redirect('reset_password')
     return render(request, 'accounts/reset_password.html')
+
+
+
+# Start of Class Based View
