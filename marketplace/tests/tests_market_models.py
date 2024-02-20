@@ -1,11 +1,10 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from marketplace.models import Tax
-from decimal import Decimal  
-
 
 class TaxModelTest(TestCase):
     def setUp(self):
+        # Set up test data
         Tax.objects.create(tax_type='VAT', tax_percentage='10.00', is_active=True)
         Tax.objects.create(tax_type='Sales Tax', tax_percentage='5.50', is_active=False)
 
@@ -23,11 +22,7 @@ class TaxModelTest(TestCase):
 
     def test_tax_percentage_decimal_places(self):
         vat_tax = Tax.objects.get(tax_type='VAT')
-        
-        # Convert the Decimal to string for comparison
-        expected_percentage = Decimal('10.00').quantize(Decimal('0.00'))
-        self.assertEqual(vat_tax.tax_percentage, expected_percentage)
-
+        self.assertEqual(vat_tax.tax_percentage, 10.00) 
 
     def test_tax_is_active_default_value(self):
         sales_tax = Tax.objects.get(tax_type='Sales Tax')
