@@ -4,6 +4,10 @@ from django.contrib.auth import get_user_model
 
 
 class ModelTest(TestCase):
+    def tearDown(self):
+        # Clean up any resources created during the test
+        get_user_model().objects.all().delete()
+        
     def test_create_user_with_email_successful(self):
         """Test creating a user with an email is successful"""
         email = 'test@example.com'
@@ -65,6 +69,10 @@ class UserModelTestCase(TestCase):
             email='test@example.com',
             password='password'
         )
+        
+    def tearDown(self):
+        # Clean up any resources created during the test
+        get_user_model().objects.all().delete()
 
     def test_create_user(self):
         self.assertEqual(get_user_model().objects.count(), 1)
