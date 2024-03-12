@@ -41,6 +41,28 @@ pip install -r requirements.txt
 
 ```
 
+--> Create your an env file and pass in the env variables like in the sample below, Check .env-sample file :
+```bash
+SECRET_KEY=yoursecretkeyhere
+DEBUG=True # Set to False when deploying to production
+
+#Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+# Add Google API
+GOOGLE_API_KEY=config('GOOGLE_API_KEY')
+
+# Paypal Configuration
+PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
+
+```
+
+
 --> Migrate Database
 ```bash
 python manage.py migrate
