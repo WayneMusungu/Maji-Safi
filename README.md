@@ -42,16 +42,28 @@ PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 
 The first step is to sign up for a free account on [Docker Hub](https://hub.docker.com/signup) and install Docker on your local machine by following this [installation link](https://docs.docker.com/get-docker/)
 
-Once Docker is done installing we can confirm the correct version is running by typing the command `docker --version` in the command line shell
+Once Docker is done installing, we can confirm the correct version is running by typing the command below in the command line shell
+```bash
+docker --version
+```
+
 
 ### Building a Docker image for our application 
-A Docker image is a read-only template that describes how to create a Docker container. To build an optimized docker image of our app with one command, run this command from the root folder `docker-compose up -d --build` where `Dockerfile` is located.
+A Docker image is a read-only template that describes how to create a Docker container. To build an optimized docker image of our app with one command, run the command below from the root folder where `Dockerfile` is located.
+```bash
+docker-compose up -d --build
+```
 
 ### New Database and SuperUser
 Apply migrations to the application by running the command
-`docker-compose exec web python manage.py migrate`
+```bash
+docker-compose exec web python manage.py migrate
+```
+
 and create superuser using the command below
-`docker-compose exec web python manage.py createsuperuser`
+```bash
+docker-compose exec web python manage.py createsuperuser
+```
 
 
 ### View Application
