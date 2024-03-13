@@ -1,7 +1,7 @@
 # Maji-Safi
 A project to offer safe drinking water
 
-### Cloning the repository
+## Cloning the repository
 
 Clone the repository using the command below :
 
@@ -16,32 +16,7 @@ cd Maji-Safi
 
 ```
 
-Create a virtual environment :
-```bash
-# Create our virtual environment
-python -m venv venv
-
-```
-
---> Activate the virtual environment : <br><br>
-windows
-```bash
-venv\scripts\activate
-
-```
-linux
-```bash
-source venv/bin/activate
-
-```
-
---> Install the requirements :
-```bash
-pip install -r requirements.txt
-
-```
-
---> Create your an env file and pass in the env variables like in the sample below, Check .env-sample file :
+Create your `.env` file and pass in the env variables like in the sample below, Check `.env-sample` file:
 ```bash
 SECRET_KEY=yoursecretkeyhere
 DEBUG=True # Set to False when deploying to production
@@ -63,25 +38,21 @@ PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 
 ```
 
+## Install Docker
 
---> Migrate Database
-```bash
-python manage.py migrate
+The first step is to sign up for a free account on [Docker Hub](https://hub.docker.com/signup) and install Docker on your local machine by following this [installation link](https://docs.docker.com/get-docker/)
 
-```
+Once Docker is done installing we can confirm the correct version is running by typing the command `docker --version` in the command line shell
 
---> Create Super User
-```bash
-python manage.py createsuperuser
+### Building a Docker image for our application 
+A Docker image is a read-only template that describes how to create a Docker container. To build an optimized docker image of our app with one command, run this command from the root folder `docker-compose up -d --build` where `Dockerfile` is located.
 
-```
+### New Database and SuperUser
+Apply migrations to the application by running the command
+`docker-compose exec web python manage.py migrate`
+and create superuser using the command below
+`docker-compose exec web python manage.py createsuperuser`
 
-### Running the App
 
---> To run the App, we use :
-```bash
-python manage.py runserver
-
-```
-
+### View Application
 > ⚠ Then, the development server will be started at http://127.0.0.1:8000/
