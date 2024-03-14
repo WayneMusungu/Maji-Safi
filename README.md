@@ -2,7 +2,6 @@
 A project to offer safe drinking water
 
 ## Cloning the repository
-
 Clone the repository using the command below :
 
 ```bash
@@ -39,14 +38,12 @@ PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 ```
 
 ## Install Docker
-
 The first step is to sign up for a free account on [Docker Hub](https://hub.docker.com/signup) and install Docker on your local machine by following this [installation link](https://docs.docker.com/get-docker/)
 
 Once Docker is done installing, we can confirm the correct version is running by typing the command below in the command line shell
 ```bash
 docker --version
 ```
-
 
 ### Building a Docker image for our application 
 A Docker image is a read-only template that describes how to create a Docker container. To build an optimized docker image of our app with one command, run the command below from the root folder where `Dockerfile` is located.
@@ -65,6 +62,12 @@ and create superuser using the command below
 docker-compose exec web python manage.py createsuperuser
 ```
 
+### Running tests
+To run tests, use the following command:
+
+```bash
+docker-compose exec web python manage.py test
+```
 
 ### View Application
 > ⚠ Then, the development server will be started at http://127.0.0.1:8000/
