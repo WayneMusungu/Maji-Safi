@@ -37,6 +37,24 @@ PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 
 ```
 
+## Set Up Host Gmail Account
+- Go to [Security](https://myaccount.google.com/security)
+
+- Scroll till you find **Signing in to Google**
+    
+    - In that section, you will see the "App Passwords" option as shown in the below image.
+
+    ![Password](images/app_pwd.png)
+
+    - When you click on **App Passwords**, you will be asked to enter your Gmail account password. Enter it and the page would open:
+
+    - Follow the below steps as shown in the image to setup your app password.
+
+    ![SetupAppPassword](images/setup_app_pwd.jpg)
+
+- Only if you follow the above steps, then you can send mail from your Gmail account using your django code. 
+
+
 ## Install Docker
 The first step is to sign up for a free account on [Docker Hub](https://hub.docker.com/signup) and install Docker on your local machine by following this [installation link](https://docs.docker.com/get-docker/)
 
