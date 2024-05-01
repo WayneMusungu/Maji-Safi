@@ -13,37 +13,32 @@ from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order
+from django.views.generic import View
+
 
 
 
 # Create your views here.
+class RegisterUserView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'You are already logged in')
+            return redirect('myAccount')
+        form = UserForm()
+        context = {'form': form}
+        return render(request, 'accounts/registerUser.html', context)
 
-def registerUser(request):
-    if request.user.is_authenticated:
-        messages.warning(request, 'You are already logged in')
-        return redirect ('myAccount')
-    elif request.method == 'POST':
-        print(request.POST)
+    def post(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'You are already logged in')
+            return redirect('myAccount')
         form = UserForm(request.POST)
         if form.is_valid():
-            """
-            store password in a hashed format
-            """
-            # CREATE USER USING THE FORM
-            
-            # password = form.cleaned_data['password']
-            # user = form.save(commit=False)
-            # user.set_password(password)
-            # user.role = User.CUSTOMER
-            # user.save()
-            
-            # CREATE USER USING THE CREATE USER METHOD
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.CUSTOMER
             user.save()
@@ -55,20 +50,14 @@ def registerUser(request):
             subject = 'Account Activation'
             email_template = 'accounts/emails/account_email_verification.html'
             send_email_verification(request, user, subject, email_template)
-            
             messages.success(request, "Your account has been created, an activation link has been sent to your email")
-            print('The user has been created successfuly')            
+            print('The user has been created successfully')
             return redirect('registerUser')
         else:
-            print('form is invalid')
+            print('Form is invalid')
             print(form.errors)
-    else:
-        form = UserForm()
-    context = {
-        'form':form,
-    }
-    return render (request, 'accounts/registerUser.html', context)
-
+            context = {'form': form}
+            return render(request, 'accounts/registerUser.html', context)
 
 def registerSupplier(request):
     if request.user.is_authenticated:
