@@ -16,8 +16,6 @@ from orders.models import Order
 from django.views.generic import View
 
 
-
-
 # Create your views here.
 class RegisterUserView(View):
     def get(self, request):
@@ -58,6 +56,7 @@ class RegisterUserView(View):
             print(form.errors)
             context = {'form': form}
             return render(request, 'accounts/registerUser.html', context)
+        
 
 def registerSupplier(request):
     if request.user.is_authenticated:
