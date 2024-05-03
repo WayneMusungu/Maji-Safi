@@ -56,7 +56,7 @@ class RegisterUserView(View):
             context = {'form': form}
             return render(request, 'accounts/registerUser.html', context)
             
-        
+  
 class RegisterSupplierView(View):
     def get(self, request):
         if request.user.is_authenticated:
