@@ -41,7 +41,6 @@ class RegisterUserView(View):
             user.role = User.CUSTOMER
             user.save()
             
-            # Send Email Verification to the Registered User
             """
             Create a helper function to send the verification email to the registered User
             """
@@ -56,13 +55,22 @@ class RegisterUserView(View):
             print(form.errors)
             context = {'form': form}
             return render(request, 'accounts/registerUser.html', context)
+            
         
+class RegisterSupplierView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'You are already logged in')
+            return redirect('myAccount')
+        form = UserForm()
+        supplier_form = SupplierForm()
+        context ={
+            'form': form,
+            'supplier_form': supplier_form,
+        }
+        return render(request, 'accounts/registerSupplier.html', context)
 
-def registerSupplier(request):
-    if request.user.is_authenticated:
-        messages.warning(request, 'You are already logged in')
-        return redirect ('myAccount')
-    elif request.method == 'POST':
+    def post(self, request):
         form = UserForm(request.POST)
         supplier_form = SupplierForm(request.POST, request.FILES)
         if form.is_valid() and supplier_form.is_valid():
@@ -75,60 +83,50 @@ def registerSupplier(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
             user.role = User.WATER_SUPPLIER
             user.save()    
-            supplier = supplier_form.save(commit = False)
+            supplier = supplier_form.save(commit=False)
             supplier.user = user
             supplier_name = supplier_form.cleaned_data['supplier_name']
-            supplier.supplier_slug = slugify(supplier_name) +'-'+str(user.id)
+            supplier.supplier_slug = slugify(supplier_name) + '-' + str(user.id)
+            
             """
             Get the user profile fom the UserProfile Model.
             When the user.save is trigerred, 
             Signals will create the user profile of the user
             """
+            
             user_profile = UserProfile.objects.get(user=user)
             supplier.user_profile = user_profile
             supplier.save()
             
             # Send Email Verification to the Registered Supplier
-            """
-            Create a helper function to send the verification email to the registered Supplier
-            """
             subject = 'Account Activation'
             email_template = 'accounts/emails/account_email_verification.html'
-
             send_email_verification(request, user, subject, email_template)
             
             messages.success(request, "Your account has been created, an activation link has been sent to your email. Kindly wait for approval from the admin")
             return redirect('registerSupplier')
 
         else:
-            print('invalid form')
-            print(form.errors)
-    else:
-        form = UserForm()
-        supplier_form = SupplierForm()
-    context ={
-        'form':form,
-        'supplier_form': supplier_form,
-    }
-    return render(request, 'accounts/registerSupplier.html', context)
+            messages.error(request, "Invalid form")
+            return render(request, 'accounts/registerSupplier.html', {'form': form, 'supplier_form': supplier_form})
 
-def activate(request, uidb64, token):
-    # Activate the user by setting the is_active status to true
-    try:
-        """Get the encoded uid and decode it."""
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = User._default_manager.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+
+class ActivateAccountView(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
         
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        messages.success(request, 'Your account has been activated')
-        return redirect('myAccount')
-    else:  
-        messages.error(request, 'Invalid activation link')  
-        return redirect ('myAccount')    
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Your account has been activated')
+        else:  
+            messages.error(request, 'Invalid activation link')
+        
+        return redirect('myAccount')   
 
 
 def login(request):

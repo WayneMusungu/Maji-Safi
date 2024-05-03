@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.myAccount ),
     path('registerUser/',views.RegisterUserView.as_view(), name='registerUser'),
-    path('registerSupplier/',views.registerSupplier, name='registerSupplier'),
+    path('registerSupplier/',views.RegisterSupplierView.as_view(), name='registerSupplier'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
@@ -12,7 +12,7 @@ urlpatterns = [
     path('customerDashboard/', views.customerDashboard, name='customerDashboard'),
     path('supplierDashboard/', views.supplierDashboard, name='supplierDashboard'),
 
-    path('activate/<uidb64>/<token>/', views.activate, name='activate'),
+    path('activate/<uidb64>/<token>/', views.ActivateAccountView.as_view(), name='activate'),
 
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('reset_password_validate/<uidb64>/<token>/', views.reset_password_validate, name='reset_password_validate'),
