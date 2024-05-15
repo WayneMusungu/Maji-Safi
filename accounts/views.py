@@ -16,7 +16,7 @@ from django.template.defaultfilters import slugify
 from orders.models import Order
 from django.views.generic import View
 from django.utils.decorators import method_decorator
-
+from django.db import transaction
 
 # Create your views here.
 class RegisterUserView(View):
@@ -32,33 +32,42 @@ class RegisterUserView(View):
         if request.user.is_authenticated:
             messages.warning(request, 'You are already logged in')
             return redirect('myAccount')
+        
         form = UserForm(request.POST)
         if form.is_valid():
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
-            user.role = User.CUSTOMER
-            user.save()
-            
-            """
-            Create a helper function to send the verification email to the registered User
-            """
-            subject = 'Account Activation'
-            email_template = 'accounts/emails/account_email_verification.html'
-            send_email_verification(request, user, subject, email_template)
-            messages.success(request, "Your account has been created, an activation link has been sent to your email")
-            print('The user has been created successfully')
-            return redirect('registerUser')
+            try:
+                with transaction.atomic():
+                    first_name = form.cleaned_data['first_name']
+                    last_name = form.cleaned_data['last_name']
+                    username = form.cleaned_data['username']
+                    email = form.cleaned_data['email']
+                    password = form.cleaned_data['password']
+                    
+                    user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+                    user.role = User.CUSTOMER
+                    user.save()
+                    
+                    """
+                    Create a helper function to send the verification email to the registered User
+                    """
+                    subject = 'Account Activation'
+                    email_template = 'accounts/emails/account_email_verification.html'
+                    send_email_verification(request, user, subject, email_template)
+                    
+                    messages.success(request, "Your account has been created, an activation link has been sent to your email")
+                    print('The user has been created successfully')
+                    return redirect('registerUser')
+            except Exception as e:
+                print('An error occurred during user registration:', e)
+                messages.error(request, "An error occurred during user registration. Please try again later.")
+                return redirect('registerUser')
         else:
             print('Form is invalid')
             print(form.errors)
             context = {'form': form}
             return render(request, 'accounts/registerUser.html', context)
             
-  
+        
 class RegisterSupplierView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -128,9 +137,9 @@ class ActivateAccountView(View):
         else:  
             messages.error(request, 'Invalid activation link')
         
-        return redirect('myAccount')   
-
-
+        return redirect('myAccount')  
+    
+    
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -173,7 +182,6 @@ class MyAccountView(View):
         user = request.user
         redirectUrl = detectUser(user)
         return redirect(redirectUrl)
-
 
 """
 Restricting customer from accessing the supplier's page
