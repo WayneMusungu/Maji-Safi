@@ -6,9 +6,10 @@ urlpatterns = [
     path('registerUser/',views.RegisterUserView.as_view(), name='registerUser'),
     path('registerSupplier/',views.RegisterSupplierView.as_view(), name='registerSupplier'),
 
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
-    path('myAccount', views.myAccount, name='myAccount'),
+     path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('myAccount/', views.MyAccountView.as_view(), name='myAccount'),
+    
     path('customerDashboard/', views.customerDashboard, name='customerDashboard'),
     path('supplierDashboard/', views.supplierDashboard, name='supplierDashboard'),
 

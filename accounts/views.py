@@ -1,10 +1,11 @@
 import datetime
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from supplier.forms import SupplierForm
 from .forms import UserForm
 from .models import User, UserProfile
-from django.contrib import messages, auth
+from django.contrib import auth, messages
+from django.contrib.auth import authenticate, login
 from .utils import detectUser, send_email_verification
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
@@ -14,6 +15,7 @@ from supplier.models import Supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order
 from django.views.generic import View
+from django.utils.decorators import method_decorator
 
 
 # Create your views here.
@@ -129,43 +131,48 @@ class ActivateAccountView(View):
         return redirect('myAccount')   
 
 
-def login(request):
-    if request.user.is_authenticated:
-        messages.warning(request, 'You are already logged in')
-        return redirect ('myAccount')
-    elif request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
+class LoginView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'You are already logged in')
+            return redirect('myAccount')
+        return render(request, 'accounts/login.html')
+    
+    def post(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'You are already logged in')
+            return redirect('myAccount')
         
-        """
-        Use Django inbuilt authenticate function
-        """
-        user = auth.authenticate(email=email, password=password)
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, email=email, password=password)
         
         if user is not None:
-            auth.login(request, user)
-            messages.success(request, "You are logged in")
+            login(request, user)
+            messages.success(request, 'You are logged in')
             return redirect('myAccount')
         else:
-            messages.error(request, "Invalid Credentials")
+            messages.error(request, 'Invalid Credentials')
             return redirect('login')
-    return render(request, 'accounts/login.html')
 
 
-def logout(request):
-    auth.logout(request)
-    messages.info(request, "You have logged out")
-    return redirect('login')
+class LogoutView(View):
+    def get(self, request):
+        auth.logout(request)
+        messages.info(request, "You have logged out")
+        return redirect('login')
 
 
-"""
-This function is responsible for detecting whether the User is a Customer or a Supplier and be taken to the respective dashboard
-"""
-@login_required(login_url='login')
-def myAccount(request):
-    user = request.user
-    redirectUrl = detectUser(user)
-    return redirect(redirectUrl)
+class MyAccountView(View):
+    """
+    This function is responsible for detecting whether the User is a Customer or a Supplier and be taken to the respective dashboard
+    """
+    @method_decorator(login_required(login_url=reverse_lazy('login')))
+    def get(self, request):
+        user = request.user
+        redirectUrl = detectUser(user)
+        return redirect(redirectUrl)
 
 
 """
