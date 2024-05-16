@@ -91,32 +91,38 @@ class RegisterSupplierView(View):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             
-            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
-            user.role = User.WATER_SUPPLIER
-            user.save()    
-            supplier = supplier_form.save(commit=False)
-            supplier.user = user
-            supplier_name = supplier_form.cleaned_data['supplier_name']
-            supplier.supplier_slug = slugify(supplier_name) + '-' + str(user.id)
-            
-            """
-            Get the user profile fom the UserProfile Model.
-            When the user.save is trigerred, 
-            Signals will create the user profile of the user
-            """
-            
-            user_profile = UserProfile.objects.get(user=user)
-            supplier.user_profile = user_profile
-            supplier.save()
-            
-            # Send Email Verification to the Registered Supplier
-            subject = 'Account Activation'
-            email_template = 'accounts/emails/account_email_verification.html'
-            send_email_verification(request, user, subject, email_template)
-            
-            messages.success(request, "Your account has been created, an activation link has been sent to your email. Kindly wait for approval from the admin")
-            return redirect('registerSupplier')
+            try:
+                with transaction.atomic():
+                    user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+                    user.role = User.WATER_SUPPLIER
+                    user.save()    
+                    supplier = supplier_form.save(commit=False)
+                    supplier.user = user
+                    supplier_name = supplier_form.cleaned_data['supplier_name']
+                    supplier.supplier_slug = slugify(supplier_name) + '-' + str(user.id)
+                    
+                    """
+                    Get the user profile from the UserProfile Model.
+                    When the user.save is triggered, 
+                    Signals will create the user profile of the user
+                    """
+                    
+                    user_profile = UserProfile.objects.get(user=user)
+                    supplier.user_profile = user_profile
+                    supplier.save()
+                    
+                    # Send Email Verification to the Registered Supplier
+                    subject = 'Account Activation'
+                    email_template = 'accounts/emails/account_email_verification.html'
+                    send_email_verification(request, user, subject, email_template)
+                    
+                    messages.success(request, "Your account has been created, an activation link has been sent to your email. Kindly wait for approval from the admin")
+                    return redirect('registerSupplier')
 
+            except Exception as e:
+                print('An error occurred during supplier registration:', e)
+                messages.error(request, "An error occurred during supplier registration. Please try again later.")
+                return redirect('registerSupplier')
         else:
             messages.error(request, "Invalid form")
             return render(request, 'accounts/registerSupplier.html', {'form': form, 'supplier_form': supplier_form})
