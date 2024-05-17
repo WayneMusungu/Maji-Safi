@@ -1,5 +1,6 @@
 import datetime
 from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from supplier.forms import SupplierForm
 from .forms import UserForm
@@ -17,6 +18,8 @@ from orders.models import Order
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.db import transaction
+from .mixins import CustomerRoleRequiredMixin
+
 
 # Create your views here.
 class RegisterUserView(View):
@@ -189,28 +192,21 @@ class MyAccountView(View):
         redirectUrl = detectUser(user)
         return redirect(redirectUrl)
 
-"""
-Restricting customer from accessing the supplier's page
-"""
-def check_role_customer(user):
-    if user.role == 2:
-        return True
-    else: 
-        raise PermissionDenied
+
+class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
+    login_url = 'url'
     
-@login_required(login_url='login')
-@user_passes_test(check_role_customer)
-def customerDashboard(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True)
-    recent_orders = orders[:6]  # Show only six recent orders
-    context = {
-        'orders': orders,
-        'orders_count': orders.count(),  # count the number of orders made by the customer
-        'recent_orders': recent_orders,
-    }
-    return render(request, 'accounts/customerDashboard.html', context)
-
-
+    def get(self, request, *args, **kwargs):
+        orders = Order.objects.filter(user=request.user, is_ordered=True)
+        recent_orders = orders[:6]  # Show only six recent orders
+        context = {
+            'orders': orders,
+            'orders_count': orders.count(),  # Count the number of orders made by the customer
+            'recent_orders': recent_orders,
+        }
+        return render(request, 'accounts/customerDashboard.html', context)
+    
+    
 """
 Restricting Supplier from accessing the customers page
 """
@@ -322,6 +318,3 @@ def reset_password(request):
             return redirect('reset_password')
     return render(request, 'accounts/reset_password.html')
 
-
-
-# Start of Class Based View
