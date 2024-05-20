@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import SupplierForm, OpeningHourForm, SupplierPhoneNumber
-from accounts.forms import UserProfileForm, UserInfoForm
+from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
 

@@ -1,41 +1,49 @@
 from django.shortcuts import get_object_or_404, render, redirect
+from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.views import View
 from accounts.forms import UserProfileForm, UserInfoForm
 from accounts.models import UserProfile
 from django.contrib import messages
 from orders.models import Order, OrderedProduct
 import simplejson as json
-# Create your views here.
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-@login_required(login_url='login')
-def customerProfile(request):
-    # Show the existing values inside the form field of a logged in customer
-    profile = get_object_or_404(UserProfile, user=request.user)
-    
-    if request.method == 'POST':
+class CustomerProfileView(LoginRequiredMixin, View):
+   login_url = 'login' 
+
+   def get(self, request):
+      profile = get_object_or_404(UserProfile, user=request.user)
+      profile_form = UserProfileForm(instance=profile)
+      user_form = UserInfoForm(instance=request.user)
+      context = {
+         'profile_form': profile_form,
+         'user_form': user_form,
+         'profile': profile,
+      }
+      return render(request, 'customers/customerProfile.html', context)
+
+   def post(self, request):
+      profile = get_object_or_404(UserProfile, user=request.user)
       profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
       user_form = UserInfoForm(request.POST, instance=request.user)
-      
+
       if profile_form.is_valid() and user_form.is_valid():
-         profile_form.save()
-         user_form.save()
-         messages.success(request, 'Profile updated')
-         return redirect('customerProfile')
+         with transaction.atomic():
+            profile_form.save()
+            user_form.save()
+            messages.success(request, 'Profile updated')
+            return redirect('customerProfile')
       else:
          print(profile_form.errors)
          print(user_form.errors)
-    
-    else:
-      profile_form = UserProfileForm(instance=profile)
-      user_form = UserInfoForm(instance=request.user)
-    
-    context = {
-       'profile_form': profile_form,
-       'user_form': user_form ,
-       'profile': profile,
-    }
-    return render(request, 'customers/customerProfile.html', context)
- 
+         context = {
+               'profile_form': profile_form,
+               'user_form': user_form,
+               'profile': profile,
+         }
+         return render(request, 'customers/customerProfile.html', context)
+
 
 @login_required(login_url='login') 
 def my_orders(request):

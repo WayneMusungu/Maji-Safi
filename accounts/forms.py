@@ -53,12 +53,7 @@ class UserProfileForm(forms.ModelForm):
         fields = ['profile_picture', 'cover_photo', 'county', 'town', 'pin_code']
 
 
-# class UserInfoForm(forms.ModelForm):
-#     phone_number = PhoneNumberField(
-#         widget = PhoneNumberPrefixWidget(initial='KE')
-#     )
-
-#     class Meta:
-
-#         model = User
-#         fields = ['first_name', 'last_name', 'phone_number']
+class UserInfoForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
