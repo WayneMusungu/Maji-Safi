@@ -56,25 +56,26 @@ class MyOrdersView(LoginRequiredMixin, View):
       return render(request, 'customers/my_orders.html', context)
 
 
-@login_required(login_url='login') 
-def order_detail(request, order_number):
-   try:
-      order = Order.objects.get(order_number=order_number, is_ordered=True)
-      ordered_product = OrderedProduct.objects.filter(order=order)
-      # print(ordered_product)
-      
-      # Loop through the ordered product
-      subtotal = 0
-      for item in ordered_product:
-         subtotal +=(item.price * item.quantity)
-      tax_data = json.loads(order.tax_data)
-      context = {
-         'order': order,
-         'ordered_product': ordered_product,
-         'subtotal':subtotal,
-         'tax_data':tax_data,
+class OrderDetailView(LoginRequiredMixin, View):
+   login_url = 'login'
+   
+   def get(self, request, order_number):
+      try:
+         order = Order.objects.get(order_number=order_number, is_ordered=True)
+         ordered_product = OrderedProduct.objects.filter(order=order)
          
-      }
-      return render(request, 'customers/order_detail.html', context)
-   except:
-      return redirect('customer')
+            # Loop through the ordered product
+         subtotal = 0
+         for item in ordered_product:
+            subtotal +=(item.price * item.quantity)
+         tax_data = json.loads(order.tax_data)
+         context = {
+            'order': order,
+            'ordered_product': ordered_product,
+            'subtotal':subtotal,
+            'tax_data':tax_data,    
+         }
+         return render(request, 'customers/order_detail.html', context)
+      except Order.DoesNotExist:
+            return redirect('customer')
+         
