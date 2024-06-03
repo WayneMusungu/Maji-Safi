@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db import transaction
-from django.contrib.auth.decorators import login_required
 from django.views import View
 from accounts.forms import UserProfileForm, UserInfoForm
 from accounts.models import UserProfile
