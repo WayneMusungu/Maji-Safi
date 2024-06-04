@@ -250,9 +250,12 @@ def supplierDashboard(request):
     return render(request, 'accounts/supplierDashboard.html', context)
 
 
-def forgot_password(request):
-    if request.method == 'POST':
-        email = request.POST['email']
+class ForgotPassword(View):
+    def get(self, request):
+        return render(request, 'accounts/forgot_password.html')
+    
+    def post(self, request):
+        email = request.POST.get('email')
         
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email__exact=email)
@@ -261,19 +264,17 @@ def forgot_password(request):
             Create a helper function for password reset email
             """
             
-            # send_password_reset_email(request, user)
             subject = 'Password Reset'
             email_template = 'accounts/emails/reset_password_email.html'
             send_email_verification(request, user, subject, email_template)
             
             messages.success(request, 'Password reset link has been sent to your email address')
             return redirect('login')
-            
+        
         else:
             messages.error(request, 'An account with that email does not exist')
-            return redirect('forgot_password')
-            
-    return render(request, 'accounts/forgot_password.html')
+            return redirect('forgot_password') 
+
 
 
 def reset_password_validate(request, uidb64, token):
