@@ -301,11 +301,14 @@ def reset_password_validate(request, uidb64, token):
         return redirect(myAccount)
 
 
-def reset_password(request):
-    if request.method == 'POST':
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
-
+class ResetPasswordView(View):
+    def get(self, request):
+        return render(request, 'accounts/reset_password.html')
+    
+    def post(self, request):
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        
         if password == confirm_password:
             pk = request.session.get('uid')
             user = User.objects.get(pk=pk)
@@ -317,5 +320,3 @@ def reset_password(request):
         else:
             messages.error(request, 'Password do not match!')
             return redirect('reset_password')
-    return render(request, 'accounts/reset_password.html')
-
