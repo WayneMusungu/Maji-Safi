@@ -194,7 +194,7 @@ class MyAccountView(View):
 
 
 class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
-    login_url = 'url'
+    login_url = 'login'
     
     def get(self, request, *args, **kwargs):
         orders = Order.objects.filter(user=request.user, is_ordered=True)
@@ -276,7 +276,6 @@ class ForgotPassword(View):
             return redirect('forgot_password') 
 
 
-
 class ResetPasswordValidateView(View):
     """
     Validate the user by decoding the token and the user pk
@@ -299,7 +298,6 @@ class ResetPasswordValidateView(View):
         else:
             messages.error(request, 'This link has expired')
             return redirect('myAccount')
-
 
 
 class ResetPasswordView(View):
