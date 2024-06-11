@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
-from django_countries.fields import CountryField
 
 
 # Create your models here.
@@ -66,8 +65,6 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=45, unique=True)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     phone_number = PhoneNumberField(blank=True)
-    # phone_number = PhoneNumberField(blank=True, unique=True)
-    # phone_number = models.CharField(max_length=10, blank=True)
     role = models.PositiveSmallIntegerField(choices = ROLE_CHOICE, blank=True, null=True)
     
     
@@ -111,10 +108,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True)
     cover_photo = models.ImageField(upload_to='users/cover_photos', blank=True, null=True) 
-    # country = CountryField(blank_label='(select country)')
     county = models.CharField(max_length=15, blank=True, null=True)
     town = models.CharField(max_length=15, blank=True, null=True)
-    # address = models.CharField(max_length=250, blank=True, null=True)
     pin_code = models.CharField(max_length=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -124,5 +119,5 @@ class UserProfile(models.Model):
         return self.user.email
     
     def location(self):
-        return f'{self.county}, {self.town}, {self.address}-{self.pin_code}'
+        return f'{self.county}, {self.town}--{self.pin_code}'
  

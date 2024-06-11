@@ -277,28 +277,29 @@ class ForgotPassword(View):
 
 
 
-def reset_password_validate(request, uidb64, token):
+class ResetPasswordValidateView(View):
     """
     Validate the user by decoding the token and the user pk
     """
-    try:
-        """Get the encoded uid and decode it."""
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = User._default_manager.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-        
-    if user is not None and default_token_generator.check_token(user, token):
-        """
-        Store the uid inside the session because we need the pk to reset the password
-        """
-        request.session['uid'] = uid
-        messages.info(request, 'Enter new password')
-        return redirect('reset_password')
-        
-    else:
-        messages.error(request, 'This link has expired')
-        return redirect(myAccount)
+    def get(self, request, uidb64, token, *args, **kwargs):
+        try:
+            """Get the encoded uid and decode it."""
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            """
+            Store the uid inside the session because we need the pk to reset the password
+            """
+            request.session['uid'] = uid
+            messages.info(request, 'Enter new password')
+            return redirect('reset_password')
+        else:
+            messages.error(request, 'This link has expired')
+            return redirect('myAccount')
+
 
 
 class ResetPasswordView(View):
