@@ -1,6 +1,9 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import SupplierForm, OpeningHourForm, SupplierPhoneNumber
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
@@ -18,43 +21,43 @@ from orders.models import Order, OrderedProduct
 
 # Create your views here.
 
-def supplierProfile(request):
-    profile = get_object_or_404(UserProfile, user=request.user)
-    supplier = get_object_or_404(Supplier, user=request.user)
-    # phone = get_object_or_404(Supplier, user=request.user)
-
-    if request.method == 'POST':
+class SupplierProfileView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        profile = get_object_or_404(UserProfile, user=request.user)
+        supplier = get_object_or_404(Supplier, user=request.user)
+        profile_form = UserProfileForm(instance=profile)
+        supplier_form = SupplierForm(instance=supplier)
+        
+        context = {
+            'profile_form': profile_form,
+            'supplier_form': supplier_form,
+            'profile': profile,
+            'supplier': supplier,
+        }
+        return render(request, 'supplier/supplierProfile.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        profile = get_object_or_404(UserProfile, user=request.user)
+        supplier = get_object_or_404(Supplier, user=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         supplier_form = SupplierForm(request.POST, request.FILES, instance=supplier)
-        sup_form = SupplierPhoneNumber(request.POST, instance=request.user)
-        # sup_form = SupplierPhoneNumber(request.POST, instance=phone)
 
-        if profile_form.is_valid() and supplier_form.is_valid() and sup_form.is_valid():
+        if profile_form.is_valid() and supplier_form.is_valid():
             profile_form.save()
             supplier_form.save()
-            sup_form.save()
             messages.success(request, 'Settings updated.')
             return redirect('supplierProfile')
-
         else:
             print(profile_form.errors)
             print(supplier_form.errors)
-            print(sup_form.errors)
-
-    else:
-        profile_form = UserProfileForm(instance = profile)
-        supplier_form = SupplierForm(instance = supplier)
-        sup_form = SupplierPhoneNumber(instance = request.user)
-
-    context = {
-        'profile_form':profile_form,
-        'supplier_form':supplier_form,
-        'sup_form':sup_form,
-        'profile':profile,
-        'supplier':supplier,
-        # 'phone':phone,
-    }
-    return render(request, 'supplier/supplierProfile.html', context)
+        
+        context = {
+            'profile_form': profile_form,
+            'supplier_form': supplier_form,
+            'profile': profile,
+            'supplier': supplier,
+        }
+        return render(request, 'supplier/supplierProfile.html', context)
 
 
 @login_required(login_url='login')
