@@ -15,7 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class MarketplaceView(View):
+class MarketPlaceView(View):
     def get(self, request):
         suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
         supplier_count = suppliers.count()
