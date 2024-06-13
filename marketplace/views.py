@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views import View
 from supplier.models import OpeningHour, Supplier
 from services.models import Type, Product
 from .models import Cart
@@ -13,14 +14,15 @@ from accounts.models import UserProfile
 
 # Create your views here.
 
-def marketplace(request):
-    suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
-    supplier_count = suppliers.count()
-    context = {
-        "suppliers":suppliers,
-        "supplier_count":supplier_count,
-    }
-    return render(request, 'marketplace/listings.html', context)
+class Marketplace(View):
+    def get(self, request):
+        suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
+        supplier_count = suppliers.count()
+        context = {
+            "suppliers":suppliers,
+            "supplier_count":supplier_count 
+        }
+        return render(request, 'marketplace/listings.html', context)
 
 
 def supplier_detail(request, supplier_slug):
