@@ -11,10 +11,11 @@ from django.db.models import Q
 from datetime import date, datetime
 from orders.forms import OrderForm
 from accounts.models import UserProfile
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class Marketplace(View):
+class MarketplaceView(View):
     def get(self, request):
         suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
         supplier_count = suppliers.count()
@@ -119,13 +120,15 @@ def decrease_cart(request, product_id):
         return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
    
 
-@login_required(login_url='login')
-def cart(request):
-    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
-    context = {
-        "cart_items": cart_items,
-    }
-    return render(request, 'marketplace/cart.html', context)
+class CartView(LoginRequiredMixin, View):
+    login_url = 'login'
+    
+    def get(self, request):
+        cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+        context = {
+            "cart_items": cart_items,
+        }
+        return render(request, 'marketplace/cart.html', context)
 
 
 @login_required(login_url='login')

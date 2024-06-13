@@ -28,7 +28,7 @@ urlpatterns = [
     path('marketplace/', include('marketplace.urls')),
 
      # CART
-    path('cart/', MarketplaceViews.cart, name='cart'),
+    path('cart/', MarketplaceViews.CartView.as_view(), name='cart'),
 
     #SEARCH
     path('search/', MarketplaceViews.search, name='search'),

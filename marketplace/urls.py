@@ -2,7 +2,7 @@ from django.urls import path
 from .import views
 
 urlpatterns = [
-    path('', views.Marketplace.as_view(), name='marketplace'),
+    path('', views.MarketplaceView.as_view(), name='marketplace'),
     path('<slug:supplier_slug>/', views.supplier_detail, name='supplier_detail'),
     
     
