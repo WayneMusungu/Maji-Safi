@@ -95,12 +95,6 @@ WSGI_APPLICATION = 'MajiSafi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
        'default': {
@@ -112,11 +106,6 @@ DATABASES = {
            'PORT': '5432',
        }
    }
-
-# DATABASES = {
-#     'default':dj_database_url.parse(os.environ.get('DATABASE_URL'))
-# }
-
 
 
 # Password validation
@@ -198,3 +187,37 @@ PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 
 # Block pop-ups using 3rd party services
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+# CELERY Configuration
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Nairobi'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Logging Configurations
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'accounts': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
