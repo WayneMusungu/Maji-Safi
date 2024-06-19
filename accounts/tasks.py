@@ -42,25 +42,3 @@ def send_email_verification_task(user_id, subject, email_template, domain):
         logger.info(f"Email verification sent to {to_email}")
     except Exception as e:
         logger.error(f"Error in email verification task: {e}")
-
-        
-"""
-Function to send notification to Supplier if their business has been approved by the admin or not
-"""
-@shared_task(name='accounts.tasks.send_notification_task')
-def send_notification_task(subject, email_template, context):
-    logger.info(f"Starting notification task with subject: {subject}")
-    try:
-        from_email = settings.DEFAULT_FROM_EMAIL
-        message = render_to_string(email_template, context)
-
-        to_email = context['to_email']
-        if isinstance(to_email, str):  # Check if the email address is str or not
-            to_email = [to_email]
-
-        mail = EmailMessage(subject, message, from_email, to=to_email)
-        mail.content_subtype = 'html'
-        mail.send()
-        logger.info(f"Notification sent to {to_email}")
-    except Exception as e:
-        logger.error(f"Error in notification task: {e}")

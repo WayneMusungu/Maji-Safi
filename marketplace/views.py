@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from supplier.models import OpeningHour, Supplier
@@ -6,12 +6,14 @@ from services.models import Type, Product
 from .models import Cart
 from django.db.models import Prefetch
 from .context_processors import get_cart_counter, get_cart_amounts
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from datetime import date, datetime
+from datetime import date
 from orders.forms import OrderForm
 from accounts.models import UserProfile
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # Create your views here.
 
@@ -21,10 +23,10 @@ class MarketPlaceView(View):
         supplier_count = suppliers.count()
         context = {
             "suppliers":suppliers,
-            "supplier_count":supplier_count 
+            "supplier_count":supplier_count,
         }
         return render(request, 'marketplace/listings.html', context)
-
+        
 
 def supplier_detail(request, supplier_slug):
     supplier = get_object_or_404(Supplier, supplier_slug=supplier_slug)
@@ -62,8 +64,11 @@ def supplier_detail(request, supplier_slug):
     return render(request, 'marketplace/supplier_detail.html', context)
 
 
-def add_to_cart(request, product_id):
-    if request.user.is_authenticated:
+class AddCartView(LoginRequiredMixin, View):    
+    def handle_no_permission(self):
+        return JsonResponse({'status': 'login_required', 'message':'Please login to continue'})
+    
+    def get(self, request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # Check if the Product exist
             try:
@@ -76,21 +81,40 @@ def add_to_cart(request, product_id):
                     checkCart = Cart.objects.get(user=request.user, product=product)
                     checkCart.quantity += 1
                     checkCart.save()
-                    return JsonResponse({'status': 'Success', 'message': 'Increased the Cart Quantity', 'cart_counter': get_cart_counter(request), 'qty': checkCart.quantity, 'cart_amount': get_cart_amounts(request)})
+                    return JsonResponse({
+                        'status': 'Success', 
+                        'message': 'Increased the Cart Quantity', 
+                        'cart_counter': get_cart_counter(request), 
+                        'qty': checkCart.quantity, 
+                        'cart_amount': get_cart_amounts(request)
+                    })
                 except:
                     checkCart = Cart.objects.create(user=request.user, product=product, quantity=1)
-                    return JsonResponse({'status': 'Success', 'message': 'This Product has been added to your Cart!', 'cart_counter': get_cart_counter(request), 'qty': checkCart.quantity, 'cart_amount': get_cart_amounts(request)})     
+                    return JsonResponse({
+                        'status': 'Success', 
+                        'message': 'This Product has been added to your Cart!', 
+                        'cart_counter': get_cart_counter(request), 
+                        'qty': checkCart.quantity, 
+                        'cart_amount': get_cart_amounts(request)
+                    })     
 
             except:
-                return JsonResponse({'status': 'Failed', 'message': 'This Product does not exist!'})     
+                return JsonResponse({
+                    'status': 'Failed', 
+                    'message': 'This Product does not exist!'
+                })     
         else:
-            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
-    else:
-        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
-     
+            return JsonResponse({
+                'status': 'Failed', 
+                'message': 'Invalid Request!'
+            })       
     
-def decrease_cart(request, product_id):
-    if request.user.is_authenticated:
+                    
+class DecreaseCartView(LoginRequiredMixin, View):
+    def handle_no_permission(self):
+        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+
+    def get(self, request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # Check if the Product exist
             try:
@@ -98,7 +122,7 @@ def decrease_cart(request, product_id):
                 """
                 Check if the user has already added Product to the cart, if the number of Products is greater than one,
                 then we decrease the quantity and if it is less than one we simply delete the Product
-                
+
                 """
                 try:
                     checkCart = Cart.objects.get(user=request.user, product=product)
@@ -108,16 +132,28 @@ def decrease_cart(request, product_id):
                     else:
                         checkCart.delete()
                         checkCart.quantity = 0
-                    return JsonResponse({'status': 'Success', 'cart_counter': get_cart_counter(request), 'qty': checkCart.quantity, 'cart_amount': get_cart_amounts(request)})
-                except:
-                    return JsonResponse({'status': 'Failed', 'message': 'You do not have this item in your Cart!'})     
+                    return JsonResponse({
+                        'status': 'Success', 
+                        'cart_counter': get_cart_counter(request), 
+                        'qty': checkCart.quantity, 
+                        'cart_amount': get_cart_amounts(request)
+                    })
+                except Cart.DoesNotExist:
+                    return JsonResponse({
+                        'status': 'Failed', 
+                        'message': 'You do not have this item in your Cart!'
+                    })
 
-            except:
-                return JsonResponse({'status': 'Failed', 'message': 'This Product does not exist!'})     
+            except Product.DoesNotExist:
+                return JsonResponse({
+                    'status': 'Failed', 
+                    'message': 'This Product does not exist!'
+                })
         else:
-            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})       
-    else:
-        return JsonResponse({'status': 'login_required', 'message': 'Please login to continue'})
+            return JsonResponse({
+                'status': 'Failed', 
+                'message': 'Invalid Request!'
+            })    
    
 
 class CartView(LoginRequiredMixin, View):
@@ -131,22 +167,35 @@ class CartView(LoginRequiredMixin, View):
         return render(request, 'marketplace/cart.html', context)
 
 
-@login_required(login_url='login')
-def delete_cart(request, cart_id):
-    if request.user.is_authenticated:
+class DeleteCartView(LoginRequiredMixin, View):
+    login_url = 'login'
+    
+    def get(self, request, cart_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             try:
+                print(f"Attempting to delete cart item with id: {cart_id}")
                 # Check if the Cart Item Exist
                 cart_item = Cart.objects.get(user=request.user, id=cart_id)
-                if cart_item:
-                    cart_item.delete()
-                    return JsonResponse({'status': 'Success', 'message': 'Cart Item has been deleted!', 'cart_counter': get_cart_counter(request), 'cart_amount': get_cart_amounts(request)}) 
-            except:
-                return JsonResponse({'status': 'Failed', 'message': 'Cart Item does not exist!'})  
-                
-                    
+                cart_item.delete()
+                print(f"Deleted cart item with id: {cart_id}")
+                return JsonResponse({
+                    'status': 'Success', 
+                    'message': 'Cart Item has been deleted!', 
+                    'cart_counter': get_cart_counter(request), 
+                    'cart_amount': get_cart_amounts(request)
+                }) 
+            except Cart.DoesNotExist:
+                print(f"Cart item with id {cart_id} does not exist")
+                return JsonResponse({
+                    'status': 'Failed', 
+                    'message': 'Cart Item does not exist!'
+                })  
         else:
-            return JsonResponse({'status': 'Failed', 'message': 'Invalid Request!'})   
+            print("Invalid request type")
+            return JsonResponse({
+                'status': 'Failed', 
+                'message': 'Invalid Request!'
+            })
         
         
 def search(request):
@@ -175,35 +224,31 @@ def search(request):
     }
     return render(request, 'marketplace/listings.html', context)
 
-
-@login_required(login_url='login')
-def checkout(request):
-    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
-    cart_count = cart_items.count()
-    # If cart count is 0 redirect user to the market place page
-    if cart_count <= 0:
-        return redirect('marketplace')
-    
-    """Assign the value of logged in user to prepopulate the OrderForm"""
-    user_profile = UserProfile.objects.get(user=request.user)
-    default_values = {
-        'first_name': request.user.first_name,
-        'last_name': request.user.last_name,
-        'phone': request.user.phone_number,
-        'email': request.user.email,
-        'address': user_profile.address,
-        'country': user_profile.country,
-        'county': user_profile.county,
-        'town': user_profile.town,
-        'pin_code': user_profile.pin_code,     
-    }
-    form = OrderForm(initial=default_values)
-    context = {
-        'form': form,
-        'cart_items': cart_items,
-    }
-    return render(request, 'marketplace/checkout.html', context)
-            
-   
-
         
+class CheckoutView(LoginRequiredMixin, View):
+    login_url = 'login'
+    
+    def get(self, request):
+        cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+        cart_count = cart_items.count()
+        
+        # If cart count is 0, redirect user to the marketplace page
+        if cart_count <= 0:
+            return redirect('marketplace')
+        
+        # Assign the value of logged in user to prepopulate the OrderForm
+        user_profile = UserProfile.objects.get(user=request.user)
+        default_values = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+            'county': user_profile.county,
+            'town': user_profile.town,
+            'pin_code': user_profile.pin_code,     
+        }
+        form = OrderForm(initial=default_values)
+        context = {
+            'form': form,
+            'cart_items': cart_items,
+        }
+        return render(request, 'marketplace/checkout.html', context)
