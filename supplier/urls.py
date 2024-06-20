@@ -28,16 +28,6 @@ urlpatterns = [
     
     # ORDER DETAIL
     path('order_detail/<int:order_number>/', views.order_detail, name='supplier_order_detail'),
-    path('my_orders/', views.my_orders, name='supplier_my_orders'),
-
-
-
-    
-    
-    
-    
-
-
-    
+    path('my_orders/', views.MyOrdersView.as_view(), name='supplier_my_orders'),    
 
 ]
