@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
+from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
@@ -330,12 +331,11 @@ def order_detail(request, order_number):
     return render(request, 'supplier/order_detail.html', context)
 
 
-class MyOrdersView(View):
-    def get(self, request, *args, **kwargs):
-        supplier = Supplier.objects.get(user=request.user)
-        orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
-        
-        context = {
-            'orders': orders,
-        }
-        return render(request, 'supplier/my_orders.html', context)
+class MyOrdersView(ListView):
+    model = Order
+    template_name = 'supplier/my_orders.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        supplier = Supplier.objects.get(user=self.request.user)
+        return Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
