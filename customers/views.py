@@ -1,14 +1,17 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db import transaction
 from django.views import View
+from django.views.generic import ListView
 from accounts.forms import UserProfileForm, UserInfoForm
+from accounts.mixins import CustomerRoleRequiredMixin
 from accounts.models import UserProfile
 from django.contrib import messages
 from orders.models import Order, OrderedProduct
 import simplejson as json
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class CustomerProfileView(LoginRequiredMixin, View):
+class CustomerProfileView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
    login_url = 'login' 
 
    def get(self, request):
@@ -44,18 +47,16 @@ class CustomerProfileView(LoginRequiredMixin, View):
          return render(request, 'customers/customerProfile.html', context)
 
 
-class MyOrdersView(LoginRequiredMixin, View):
+class MyOrdersView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListView):
    login_url = 'login'
+   template_name = 'customers/my_orders.html'
+   context_object_name = 'orders'
    
-   def get(self, request):
-      orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
-      context = {
-         'orders': orders,
-      }
-      return render(request, 'customers/my_orders.html', context)
+   def get_queryset(self):
+      return Order.objects.filter(user=self.request.user, is_ordered=True).order_by('-created_at')
+   
 
-
-class OrderDetailView(LoginRequiredMixin, View):
+class OrderDetailView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
    login_url = 'login'
    
    def get(self, request, order_number):
@@ -63,7 +64,7 @@ class OrderDetailView(LoginRequiredMixin, View):
          order = Order.objects.get(order_number=order_number, is_ordered=True)
          ordered_product = OrderedProduct.objects.filter(order=order)
          
-            # Loop through the ordered product
+         # Loop through the ordered product
          subtotal = 0
          for item in ordered_product:
             subtotal +=(item.price * item.quantity)
