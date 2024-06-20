@@ -1,15 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic import ListView
 from supplier.models import Supplier
 
 
-def home(request):
-    """
-    Show approved and active Suppliers on the homepage
-    """
-    suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)[:10]
-    print(suppliers)
-    context = {
-        "suppliers":suppliers,
-    }
-    return render(request, "home.html", context)
+class HomeView(ListView):
+    template_name = 'home.html'
+    context_object_name = 'suppliers'
+    
+    def get_queryset(self):
+        return Supplier.objects.filter(is_approved=True, user__is_active=True)[:10]
+
