@@ -26,42 +26,44 @@ class MarketPlaceView(View):
             "supplier_count":supplier_count,
         }
         return render(request, 'marketplace/listings.html', context)
-        
-
-def supplier_detail(request, supplier_slug):
-    supplier = get_object_or_404(Supplier, supplier_slug=supplier_slug)
-    """
-    Type class model we have no access to Product class model therefore we use Prefetch to reverse look up Product class model
-    """
-    water_type = Type.objects.filter(supplier=supplier).prefetch_related(
-        Prefetch(
-            "products",
-            queryset = Product.objects.filter(is_available=True),
+    
+    
+class SupplierDetailView(View):
+    def get(self, request, supplier_slug):
+    
+        supplier = get_object_or_404(Supplier, supplier_slug=supplier_slug)
+        """
+        Type class model we have no access to Product class model therefore we use Prefetch to reverse look up Product class model
+        """
+        water_type = Type.objects.filter(supplier=supplier).prefetch_related(
+            Prefetch(
+                "products",
+                queryset = Product.objects.filter(is_available=True),
+            )
         )
-    )
-    
-    opening_hours = OpeningHour.objects.filter(supplier=supplier).order_by('day','from_hour')
-    
-    """
-    Check current day's opening hours
-    """
-    today_date = date.today()
-    today = today_date.isoweekday()
-    
-    current_opening_hours = OpeningHour.objects.filter(supplier=supplier, day=today)
-    if request.user.is_authenticated:
-        cart_items = Cart.objects.filter(user=request.user)
-    else:
-        cart_items=None
-    context = {
-        "supplier":supplier,
-        "water_type":water_type,
-        "cart_items":cart_items,
-        "opening_hours":opening_hours,
-        "current_opening_hours": current_opening_hours,
         
-    }
-    return render(request, 'marketplace/supplier_detail.html', context)
+        opening_hours = OpeningHour.objects.filter(supplier=supplier).order_by('day','from_hour')
+        
+        """
+        Check current day's opening hours
+        """
+        today_date = date.today()
+        today = today_date.isoweekday()
+        
+        current_opening_hours = OpeningHour.objects.filter(supplier=supplier, day=today)
+        if request.user.is_authenticated:
+            cart_items = Cart.objects.filter(user=request.user)
+        else:
+            cart_items=None
+        context = {
+            "supplier":supplier,
+            "water_type":water_type,
+            "cart_items":cart_items,
+            "opening_hours":opening_hours,
+            "current_opening_hours": current_opening_hours,
+            
+        }
+        return render(request, 'marketplace/supplier_detail.html', context)
 
 
 class AddCartView(LoginRequiredMixin, View):    
@@ -252,3 +254,4 @@ class CheckoutView(LoginRequiredMixin, View):
             'cart_items': cart_items,
         }
         return render(request, 'marketplace/checkout.html', context)
+        
