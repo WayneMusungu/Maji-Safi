@@ -301,7 +301,6 @@ def order_detail(request, order_number):
 
 
 class MyOrdersView(ListView):
-    model = Order
     template_name = 'supplier/my_orders.html'
     context_object_name = 'orders'
 
