@@ -5,7 +5,6 @@ from supplier.models import Supplier
 
 class Type(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    # bottle_size = models.CharField(max_length=50, unique=True)
     water_type = models.CharField(max_length=50)
     """
     A slug field in Django is used to store and generate valid URLs for your dynamically created web pages.
@@ -34,7 +33,6 @@ class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='products')
     bottle_size = models.CharField(max_length=50)
-    # water_type = models.CharField(max_length=50)
     slug = models.SlugField(max_length=100)
     description = models.TextField(max_length=250, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -45,7 +43,6 @@ class Product(models.Model):
     
     class Meta:
         ordering = ['-updated_at', '-created_at']
-        # ordering = ('-created_at',)
     
     def __str__(self):
         return f'{self.bottle_size}, for {self.price} ksh'

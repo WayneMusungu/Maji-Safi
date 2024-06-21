@@ -6,8 +6,6 @@ from services.models import Type, Product
 from .models import Cart
 from django.db.models import Prefetch
 from .context_processors import get_cart_counter, get_cart_amounts
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import date
 from orders.forms import OrderForm

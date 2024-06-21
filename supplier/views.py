@@ -7,9 +7,7 @@ from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
-
-
-from accounts.models import UserProfile, User
+from accounts.models import UserProfile
 from .models import Supplier, OpeningHour
 from services.models import Type, Product
 
