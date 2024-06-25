@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db import transaction
 from django.views import View
@@ -46,16 +47,29 @@ class CustomerProfileView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
                'profile': profile,
          }
          return render(request, 'customers/customerProfile.html', context)
-
-
+   
+   
 class MyOrdersView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListView):
    login_url = 'login'
    template_name = 'customers/my_orders.html'
    context_object_name = 'orders'
    
    def get_queryset(self):
-      return Order.objects.filter(user=self.request.user, is_ordered=True).order_by('-created_at')
-   
+      user = self.request.user
+      cache_key =  f'my_orders_{user.username}_{user.id}'
+      orders = cache.get(cache_key)
+      
+      if orders:
+         print("Retrieving from cache")
+         print(f"Cache key: {cache_key}") 
+         print(f"Cached orders: {orders}")
+         
+      else:
+         print("Retrieving from database")
+         orders = Order.objects.filter(user=user, is_ordered=True).order_by('-created_at')
+         cache.set(cache_key, orders, timeout=300) # Cache timeout of 5 minutes
+         
+      return orders
 
 class OrderDetailView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
     login_url = 'login'
