@@ -314,5 +314,21 @@ class MyOrdersView(ListView):
     context_object_name = 'orders'
 
     def get_queryset(self):
-        supplier = Supplier.objects.get(user=self.request.user)
-        return Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
+        user = self.request.user
+        supplier = Supplier.objects.get(user=user)
+        cache_key = f'my_orders_{user.username}_{supplier.id}' 
+        orders = cache.get(cache_key)
+        
+        if orders:
+            print("Retrieving from cache")
+            print(f"Cache key: {cache_key}") 
+        else:
+            print("Retrieving from database")
+            orders = list(Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at'))
+            cache.set(cache_key, orders, timeout=300)  # Cache timeout of 5 minutes
+
+        # Retrieve order usernames once after retrieving from cache or database
+        order_usernames = [order.user.username for order in orders]
+        print(f"Order usernames: {order_usernames}")
+
+        return orders
