@@ -8,6 +8,8 @@ from accounts.models import UserProfile
 from django.contrib import messages
 from orders.models import Order, OrderedProduct
 import simplejson as json
+from django.core.cache import cache
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class CustomerProfileView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
@@ -56,25 +58,33 @@ class MyOrdersView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListView):
    
 
 class OrderDetailView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
-   login_url = 'login'
-   
-   def get(self, request, order_number):
-      try:
-         order = Order.objects.get(order_number=order_number, is_ordered=True)
-         ordered_product = OrderedProduct.objects.filter(order=order)
-         
-         # Loop through the ordered product
-         subtotal = 0
-         for item in ordered_product:
-            subtotal +=(item.price * item.quantity)
-         tax_data = json.loads(order.tax_data)
-         context = {
-            'order': order,
-            'ordered_product': ordered_product,
-            'subtotal':subtotal,
-            'tax_data':tax_data,    
-         }
-         return render(request, 'customers/order_detail.html', context)
-      except Order.DoesNotExist:
-            return redirect('customer')
+    login_url = 'login'
+
+    def get(self, request, order_number):
+        cache_key = f'order_detail_{order_number}'
+        context = cache.get(cache_key)
+
+        if context:
+            print("Retrieving from cache")
+        else:
+            print("Retrieving from database")
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_product = OrderedProduct.objects.filter(order=order)
+                
+                # Calculate subtotal
+                subtotal = sum(item.price * item.quantity for item in ordered_product)
+                tax_data = json.loads(order.tax_data)
+                
+                context = {
+                    'order': order,
+                    'ordered_product': ordered_product,
+                    'subtotal': subtotal,
+                    'tax_data': tax_data,    
+                }
+                cache.set(cache_key, context, timeout=300)  # Cache timeout of 5 minutes
+            except Order.DoesNotExist:
+                return redirect('customer')
+        
+        return render(request, 'customers/order_detail.html', context)
          
