@@ -16,6 +16,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.views import check_role_supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order, OrderedProduct
+from django.core.cache import cache
 
 # Create your views here.
 
@@ -280,22 +281,32 @@ def remove_opening_hours(request, pk=None):
             return JsonResponse({'status': 'success', 'id': pk})
 
 
-def order_detail(request, order_number):
-    try:
-        order = Order.objects.get(order_number=order_number,is_ordered=True)
-        ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
-        # print(ordered_product)
-        # print(order)
-        context = {
-            'order':order,
-            'ordered_product':ordered_product,
-            'subtotal': order.get_total_by_supplier()['subtotal'],
-            'tax_data':order.get_total_by_supplier()['tax_dict'],
-            'grand_total':order.get_total_by_supplier()['grand_total'],
-        }
-    except:
-        return redirect('supplier')
-    return render(request, 'supplier/order_detail.html', context)
+class OrderDetailView(View):
+    template_name = 'supplier/order_detail.html'
+
+    def get(self, request, order_number):
+        cache_key = f'order_detail_{order_number}'
+        context = cache.get(cache_key)
+
+        if context:
+            print("Retrieving from cache")
+        else:
+            print("Retrieving from database")
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
+                context = {
+                    'order': order,
+                    'ordered_product': ordered_product,
+                    'subtotal': order.get_total_by_supplier()['subtotal'],
+                    'tax_data': order.get_total_by_supplier()['tax_dict'],
+                    'grand_total': order.get_total_by_supplier()['grand_total'],
+                }
+                cache.set(cache_key, context, timeout=300)  # Cache timeout of 5 minutes
+            except Order.DoesNotExist:
+                return redirect('supplier')
+        
+        return render(request, self.template_name, context)
 
 
 class MyOrdersView(ListView):
