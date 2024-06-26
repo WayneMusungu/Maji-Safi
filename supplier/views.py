@@ -309,26 +309,28 @@ class OrderDetailView(View):
         return render(request, self.template_name, context)
 
 
-class MyOrdersView(ListView):
+class MyOrdersView(LoginRequiredMixin, ListView):
+    login_url = 'login'
     template_name = 'supplier/my_orders.html'
     context_object_name = 'orders'
 
     def get_queryset(self):
         user = self.request.user
         supplier = Supplier.objects.get(user=user)
-        cache_key = f'my_orders_{user.username}_{supplier.id}' 
+        cache_key = f'my_orders_{user.username}_{supplier.id}'
         orders = cache.get(cache_key)
-        
+
         if orders:
             print("Retrieving from cache")
-            print(f"Cache key: {cache_key}") 
+            print(f"Cache key: {cache_key}")
+            print(f"Cached orders: {orders}")
         else:
             print("Retrieving from database")
-            orders = list(Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at'))
+            orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
             cache.set(cache_key, orders, timeout=300)  # Cache timeout of 5 minutes
-
+            
         # Retrieve order usernames once after retrieving from cache or database
-        order_usernames = (order.user.username for order in orders)
-        print(f"Order usernames: {order_usernames}")
+        # order_usernames = [order.user.username for order in orders]
+        # print(order_usernames)
 
         return orders
