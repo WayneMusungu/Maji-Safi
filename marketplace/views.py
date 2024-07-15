@@ -212,6 +212,9 @@ def search(request):
     fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=keyword).values_list('supplier', flat=True)
     # print(fetch_supplier_by_water_type)
     
+    # Passing flat=True with multiple values will throw an error
+    # Flat is not valid when values_list is called with more than one field
+    
     suppliers = Supplier.objects.filter(Q(id__in=fetch_supplier_by_product) | Q(id__in=fetch_supplier_by_water_type) | Q(supplier_name__icontains=keyword, is_approved=True, user__is_active=True))
     
     # suppliers = Supplier.objects.filter(supplier_name__icontains=keyword, is_approved=True, user__is_active=True)
