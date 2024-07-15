@@ -199,7 +199,7 @@ def payments(request):
         
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
-        # cart_items.delete()
+        cart_items.delete()
         # return HttpResponse('Data Saved and email sent')
        
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE

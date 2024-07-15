@@ -199,26 +199,23 @@ class DeleteCartView(LoginRequiredMixin, View):
         
         
 def search(request):
-    address = request.GET['address']
-    keyword = request.GET['keyword']
-    # print(address, keyword)
+    query = request.GET.get('query', '') 
+    print(query)
    
     """
-    Get Supplier ids that has the water type that a user is looking for
+    Get Supplier ids that has the water type or bottle size that a user is looking for
     """
-    fetch_supplier_by_product = Product.objects.filter(bottle_size__icontains=keyword, is_available=True).values_list('supplier', flat=True)# Get the list of Supplier ids 
-    # print(fetch_supplier_by_product)
+    fetch_supplier_by_product = Product.objects.filter(bottle_size__icontains=query, is_available=True).values_list('supplier', flat=True)
     
-    fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=keyword).values_list('supplier', flat=True)
-    # print(fetch_supplier_by_water_type)
+    fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=query).values_list('supplier', flat=True)
     
-    # Passing flat=True with multiple values will throw an error
-    # Flat is not valid when values_list is called with more than one field
+    suppliers = Supplier.objects.filter(
+        Q(id__in=fetch_supplier_by_product) | 
+        Q(id__in=fetch_supplier_by_water_type) | 
+        Q(supplier_name__icontains=query) &
+        Q(is_approved=True, user__is_active=True)
+    )
     
-    suppliers = Supplier.objects.filter(Q(id__in=fetch_supplier_by_product) | Q(id__in=fetch_supplier_by_water_type) | Q(supplier_name__icontains=keyword, is_approved=True, user__is_active=True))
-    
-    # suppliers = Supplier.objects.filter(supplier_name__icontains=keyword, is_approved=True, user__is_active=True)
-        # print(suppliers)
     supplier_count = suppliers.count()
     
     context = {
@@ -226,7 +223,6 @@ def search(request):
         'supplier_count': supplier_count,
     }
     return render(request, 'marketplace/listings.html', context)
-
         
 class CheckoutView(LoginRequiredMixin, View):
     login_url = 'login'
