@@ -197,32 +197,33 @@ class DeleteCartView(LoginRequiredMixin, View):
                 'message': 'Invalid Request!'
             })
         
+class SearchView(View):
+      
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('query', '') 
+        print(query)
+    
+        """
+        Get Supplier ids that has the water type or bottle size that a user is looking for
+        """
+        fetch_supplier_by_product = Product.objects.filter(bottle_size__icontains=query, is_available=True).values_list('supplier', flat=True)
         
-def search(request):
-    query = request.GET.get('query', '') 
-    print(query)
-   
-    """
-    Get Supplier ids that has the water type or bottle size that a user is looking for
-    """
-    fetch_supplier_by_product = Product.objects.filter(bottle_size__icontains=query, is_available=True).values_list('supplier', flat=True)
-    
-    fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=query).values_list('supplier', flat=True)
-    
-    suppliers = Supplier.objects.filter(
-        Q(id__in=fetch_supplier_by_product) | 
-        Q(id__in=fetch_supplier_by_water_type) | 
-        Q(supplier_name__icontains=query) &
-        Q(is_approved=True, user__is_active=True)
-    )
-    
-    supplier_count = suppliers.count()
-    
-    context = {
-        'suppliers': suppliers,
-        'supplier_count': supplier_count,
-    }
-    return render(request, 'marketplace/listings.html', context)
+        fetch_supplier_by_water_type = Type.objects.filter(water_type__icontains=query).values_list('supplier', flat=True)
+        
+        suppliers = Supplier.objects.filter(
+            Q(id__in=fetch_supplier_by_product) | 
+            Q(id__in=fetch_supplier_by_water_type) | 
+            Q(supplier_name__icontains=query) &
+            Q(is_approved=True, user__is_active=True)
+        )
+        
+        supplier_count = suppliers.count()
+        
+        context = {
+            'suppliers': suppliers,
+            'supplier_count': supplier_count,
+        }
+        return render(request, 'marketplace/listings.html', context)
         
 class CheckoutView(LoginRequiredMixin, View):
     login_url = 'login'

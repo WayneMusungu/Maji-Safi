@@ -31,7 +31,7 @@ urlpatterns = [
     path('cart/', MarketplaceViews.CartView.as_view(), name='cart'),
 
     #SEARCH
-    path('search/', MarketplaceViews.search, name='search'),
+    path('search/', MarketplaceViews.SearchView.as_view(), name='search'),
 
     #CHECKOUT
     path('checkout/', MarketplaceViews.CheckoutView.as_view(), name='checkout'),
