@@ -16,7 +16,6 @@ from django.contrib.sites.shortcuts import get_current_site
 def place_order(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
-    # If cart count is 0 redirect user to the market place page
     if cart_count <= 0:
         return redirect('marketplace')
     
@@ -68,10 +67,7 @@ def place_order(request):
             order = Order()
             order.first_name = form.cleaned_data['first_name']
             order.last_name = form.cleaned_data['last_name']
-            order.phone = form.cleaned_data['phone']
             order.email = form.cleaned_data['email']
-            order.address = form.cleaned_data['address']
-            order.country = form.cleaned_data['country']
             order.county = form.cleaned_data['county']
             order.town = form.cleaned_data['town']
             order.pin_code = form.cleaned_data['pin_code']      
@@ -95,6 +91,7 @@ def place_order(request):
     
     # print(subtotal,total_tax,grand_total,tax_data)
     return render(request, 'orders/place_order.html')
+
 
 
 @login_required(login_url='login')
