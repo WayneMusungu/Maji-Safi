@@ -1,9 +1,11 @@
 import datetime
+from django.http import HttpResponse
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from supplier.forms import SupplierForm
-from .forms import UserForm
+from .forms import ChangePasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
@@ -19,6 +21,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin
+from django.views.generic.edit import FormView
 
 
 # Create your views here.
@@ -319,3 +322,25 @@ class ResetPasswordView(View):
         else:
             messages.error(request, 'Password do not match!')
             return redirect('reset_password')
+        
+        
+class ChangePasswordView(LoginRequiredMixin, FormView):
+    template_name = 'accounts/change_password.html'
+    form_class = ChangePasswordForm
+    success_url = reverse_lazy('myAccount')
+    
+    def form_valid(self, form):
+        user = self.request.user
+        old_password = form.cleaned_data['old_password']
+        new_password = form.cleaned_data['new_password']
+        
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(self.request, user)  # Important for keeping the user logged in
+            messages.success(self.request, 'Password changed successfully!')
+            return super().form_valid(form)
+        
+        else:
+            form.add_error('old_password', 'Old password is incorrect.')
+            return self.form_invalid(form)

@@ -6,11 +6,14 @@ from django.core.exceptions import ValidationError
 import re
 
 def validate_special_character(value):
+    # This is a custom validator that adds aditional layer of complexity to ensure passwords
+    # includes characters beyond alpha numeric ones
     pattern = r'[\W_]+'
     if not re.search(pattern, value):
         raise ValidationError('Password must contain at least one special character eg."~!@#$%^&*"')
 
 class UserForm(forms.ModelForm):
+    # validate_password ensures that the password meets Django's default password strength requirements
     password = forms.CharField(widget=forms.PasswordInput(), validators=[validate_password, validate_special_character])
     confirm_password = forms.CharField(widget=forms.PasswordInput())
 
@@ -55,3 +58,22 @@ class UserInfoForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name']
+        
+        
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput(), label='Old Password')
+    new_password = forms.CharField(widget=forms.PasswordInput(), label='New Password', validators=[validate_password, validate_special_character])
+    confirm_password = forms.CharField(widget=forms.PasswordInput(), label='Confirm New Password')
+
+    def clean(self):
+        # This method is called to clean and validate the form fields
+        # It ensures all the fields are properly cleaned and validated before
+        # custom logic is applied
+        cleaned_data = super().clean() # Call the parent class's clean method to get the cleaned data
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password and confirm_password and new_password != confirm_password:
+            raise ValidationError("New passwords do not match!")
+
+        return cleaned_data
