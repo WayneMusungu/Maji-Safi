@@ -61,7 +61,7 @@ class UserInfoForm(forms.ModelForm):
         
         
 class ChangePasswordForm(forms.Form):
-    old_password = forms.CharField(widget=forms.PasswordInput(), label='Old Password')
+    otp = forms.CharField(label='OTP')
     new_password = forms.CharField(widget=forms.PasswordInput(), label='New Password', validators=[validate_password, validate_special_character])
     confirm_password = forms.CharField(widget=forms.PasswordInput(), label='Confirm New Password')
 
@@ -77,3 +77,4 @@ class ChangePasswordForm(forms.Form):
             raise ValidationError("New passwords do not match!")
 
         return cleaned_data
+    

@@ -1,3 +1,4 @@
+from datetime import timezone
 import logging
 from time import sleep
 from celery import shared_task
@@ -42,3 +43,25 @@ def send_email_verification_task(user_id, subject, email_template, domain):
         logger.info(f"Email verification sent to {to_email}")
     except Exception as e:
         logger.error(f"Error in email verification task: {e}")
+
+
+@shared_task(name='accounts.tasks.send_otp_email_task')
+def send_otp_email_task(user_id, subject, email_template, context):
+    logger.info(f"Starting OTP email task for user_id: {user_id}")
+    try:
+        user = User.objects.get(pk=user_id)
+        logger.info(f"User fetched: {user.email}")
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        logger.info(f"From email: {from_email}")
+
+        message = render_to_string(email_template, context)
+        logger.info(f"Email message rendered for user {user.email}")
+
+        to_email = user.email
+        mail = EmailMessage(subject, message, from_email, to=[to_email])
+        mail.content_subtype = 'html'  # Send the HTML content inside the email
+        mail.send()
+        logger.info(f"OTP email sent to {to_email}")
+    except Exception as e:
+        logger.error(f"Error in OTP email task: {e}")

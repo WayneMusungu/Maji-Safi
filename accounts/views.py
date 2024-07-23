@@ -1,5 +1,6 @@
 import datetime
-from django.http import HttpResponse
+import random
+from django.core.cache import cache
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,7 +10,7 @@ from .forms import ChangePasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
-from .utils import detectUser, send_email_verification
+from .utils import detectUser, send_email_verification, send_otp
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
@@ -22,7 +23,6 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin
 from django.views.generic.edit import FormView
-
 
 # Create your views here.
 class RegisterUserView(View):
@@ -329,18 +329,29 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
     form_class = ChangePasswordForm
     success_url = reverse_lazy('myAccount')
     
+    def send_otp(self, user):
+        otp = random.randint(100000, 999999)
+        cache.set(f'otp_{user.pk}', otp, 300)  # OTP valid for 5 minutes
+        send_otp(self.request, user, otp)  # Call the utility function
+
+    def get(self, request, *args, **kwargs):
+        self.send_otp(request.user)
+        messages.info(request, 'An OTP has been sent to your email.')
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         user = self.request.user
-        old_password = form.cleaned_data['old_password']
         new_password = form.cleaned_data['new_password']
+        otp = form.cleaned_data['otp']
         
-        if user.check_password(old_password):
+        stored_otp = cache.get(f'otp_{user.pk}')
+        
+        if stored_otp and str(stored_otp) == otp:
             user.set_password(new_password)
             user.save()
             update_session_auth_hash(self.request, user)  # Important for keeping the user logged in
             messages.success(self.request, 'Password changed successfully!')
             return super().form_valid(form)
-        
         else:
-            form.add_error('old_password', 'Old password is incorrect.')
+            form.add_error('otp', 'Invalid OTP.')
             return self.form_invalid(form)
