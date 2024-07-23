@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Other Installations
-    "phonenumber_field",
-    "django_countries",
     "debug_toolbar",
 ]
 

@@ -42,3 +42,25 @@ def send_email_verification_task(user_id, subject, email_template, domain):
         logger.info(f"Email verification sent to {to_email}")
     except Exception as e:
         logger.error(f"Error in email verification task: {e}")
+
+
+
+@shared_task(name='accounts.tasks.send_otp_email')
+def send_otp_email(user_id, otp):
+    logger.info(f"Starting OTP email task for user_id: {user_id}")
+    try:
+        user = User.objects.get(pk=user_id)
+        from_email = settings.DEFAULT_FROM_EMAIL
+        subject = 'Your OTP Code'
+        message = render_to_string('accounts/emails/otp_email.html', {
+            'user': user,
+            'otp': otp,
+            'domain': settings.SITE_DOMAIN,
+        })
+        to_email = user.email
+        mail = EmailMessage(subject, message, from_email, to=[to_email])
+        mail.content_subtype = 'html'  # Send the HTML content inside the email
+        mail.send()
+        logger.info(f"OTP sent to {to_email}")
+    except Exception as e:
+        logger.error(f"Error in OTP email task: {e}")
