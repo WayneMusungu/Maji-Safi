@@ -1,16 +1,16 @@
 import datetime
 import random
+from django.core.cache import cache
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from accounts.tasks import send_otp_email
 from supplier.forms import SupplierForm
 from .forms import ChangePasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
-from .utils import detectUser, send_email_verification
+from .utils import detectUser, send_email_verification, send_otp
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
@@ -23,9 +23,6 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin
 from django.views.generic.edit import FormView
-from django.core.cache import cache
-
-
 
 # Create your views here.
 class RegisterUserView(View):
@@ -335,7 +332,7 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
     def send_otp(self, user):
         otp = random.randint(100000, 999999)
         cache.set(f'otp_{user.pk}', otp, 300)  # OTP valid for 5 minutes
-        send_otp_email.delay(user.id, otp)  # Call the Celery task
+        send_otp(self.request, user, otp)  # Call the utility function
 
     def get(self, request, *args, **kwargs):
         self.send_otp(request.user)
