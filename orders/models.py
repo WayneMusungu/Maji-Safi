@@ -1,7 +1,6 @@
 from django.db import models
 from accounts.models import User
 from services.models import Product
-from phonenumber_field.modelfields import PhoneNumberField
 from django_countries.fields import CountryField
 from supplier.models import Supplier
 import simplejson as json
@@ -42,7 +41,7 @@ class Order(models.Model):
     order_number = models.CharField(max_length=20) #To generate order_number take the current date time and concatenate it with the pk
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = PhoneNumberField(blank=True)
+    phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(max_length=50)
     address = models.CharField(max_length=200)
     country = CountryField(blank_label='(select country)')
