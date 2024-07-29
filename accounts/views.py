@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from supplier.forms import SupplierForm
-from .forms import ChangePasswordForm, UserForm
+from .forms import ChangePasswordForm, ResetPasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
@@ -304,14 +304,17 @@ class ResetPasswordValidateView(View):
 
 
 class ResetPasswordView(View):
+    form_class = ResetPasswordForm
+    template_name = 'accounts/reset_password.html'
+    
     def get(self, request):
-        return render(request, 'accounts/reset_password.html')
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        
-        if password == confirm_password:
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data['new_password']
             pk = request.session.get('uid')
             user = User.objects.get(pk=pk)
             user.set_password(password)
@@ -320,8 +323,7 @@ class ResetPasswordView(View):
             messages.success(request, 'Password reset successful')
             return redirect('login')
         else:
-            messages.error(request, 'Password do not match!')
-            return redirect('reset_password')
+            return render(request, self.template_name, {'form': form})
         
         
 class ChangePasswordView(LoginRequiredMixin, FormView):
