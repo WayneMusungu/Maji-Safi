@@ -303,27 +303,20 @@ class ResetPasswordValidateView(View):
             return redirect('myAccount')
 
 
-class ResetPasswordView(View):
+class ResetPasswordView(FormView):
     form_class = ResetPasswordForm
     template_name = 'accounts/reset_password.html'
+    success_url = reverse_lazy('login')
     
-    def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
-    
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            password = form.cleaned_data['new_password']
-            pk = request.session.get('uid')
-            user = User.objects.get(pk=pk)
-            user.set_password(password)
-            user.is_active = True
-            user.save()
-            messages.success(request, 'Password reset successful')
-            return redirect('login')
-        else:
-            return render(request, self.template_name, {'form': form})
+    def form_valid(self, form):
+        password = form.cleaned_data['new_password']
+        pk = self.request.session.get('uid')
+        user = User.objects.get(pk=pk)
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+        messages.success(self.request, 'Password reset successful')
+        return super().form_valid(form)
         
         
 class ChangePasswordView(LoginRequiredMixin, FormView):
