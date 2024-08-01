@@ -22,56 +22,38 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 
-# Create your views here.
-class RegisterUserView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            messages.warning(request, 'You are already logged in')
-            return redirect('myAccount')
-        form = UserForm()
-        context = {'form': form}
-        return render(request, 'accounts/registerUser.html', context)
 
-    def post(self, request):
-        if request.user.is_authenticated:
-            messages.warning(request, 'You are already logged in')
+class RegisterUserView(CreateView):
+    form_class = UserForm
+    template_name = 'accounts/registerUser.html'
+    success_url = reverse_lazy('registerUser')
+    
+    def form_valid(self, form):
+        if self.request.user.is_authenticated:
+            messages.warning(self.request, 'You are already logged in')
             return redirect('myAccount')
         
-        form = UserForm(request.POST)
-        if form.is_valid():
-            try:
-                with transaction.atomic():
-                    first_name = form.cleaned_data['first_name']
-                    last_name = form.cleaned_data['last_name']
-                    username = form.cleaned_data['username']
-                    email = form.cleaned_data['email']
-                    password = form.cleaned_data['password']
-                    
-                    user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
-                    user.role = User.CUSTOMER
-                    user.save()
-                    
-                    """
-                    Create a helper function to send the verification email to the registered User
-                    """
-                    subject = 'Account Activation'
-                    email_template = 'accounts/emails/account_email_verification.html'
-                    send_email_verification(request, user, subject, email_template)
-                    
-                    messages.success(request, "Your account has been created, an activation link has been sent to your email")
-                    print('The user has been created successfully')
-                    return redirect('registerUser')
-            except Exception as e:
-                print('An error occurred during user registration:', e)
-                messages.error(request, "An error occurred during user registration. Please try again later.")
-                return redirect('registerUser')
-        else:
-            print('Form is invalid')
-            print(form.errors)
-            context = {'form': form}
-            return render(request, 'accounts/registerUser.html', context)
+        try:
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.role = User.CUSTOMER
+            user.save()
+            
+            """
+            send verification email to the registered user
+            """
+            subject = 'Account Activation'
+            email_template = 'accounts/emails/account_email_verification.html'
+            send_email_verification(self.request, user, subject, email_template)
+            
+            messages.success(self.request, "Your account has been created, an activation link has been sent to your email")
+            return super().form_valid(form)
+        
+        except Exception as e:
+            print(f'Error during user registration: {e}')
+            messages.error(self.request, "An error occurred during user registration. Please try again later.")
             
         
 class RegisterSupplierView(View):
