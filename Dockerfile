@@ -1,17 +1,21 @@
-# Use the official Python base image
-FROM python:3.10.4-slim-bullseye
+FROM python:3.9
 
 # Set environment variables
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set the working directory
+# Set working directory
 WORKDIR /code
 
 # Install dependencies
-COPY ./requirements.txt .
+COPY requirements.txt /code/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project
-COPY . .
+# Copy project files
+COPY . /code/
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Default command
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "MajiSafi.wsgi:application"]

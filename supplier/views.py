@@ -328,9 +328,5 @@ class MyOrdersView(LoginRequiredMixin, ListView):
             print("Retrieving from database")
             orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
             cache.set(cache_key, orders, timeout=300)  # Cache timeout of 5 minutes
-            
-        # Retrieve order usernames once after retrieving from cache or database
-        # order_usernames = [order.user.username for order in orders]
-        # print(order_usernames)
 
         return orders

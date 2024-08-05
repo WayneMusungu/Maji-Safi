@@ -224,6 +224,7 @@ class SearchView(View):
             'supplier_count': supplier_count,
         }
         return render(request, 'marketplace/listings.html', context)
+   
         
 class CheckoutView(LoginRequiredMixin, View):
     login_url = 'login'
