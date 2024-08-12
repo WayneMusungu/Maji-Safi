@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from django.views import View
 from marketplace.models import Cart, Tax
 from marketplace.context_processors import get_cart_amounts
 from services.models import Product
@@ -10,6 +11,7 @@ from .utils import generate_order_number, order_total_by_supplier
 from accounts.utils import send_notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 @login_required(login_url='login')
@@ -181,7 +183,6 @@ def payments(request):
                 print(ordered_product_to_supplier)
                 
                 
-                # print('to_emails=>',to_emails)
                 context = {
                     'order': order,
                     # to_email can be a list, and send the email to the list of suppliers
@@ -192,7 +193,6 @@ def payments(request):
                     'supplier_grand_total':order_total_by_supplier(order, i.product.supplier.id)['grand_total'],
                 }
                 send_notification(subject, email_template, context)
-        # return HttpResponse('Data Saved and email sent')
         
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
@@ -208,32 +208,31 @@ def payments(request):
     return HttpResponse('Payments view')
 
 
-@login_required(login_url='login')
+class OrderCompleteView(LoginRequiredMixin, View):
+    login_url = 'login'
 
-def order_complete(request):
-    # Get the response from place_order url parameter and fetch order and ordered product:
-        # window.location.href = order_complete + '?order_no='+response.order_number+'&trans_id='+response.transaction_id
-    order_number = request.GET.get('order_no')
-    transaction_id = request.GET.get('trans_id')
-    
-    try:
-        order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
-        ordered_product = OrderedProduct.objects.filter(order=order)
+    def get(self, request, *args, **kwargs):
+        # Extract query parameters from the URL
+        order_number = request.GET.get('order_no')
+        transaction_id = request.GET.get('trans_id')
         
-        subtotal = 0
-        for item in ordered_product:
-            subtotal += (item.price * item.quantity)
+        try:
+            order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
+            ordered_product = OrderedProduct.objects.filter(order=order)
             
-        tax_data = json.loads(order.tax_data)
-        # print(tax_data)
+            subtotal = sum(item.price * item.quantity for item in ordered_product)
+            
+            # Purpose: Converts the JSON string order.tax_data into a Python dictionary.
+            # Makes it possible to interact with the tax data within Django view and template.
+            tax_data = json.loads(order.tax_data)
+            
+            context = {
+                'order': order,
+                'ordered_product': ordered_product,
+                'subtotal': subtotal,
+                'tax_data': tax_data,
+            }
+            return render(request, 'orders/order_complete.html', context)
         
-        context = {
-            'order': order,
-            'ordered_product': ordered_product,
-            'subtotal': subtotal,
-            'tax_data': tax_data,
-        }
-        return render(request, 'orders/order_complete.html', context)
-
-    except:
-        return redirect('home')
+        except Order.DoesNotExist:
+            return redirect('home')
