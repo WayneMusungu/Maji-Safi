@@ -95,6 +95,107 @@ def place_order(request):
     return render(request, 'orders/place_order.html')
 
 
+class PaymentsView(LoginRequiredMixin, View):
+    
+    login_url = 'login'
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests for payment processing.
+        """
+        # Check if the request is AJAX
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Retrieve payment details from request
+            order_number = request.POST.get('order_number')
+            transaction_id = request.POST.get('transaction_id')
+            payment_method = request.POST.get('payment_method')
+            status = request.POST.get('status')
+
+            # Get the order and create a payment object
+            order = Order.objects.get(user=request.user, order_number=order_number)
+            payment = Payment(
+                user=request.user,
+                transaction_id=transaction_id,
+                payment_method=payment_method,
+                amount=order.total,
+                status=status,
+            )
+            payment.save()
+
+            # Update the order model
+            order.payment = payment
+            order.is_ordered = True
+            order.save()
+
+            # Move the cart items to OrderedProduct model
+            cart_items = Cart.objects.filter(user=request.user)
+            for item in cart_items:
+                ordered_product = OrderedProduct(
+                    order=order,
+                    payment=payment,
+                    user=request.user,
+                    productitem=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price,
+                    amount=item.product.price * item.quantity,
+                )
+                ordered_product.save()
+
+            # Send order confirmation email to the customer
+            subject = 'Thank you for making an order'
+            email_template = 'orders/emails/order_confirmation_email.html'
+            # Create access to Ordered Products and display it on order_confirmation_email.html
+            ordered_product = OrderedProduct.objects.filter(order=order)
+            
+            customer_subtotal = sum(item.price * item.quantity for item in ordered_product)
+            tax_data = json.loads(order.tax_data)
+
+            context = {
+                'user': request.user,
+                'order': order,
+                # The to_email need not to be the logged in user email address it can be billing email address
+                'to_email': order.email,
+                'ordered_product': ordered_product,
+                'domain': get_current_site(request),
+                'customer_subtotal': customer_subtotal,
+                'tax_data': tax_data,
+            }
+            send_notification(subject, email_template, context)
+
+            # Send order received email to the supplier
+            subject = 'You have received a new order'
+            email_template = 'orders/emails/new_order_received_email.html'
+            # Prevents duplicate emails if multiple products from the same supplier are included in the order
+            to_emails = set()
+            for item in cart_items:
+                supplier_email = item.product.supplier.user.email
+                if supplier_email not in to_emails:
+                    to_emails.add(supplier_email)
+                    
+                    # Get the Supplier's Specific Ordered Product
+                    ordered_product_to_supplier = OrderedProduct.objects.filter(order=order, productitem__supplier=item.product.supplier)
+                    context = {
+                        'order': order,
+                        'to_email': supplier_email,
+                        'ordered_product_to_supplier': ordered_product_to_supplier,
+                        'supplier_subtotal': order_total_by_supplier(order, item.product.supplier.id)['subtotal'],
+                        'tax_data': order_total_by_supplier(order, item.product.supplier.id)['tax_dict'],
+                        'supplier_grand_total': order_total_by_supplier(order, item.product.supplier.id)['grand_total'],
+                    }
+                    send_notification(subject, email_template, context)
+
+            # Clear cart if the payment is successful
+            cart_items.delete()
+
+            # Return back to ajax with the status success or failure
+            response = {
+                'order_number': order_number,
+                'transaction_id': transaction_id
+            }
+            return JsonResponse(response)
+
+        return HttpResponse('Payments view')
+
 
 @login_required(login_url='login')
 def payments(request):
