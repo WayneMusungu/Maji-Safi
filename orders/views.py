@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from django.views import View
 from marketplace.models import Cart, Tax
 from marketplace.context_processors import get_cart_amounts
 from services.models import Product
@@ -10,6 +11,7 @@ from .utils import generate_order_number, order_total_by_supplier
 from accounts.utils import send_notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 @login_required(login_url='login')
@@ -92,6 +94,107 @@ def place_order(request):
     # print(subtotal,total_tax,grand_total,tax_data)
     return render(request, 'orders/place_order.html')
 
+
+class PaymentsView(LoginRequiredMixin, View):
+    
+    login_url = 'login'
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests for payment processing.
+        """
+        # Check if the request is AJAX
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Retrieve payment details from request
+            order_number = request.POST.get('order_number')
+            transaction_id = request.POST.get('transaction_id')
+            payment_method = request.POST.get('payment_method')
+            status = request.POST.get('status')
+
+            # Get the order and create a payment object
+            order = Order.objects.get(user=request.user, order_number=order_number)
+            payment = Payment(
+                user=request.user,
+                transaction_id=transaction_id,
+                payment_method=payment_method,
+                amount=order.total,
+                status=status,
+            )
+            payment.save()
+
+            # Update the order model
+            order.payment = payment
+            order.is_ordered = True
+            order.save()
+
+            # Move the cart items to OrderedProduct model
+            cart_items = Cart.objects.filter(user=request.user)
+            for item in cart_items:
+                ordered_product = OrderedProduct(
+                    order=order,
+                    payment=payment,
+                    user=request.user,
+                    productitem=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price,
+                    amount=item.product.price * item.quantity,
+                )
+                ordered_product.save()
+
+            # Send order confirmation email to the customer
+            subject = 'Thank you for making an order'
+            email_template = 'orders/emails/order_confirmation_email.html'
+            # Create access to Ordered Products and display it on order_confirmation_email.html
+            ordered_product = OrderedProduct.objects.filter(order=order)
+            
+            customer_subtotal = sum(item.price * item.quantity for item in ordered_product)
+            tax_data = json.loads(order.tax_data)
+
+            context = {
+                'user': request.user,
+                'order': order,
+                # The to_email need not to be the logged in user email address it can be billing email address
+                'to_email': order.email,
+                'ordered_product': ordered_product,
+                'domain': get_current_site(request),
+                'customer_subtotal': customer_subtotal,
+                'tax_data': tax_data,
+            }
+            send_notification(subject, email_template, context)
+
+            # Send order received email to the supplier
+            subject = 'You have received a new order'
+            email_template = 'orders/emails/new_order_received_email.html'
+            # Prevents duplicate emails if multiple products from the same supplier are included in the order
+            to_emails = set()
+            for item in cart_items:
+                supplier_email = item.product.supplier.user.email
+                if supplier_email not in to_emails:
+                    to_emails.add(supplier_email)
+                    
+                    # Get the Supplier's Specific Ordered Product
+                    ordered_product_to_supplier = OrderedProduct.objects.filter(order=order, productitem__supplier=item.product.supplier)
+                    context = {
+                        'order': order,
+                        'to_email': supplier_email,
+                        'ordered_product_to_supplier': ordered_product_to_supplier,
+                        'supplier_subtotal': order_total_by_supplier(order, item.product.supplier.id)['subtotal'],
+                        'tax_data': order_total_by_supplier(order, item.product.supplier.id)['tax_dict'],
+                        'supplier_grand_total': order_total_by_supplier(order, item.product.supplier.id)['grand_total'],
+                    }
+                    send_notification(subject, email_template, context)
+
+            # Clear cart if the payment is successful
+            cart_items.delete()
+
+            # Return back to ajax with the status success or failure
+            response = {
+                'order_number': order_number,
+                'transaction_id': transaction_id
+            }
+            return JsonResponse(response)
+
+        return HttpResponse('Payments view')
 
 
 @login_required(login_url='login')
@@ -181,7 +284,6 @@ def payments(request):
                 print(ordered_product_to_supplier)
                 
                 
-                # print('to_emails=>',to_emails)
                 context = {
                     'order': order,
                     # to_email can be a list, and send the email to the list of suppliers
@@ -192,7 +294,6 @@ def payments(request):
                     'supplier_grand_total':order_total_by_supplier(order, i.product.supplier.id)['grand_total'],
                 }
                 send_notification(subject, email_template, context)
-        # return HttpResponse('Data Saved and email sent')
         
         
         # CLEAR CART IF THE PAYMENT IS SUCCESS
@@ -208,32 +309,31 @@ def payments(request):
     return HttpResponse('Payments view')
 
 
-@login_required(login_url='login')
+class OrderCompleteView(LoginRequiredMixin, View):
+    login_url = 'login'
 
-def order_complete(request):
-    # Get the response from place_order url parameter and fetch order and ordered product:
-        # window.location.href = order_complete + '?order_no='+response.order_number+'&trans_id='+response.transaction_id
-    order_number = request.GET.get('order_no')
-    transaction_id = request.GET.get('trans_id')
-    
-    try:
-        order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
-        ordered_product = OrderedProduct.objects.filter(order=order)
+    def get(self, request, *args, **kwargs):
+        # Extract query parameters from the URL
+        order_number = request.GET.get('order_no')
+        transaction_id = request.GET.get('trans_id')
         
-        subtotal = 0
-        for item in ordered_product:
-            subtotal += (item.price * item.quantity)
+        try:
+            order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
+            ordered_product = OrderedProduct.objects.filter(order=order)
             
-        tax_data = json.loads(order.tax_data)
-        # print(tax_data)
+            subtotal = sum(item.price * item.quantity for item in ordered_product)
+            
+            # Purpose: Converts the JSON string order.tax_data into a Python dictionary.
+            # Makes it possible to interact with the tax data within Django view and template.
+            tax_data = json.loads(order.tax_data)
+            
+            context = {
+                'order': order,
+                'ordered_product': ordered_product,
+                'subtotal': subtotal,
+                'tax_data': tax_data,
+            }
+            return render(request, 'orders/order_complete.html', context)
         
-        context = {
-            'order': order,
-            'ordered_product': ordered_product,
-            'subtotal': subtotal,
-            'tax_data': tax_data,
-        }
-        return render(request, 'orders/order_complete.html', context)
-
-    except:
-        return redirect('home')
+        except Order.DoesNotExist:
+            return redirect('home')
