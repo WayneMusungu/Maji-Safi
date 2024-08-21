@@ -146,7 +146,7 @@ class LoginView(View):
             messages.warning(request, 'You are already logged in')
             return redirect('myAccount')
         
-        email = request.POST.get('email')
+        email = request.POST.get('email').strip().lower()
         password = request.POST.get('password')
         
         user = authenticate(request, email=email, password=password)

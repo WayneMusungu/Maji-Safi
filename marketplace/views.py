@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.views.generic.list import ListView
 from supplier.models import OpeningHour, Supplier
 from services.models import Type, Product
 from .models import Cart
@@ -154,17 +155,16 @@ class DecreaseCartView(LoginRequiredMixin, View):
                 'status': 'Failed', 
                 'message': 'Invalid Request!'
             })    
-   
 
-class CartView(LoginRequiredMixin, View):
+
+class CartListView(LoginRequiredMixin, ListView):
+    model = Cart
+    template_name = 'marketplace/cart.html'
+    context_object_name = 'cart_items'
     login_url = 'login'
     
-    def get(self, request):
-        cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
-        context = {
-            "cart_items": cart_items,
-        }
-        return render(request, 'marketplace/cart.html', context)
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user).order_by('created_at')
 
 
 class DeleteCartView(LoginRequiredMixin, View):

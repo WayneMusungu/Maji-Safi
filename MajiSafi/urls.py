@@ -28,8 +28,8 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('marketplace/', include('marketplace.urls')),
 
-     # CART
-    path('cart/', MarketplaceViews.CartView.as_view(), name='cart'),
+    # CART
+    path('cart/', MarketplaceViews.CartListView.as_view(), name='cart'),
 
     #SEARCH
     path('search/', MarketplaceViews.SearchView.as_view(), name='search'),
