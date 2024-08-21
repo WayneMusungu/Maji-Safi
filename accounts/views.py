@@ -167,16 +167,17 @@ class LogoutView(View):
         return redirect('login')
 
 
-class MyAccountView(View):
+class MyAccountView(LoginRequiredMixin, View):
     """
-    This function is responsible for detecting whether the User is a Customer or a Supplier and be taken to the respective dashboard
+    This view is responsible for detecting whether the User is a Customer or a Supplier and redirecting them to the respective dashboard.
     """
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def get(self, request):
+    login_url = 'login'
+
+    def get(self, request, *args, **kwargs):
         user = request.user
         redirectUrl = detectUser(user)
         return redirect(redirectUrl)
-
+    
 
 class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
     login_url = 'login'
