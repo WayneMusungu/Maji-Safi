@@ -21,7 +21,7 @@ from orders.models import Order
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.db import transaction
-from .mixins import CustomerRoleRequiredMixin
+from .mixins import CustomerRoleRequiredMixin, SupplierRoleRequiredMixin
 from django.views.generic.edit import FormView, CreateView
 
 
@@ -202,38 +202,29 @@ def check_role_supplier(user):
     else: 
         raise PermissionDenied
     
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def supplierDashboard(request):
-    supplier = Supplier.objects.get(user=request.user)
-    orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
-    recent_orders = orders[:10]
     
-    # Get The Current Month's Revenue
-    current_month = datetime.datetime.now().month
-    current_month_orders = orders.filter(suppliers__in=[supplier.id], created_at__month=current_month)
-    # print(current_month_orders)
+class SupplierDashboardView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
+    login_url = 'login'
     
-    current_month_revenue = 0
-    for i in current_month_orders:
-        current_month_revenue += i.get_total_by_supplier()['grand_total']
-    # print(current_month_revenue)
+    def get(self, request, *args, **kwargs):
+        supplier = Supplier.objects.get(user=request.user)
+        orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
+        recent_orders = orders[:10]
         
-    # Total Revenue
-    total_revenue = 0
-    for i in orders:
-        total_revenue += i.get_total_by_supplier()['grand_total']
-    
-    # print(orders)
-    # supplier = Supplier.objects.get(user=request.user)
-    context = {
-        'orders': orders,
-        'orders_count': orders.count(),
-        'recent_orders': recent_orders,
-        'total_revenue':total_revenue,
-        'current_month_revenue':current_month_revenue,
-    }
-    return render(request, 'accounts/supplierDashboard.html', context)
+        current_month = datetime.datetime.now().month
+        current_month_orders = orders.filter(suppliers__in=[supplier.id], created_at__month=current_month)
+        
+        current_month_revenue = sum(i.get_total_by_supplier()['grand_total'] for i in current_month_orders)
+        total_revenue = sum(i.get_total_by_supplier()['grand_total'] for i in orders)
+
+        context = {
+            'orders': orders,
+            'orders_count': orders.count(),
+            'recent_orders': recent_orders,
+            'total_revenue': total_revenue,
+            'current_month_revenue': current_month_revenue,
+        }
+        return render(request, 'accounts/supplierDashboard.html', context)
 
 
 class ForgotPassword(View):
