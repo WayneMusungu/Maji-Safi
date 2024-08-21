@@ -159,7 +159,7 @@ def delete_type(request, pk=None):
     water_type_name = get_object_or_404(Type, pk=pk)
     water_type_name.delete()
     messages.success(request,f'{water_type_name} has been removed from your dashboard')
-    return redirect(services)
+    return redirect('services')
 
 def get_supplier(request):
             supplier = Supplier.objects.get(user=request.user)
