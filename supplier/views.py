@@ -10,7 +10,6 @@ from django.db import IntegrityError
 from accounts.models import UserProfile
 from .models import Supplier, OpeningHour
 from services.models import Type, Product
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.views import check_role_supplier
@@ -21,7 +20,9 @@ from django.core.cache import cache
 # Create your views here.
 
 class SupplierProfileView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    login_url = 'login'
+    
+    def get(self, request):
         profile = get_object_or_404(UserProfile, user=request.user)
         supplier = get_object_or_404(Supplier, user=request.user)
         profile_form = UserProfileForm(instance=profile)
@@ -35,7 +36,7 @@ class SupplierProfileView(LoginRequiredMixin, View):
         }
         return render(request, 'supplier/supplierProfile.html', context)
     
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         profile = get_object_or_404(UserProfile, user=request.user)
         supplier = get_object_or_404(Supplier, user=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
