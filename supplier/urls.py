@@ -5,7 +5,7 @@ from accounts import views as AccountViews
 urlpatterns = [
     path('', AccountViews.SupplierDashboardView.as_view(), name='supplier'),
     path('profile/', views.SupplierProfileView.as_view(), name='supplierProfile'),
-    path('services/', views.services ,name='services'),
+    path('services/', views.Services.as_view() ,name='services'),
     path('services/type/<int:pk>/', views.water_by_type ,name='water_by_type'),
     
     

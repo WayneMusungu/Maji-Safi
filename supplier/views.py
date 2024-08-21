@@ -1,8 +1,12 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from accounts.mixins import SupplierRoleRequiredMixin
 from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
@@ -58,21 +62,19 @@ class SupplierProfileView(LoginRequiredMixin, View):
             'supplier': supplier,
         }
         return render(request, 'supplier/supplierProfile.html', context)
-
-
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def services(request):
-    """
-    Get the logged in Supplier and get multiple queryset of the type of services they offer
-    """
-    supplier = Supplier.objects.get(user=request.user)
-    types = Type.objects.filter(supplier=supplier)
-    context = {
-        'types': types,
-    }
-    return render(request, 'supplier/services.html', context)
-
+    
+    
+class Services(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
+    login_url = 'login'
+    
+    model = Type
+    template_name = "supplier/services.html"
+    context_object_name = "types"
+    
+    def get_queryset(self):
+        supplier = get_object_or_404(Supplier, user=self.request.user)
+        return Type.objects.filter(supplier=supplier)
+    
 
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
