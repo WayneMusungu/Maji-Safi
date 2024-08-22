@@ -1,12 +1,10 @@
-from typing import Any
-from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
 from accounts.mixins import SupplierRoleRequiredMixin
+from supplier.utils import get_supplier
 from .forms import SupplierForm, OpeningHourForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
@@ -162,10 +160,6 @@ def delete_type(request, pk=None):
     messages.success(request,f'{water_type_name} has been removed from your dashboard')
     return redirect('services')
 
-def get_supplier(request):
-            supplier = Supplier.objects.get(user=request.user)
-            return supplier
-
 
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
@@ -191,10 +185,6 @@ def add_product(request):
         """
         Create a function to modify the form fields to show only the type of water that belongs to a specific logged in Supplier
         """
-        # def get_supplier(request):
-        #     supplier = Supplier.objects.get(user=request.user)
-        #     return supplier
-
         form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
 
     context ={
@@ -319,9 +309,8 @@ class MyOrdersView(LoginRequiredMixin, ListView):
     context_object_name = 'orders'
 
     def get_queryset(self):
-        user = self.request.user
-        supplier = Supplier.objects.get(user=user)
-        cache_key = f'my_orders_{user.username}_{supplier.id}'
+        supplier = Supplier.objects.get(user=self.request.user)
+        cache_key = f'my_orders_{self.request.user.username}_{supplier.id}'
         orders = cache.get(cache_key)
 
         if orders:
