@@ -76,18 +76,19 @@ class Services(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
         return Type.objects.filter(supplier=supplier)
     
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def water_by_type(request, pk=None):
-    supplier = Supplier.objects.get(user=request.user)
-    type = get_object_or_404(Type, pk=pk)
-    products = Product.objects.filter(supplier=supplier, type=type)
-    context = {
-        'products': products,
-        'type': type,
-    }
-    print(products)
-    return render(request, 'supplier/water_by_type.html', context)
+class WaterByTypeView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
+    login_url = 'login'
+    template_name = 'supplier/water_by_type.html'
+
+    def get(self, request, pk):
+        supplier = Supplier.objects.get(user=request.user)
+        type = get_object_or_404(Type, pk=pk)
+        products = Product.objects.filter(supplier=supplier, type=type)
+        context = {
+            'products': products,
+            'type': type,
+        }
+        return render(request, self.template_name, context)
 
 
 @login_required(login_url='login')

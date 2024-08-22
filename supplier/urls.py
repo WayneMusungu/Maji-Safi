@@ -6,7 +6,7 @@ urlpatterns = [
     path('', AccountViews.SupplierDashboardView.as_view(), name='supplier'),
     path('profile/', views.SupplierProfileView.as_view(), name='supplierProfile'),
     path('services/', views.Services.as_view() ,name='services'),
-    path('services/type/<int:pk>/', views.water_by_type ,name='water_by_type'),
+    path('services/type/<int:pk>/', views.WaterByTypeView.as_view() ,name='water_by_type'),
     
     
     # SERVICES TYPE CRUD
