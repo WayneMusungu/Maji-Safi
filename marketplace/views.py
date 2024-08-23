@@ -161,14 +161,14 @@ class DecreaseCartView(LoginRequiredMixin, View):
 
 
 class CartListView(LoginRequiredMixin, ListView):
+    login_url = 'login'
     model = Cart
     template_name = 'marketplace/cart.html'
     context_object_name = 'cart_items'
-    login_url = 'login'
     
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user).order_by('created_at')
-
+    
 
 class DeleteCartView(LoginRequiredMixin, View):
     login_url = 'login'
