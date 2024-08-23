@@ -232,16 +232,6 @@ def delete_product(request, pk=None):
     return redirect('water_by_type', product.type.id)
 
 
-def opening_hours(request):
-    opening_hours = OpeningHour.objects.filter(supplier=get_supplier(request))
-    form = OpeningHourForm()
-    context = {
-        'form': form,
-        'opening_hours': opening_hours,
-    }
-    return render(request, 'supplier/opening_hours.html', context)
-
-
 class OpeningHoursView(FormView, ListView):
     model = OpeningHour
     form_class = OpeningHourForm
