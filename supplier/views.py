@@ -155,6 +155,7 @@ def edit_type(request, pk=None):
 
 
 class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
+    login_url = 'login'
     model = Type
     template_name = 'supplier/delete_type.html'
     success_url = reverse_lazy('services')
