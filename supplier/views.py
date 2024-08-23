@@ -160,7 +160,7 @@ class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMi
     template_name = 'supplier/delete_type.html'
     success_url = reverse_lazy('services')
     
-    def get_success_message(self):
+    def get_success_message(self, *args, **kwargs):
         return f' {self.object.water_type} has been removed from your dashboard'
 
 @login_required(login_url='login')
