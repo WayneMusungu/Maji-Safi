@@ -1,8 +1,10 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
 from supplier.utils import get_supplier
 from .forms import SupplierForm, OpeningHourForm
@@ -152,14 +154,13 @@ def edit_type(request, pk=None):
     return render(request, 'supplier/edit_type.html', context)
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def delete_type(request, pk=None):
-    water_type_name = get_object_or_404(Type, pk=pk)
-    water_type_name.delete()
-    messages.success(request,f'{water_type_name} has been removed from your dashboard')
-    return redirect('services')
-
+class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Type
+    template_name = 'supplier/delete_type.html'
+    success_url = reverse_lazy('services')
+    
+    def get_success_message(self):
+        return f' {self.object.water_type} has been removed from your dashboard'
 
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)
