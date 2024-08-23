@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DeleteView
+from django.views.generic import ListView, DeleteView, FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
@@ -240,6 +240,21 @@ def opening_hours(request):
         'opening_hours': opening_hours,
     }
     return render(request, 'supplier/opening_hours.html', context)
+
+
+class OpeningHoursView(FormView, ListView):
+    model = OpeningHour
+    form_class = OpeningHourForm
+    template_name = 'supplier/opening_hours.html'
+    context_object_name = 'opening_hours'
+    
+    def get_queryset(self):
+        return OpeningHour.objects.filter(supplier=get_supplier(self.request))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
 
 
 def add_opening_hours(request):
