@@ -16,17 +16,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class MarketPlaceView(View):
-    def get(self, request):
-        suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
-        supplier_count = suppliers.count()
-        context = {
-            "suppliers":suppliers,
-            "supplier_count":supplier_count,
-        }
-        return render(request, 'marketplace/listings.html', context)
+class MarketPlaceView(ListView):
+    model = Supplier
+    template_name = 'marketplace/listings.html'
+    context_object_name = 'suppliers'
     
+    def get_queryset(self):
+        return Supplier.objects.filter(is_approved=True, user__is_active=True)
     
+    def  get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['supplier_count'] = self.get_queryset().count()
+        return context
+    
+
 class SupplierDetailView(View):
     def get(self, request, supplier_slug):
     
