@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DeleteView, FormView, CreateView
+from django.views.generic import ListView, DeleteView, FormView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
@@ -119,36 +119,30 @@ class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin
         return f'{self.object.water_type} has been added to your dashboard'  
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def edit_type(request, pk=None):
-    water_type_name = get_object_or_404(Type, pk=pk)
-    if request.method == 'POST':
-        form = WaterTypeForm(request.POST, instance=water_type_name)
-        if form.is_valid():
-            """
-            Assign the supplier before storing the form
-            """
-            water_type_name = form.cleaned_data['water_type']
-            water = form.save(commit=False)
-            water.supplier = Supplier.objects.get(user=request.user)
-            """
-            Generate a slug based on the water type name
-            """
-            water.slug = slugify(water_type_name)+'-'+str(water.id)
-            form.save()
-
-            messages.success(request, f'{water_type_name} has been updated successfully')
-            return redirect('services')
-        else:
-            print(form.errors)
-    else:
-        form = WaterTypeForm(instance=water_type_name)
-    context = {
-        'form': form,
-        'water_type_name' : water_type_name
-    }
-    return render(request, 'supplier/edit_type.html', context)
+class EditType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Type
+    form_class = WaterTypeForm
+    template_name = 'supplier/edit_type.html'
+    success_url = reverse_lazy('services')
+    login_url = 'login'
+    context_object_name = 'water_type_name'
+    
+    def form_valid(self, form):
+        water_type_name = form.cleaned_data['water_type']
+        water = form.save(commit=False)
+        water.supplier = Supplier.objects.get(user=self.request.user)
+        
+        water.slug = slugify(water_type_name) + '-' + str(water.id)
+        water.save()
+        
+        return super().form_valid(form)
+    
+    def get_success_message(self, *args, **kwargs):
+        return f'{self.object.water_type}  has been updated successfully'  
+    
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Type, pk=pk)
 
 
 class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
@@ -159,6 +153,7 @@ class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMi
     
     def get_success_message(self, *args, **kwargs):
         return f' {self.object.water_type} has been removed from your dashboard'
+
 
 @login_required(login_url='login')
 @user_passes_test(check_role_supplier)

@@ -11,7 +11,7 @@ urlpatterns = [
     
     # SERVICES TYPE CRUD
     path('services/type/add/', views.AddType.as_view(), name ='add_type'),
-    path('services/type/edit/<int:pk>/', views.edit_type ,name='edit_type'),
+    path('services/type/edit/<int:pk>/', views.EditType.as_view() ,name='edit_type'),
     path('services/type/delete/<int:pk>/', views.DeleteType.as_view() ,name='delete_type'),
     
     
