@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -72,23 +73,25 @@ class Services(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     context_object_name = "types"
     
     def get_queryset(self):
-        supplier = get_object_or_404(Supplier, user=self.request.user)
-        return Type.objects.filter(supplier=supplier)
+        self.supplier = get_object_or_404(Supplier, user=self.request.user)
+        return Type.objects.filter(supplier=self.supplier)
     
 
-class WaterByTypeView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
+class WaterByTypeView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
+    model = Product
+    template_name = "supplier/water_by_type.html"
+    context_object_name = "products"
     login_url = 'login'
-    template_name = 'supplier/water_by_type.html'
-
-    def get(self, request, pk):
-        supplier = Supplier.objects.get(user=request.user)
-        type = get_object_or_404(Type, pk=pk)
-        products = Product.objects.filter(supplier=supplier, type=type)
-        context = {
-            'products': products,
-            'type': type,
-        }
-        return render(request, self.template_name, context)
+    
+    def get_queryset(self):
+        self.supplier = get_object_or_404(Supplier, user=self.request.user)
+        self.type = get_object_or_404(Type, pk=self.kwargs['pk'])
+        return Product.objects.filter(supplier=self.supplier, type=self.type)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['type'] = self.type
+        return context
 
 
 class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, CreateView):
