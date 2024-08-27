@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DeleteView, FormView, TemplateView
+from django.views.generic import ListView, DeleteView, FormView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
@@ -91,35 +91,32 @@ class WaterByTypeView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def add_type(request):
-    if request.method == 'POST':
-        form = WaterTypeForm(request.POST)
-        if form.is_valid():
-            """
-            Assign the supplier before storing the form
-            """
-            water_type_name = form.cleaned_data['water_type']
-            water = form.save(commit=False)
-            water.supplier = Supplier.objects.get(user=request.user)
-            water.save() # The water id will be generated
-            """
-            Generate a slug based on the water type name
-            """
-            water.slug = slugify(water_type_name)+'-'+str(water.id) # mineral-water-15
-            water.save()
-
-            messages.success(request, f'{water_type_name} has been added to your dashboard')
-            return redirect('services')
-        else:
-            print(form.errors)
-    else:
-        form = WaterTypeForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'supplier/add_type.html', context)
+class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Type
+    form_class = WaterTypeForm
+    template_name = 'supplier/add_type.html'
+    success_url = reverse_lazy('services')
+    login_url = 'login'
+    
+    def form_valid(self, form):
+        """
+        Assign the supplier before saving the form
+        """
+        water_type_name = form.cleaned_data['water_type']
+        water = form.save(commit=False)
+        water.supplier = Supplier.objects.get(user=self.request.user)
+        water.save()  # The water id will be generated
+        
+        """
+        Generate a slug based on the water type name
+        """
+        water.slug = slugify(water_type_name)+'-'+str(water.id) # mineral-water-15
+        water.save()
+        
+        return super().form_valid(form)
+        
+    def get_success_message(self, *args, **kwargs):
+        return f'{self.object.water_type} has been added to your dashboard'  
 
 
 @login_required(login_url='login')
