@@ -233,11 +233,6 @@ class OpeningHoursView(FormView, ListView):
     def get_queryset(self):
         return OpeningHour.objects.filter(supplier=get_supplier(self.request))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        return context
-
 
 def add_opening_hours(request):
     """
