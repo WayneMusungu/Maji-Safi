@@ -10,63 +10,71 @@
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <!-- LOAD SIDEBAR -->
-
                     {% include 'includes/supplier_sidebar.html' %}
-
-                    
                 </div>
-                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                <div class="col-lg-9 col-md-9 col-sm-12">
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
-                            <button class="btn btn-secondary" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
-                            <br><br>
+                            <button class="btn btn-secondary mb-3" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
                             
-                            <h5 class="text-uppercase">Services Offered by {{supplier.supplier_name}}</h5>
+                            <h5 class="text-uppercase">Services Offered by {{ supplier.supplier_name }}</h5>
                             <hr>
                             
-                            <h6><span class="text-uppercase text-success">{{type}}</span></h6>
+                            <h6><span class="text-uppercase text-success">{{ type }}</span></h6>
+
                            
-									<!-- My Water Shop Form Start -->
-                                    {% if products %}
-                                        <table class="table table-hover table-borderless">
-                                    
-                                            <tbody>
+                            <!-- My Water Shop Form Start -->
+                            {% if products %}
+                                <!-- Wrap table in a responsive class -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-borderless">
+                                        <tbody>
                                             {% for product in products %}
                                             <tr>
-                                                <td class="text-left">{{ forloop.counter }}</td>
-                                                <td class="text-left"><img src="{{product.image.url}}" alt="bottle-image" width="100" style="border-radius: 50%;"></td>
-                                                <td class="text-left">
-                                                    <a href="#"><p class="mb-0 font-weight-bold">{{ product.bottle_size }}</p>
-                                                    <small class="text-muted">{{product.description}}</small></a>
+                                                <td class="text-left align-middle">{{ forloop.counter }}</td>
+                                                <td class="text-left align-middle">
+                                                    <img src="{{ product.image.url }}" alt="bottle-image" width="100" style="border-radius: 50%;">
                                                 </td>
-                                                <td>
+                                                <td class="text-left align-middle">
+                                                    <a href="#"><p class="mb-0 font-weight-bold">{{ product.bottle_size }}</p>
+                                                    <small class="text-muted">{{ product.description }}</small></a>
+                                                </td>
+                                                <td class="align-middle">
                                                     {% if product.is_available %}
                                                         <span class="badge badge-success">Available</span>
                                                     {% else %}
                                                         <span class="badge badge-danger">Out of Stock</span>
                                                     {% endif %}
                                                 </td>
-                                                <td><a href="{% url 'edit_product' product.id %}" style="color:unset;"><i class="fa fa-pencil" aria-hidden="true"></i></a> &nbsp; <a href="{% url ' delete_product' product.id %}" onclick="return confirm('Are you sure you want to delete {{ product.bottle_size }}')"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a></td>
+                                                <td class="align-middle">
+                                                    <div class="d-flex flex-wrap align-items-center"> <!-- Ensure flex container for buttons -->
+                                                        <a href="{% url 'edit_product' product.id %}" 
+                                                           class="btn btn-warning btn-sm mr-2 mb-1" 
+                                                           role="button">
+                                                            <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+                                                        </a> 
+                                                        <a href="{% url 'delete_product' product.id %}" 
+                                                           class="btn btn-danger btn-sm mb-1" 
+                                                           role="button">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                        </a>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    {% else %}
-                                    <h5 class="text-centre ">You dont have a product for {{type}}</h5>
-                                    <div class="text-centre">
-                                        <a href="{% url 'add_product' %}" class="btn btn-success">
-                                            <i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Product
-                                        </a>
-                                    </div>
-
-
-                                    {% endif %}
-									
-                         
-                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <h5 class="text-center">You don't have a product for {{ type }}</h5>
+                                <div class="text-center">
+                                    <a href="{% url 'add_product' %}" class="btn btn-success">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> &nbsp; Add Product
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

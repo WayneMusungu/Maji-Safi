@@ -12,7 +12,6 @@ from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
 from .utils import detectUser, send_email_verification, send_otp
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -20,7 +19,6 @@ from supplier.models import Supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order
 from django.views.generic import View
-from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin, SupplierRoleRequiredMixin
 from django.views.generic.edit import FormView, CreateView

@@ -217,13 +217,22 @@ def edit_product(request, pk=None):
     return render(request, 'supplier/edit_product.html', context)
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def delete_product(request, pk=None):
-    product = get_object_or_404(Product, pk=pk)
-    product.delete()
-    messages.success(request, f'{product} has been removed from your dashboard')
-    return redirect('water_by_type', product.type.id)
+class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
+    login_url = 'login'
+    model = Product
+    template_name = 'supplier/delete_product.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the URL to redirect to after canceling
+        context['return_url'] = self.request.GET.get('return_url', self.get_success_url())
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy("water_by_type", kwargs={"pk": self.object.type.pk})
+
+    def get_success_message(self, *args, **kwargs):
+        return f'{self.object} has been removed from your dashboard'
 
 
 class OpeningHoursView(FormView, ListView):
