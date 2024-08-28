@@ -1,4 +1,3 @@
-from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
