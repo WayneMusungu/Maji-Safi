@@ -288,7 +288,7 @@ class RemoveOpeningHoursView(LoginRequiredMixin, View):
             return JsonResponse(response_data)
 
 
-class OrderDetailView(View):
+class OrderDetailView(SupplierRoleRequiredMixin, View):
     template_name = 'supplier/order_detail.html'
 
     def get(self, request, order_number):
@@ -316,7 +316,7 @@ class OrderDetailView(View):
         return render(request, self.template_name, context)
 
 
-class MyOrdersView(LoginRequiredMixin, ListView):
+class MyOrdersView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     login_url = 'login'
     template_name = 'supplier/my_orders.html'
     context_object_name = 'orders'
