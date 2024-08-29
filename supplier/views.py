@@ -235,14 +235,15 @@ class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessag
         return f'{self.object} has been removed from your dashboard'
 
 
-class OpeningHoursView(FormView, ListView):
+class OpeningHoursView(FormView, SupplierRoleRequiredMixin, ListView):
     model = OpeningHour
     form_class = OpeningHourForm
     template_name = 'supplier/opening_hours.html'
     context_object_name = 'opening_hours'
     
     def get_queryset(self):
-        return OpeningHour.objects.filter(supplier=get_supplier(self.request))
+        self.supplier = get_object_or_404(Supplier, user=self.request.user)
+        return OpeningHour.objects.filter(supplier=self.supplier)
 
 
 def add_opening_hours(request):
@@ -272,7 +273,7 @@ def add_opening_hours(request):
             HttpResponse('Invalid request')
 
 
-class RemoveOpeningHoursView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
+class RemoveOpeningHoursView(LoginRequiredMixin, View):
     """
     Handle deletion of OpeningHour objects via AJAX requests
     """
