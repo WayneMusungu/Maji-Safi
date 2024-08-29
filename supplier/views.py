@@ -272,12 +272,19 @@ def add_opening_hours(request):
             HttpResponse('Invalid request')
 
 
-def remove_opening_hours(request, pk=None):
-    if request.user.is_authenticated:
+class RemoveOpeningHoursView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
+    """
+    Handle deletion of OpeningHour objects via AJAX requests
+    """
+    login_url = 'login'
+    
+    def get(self, request, pk=None):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             hour = get_object_or_404(OpeningHour, pk=pk)
             hour.delete()
-            return JsonResponse({'status': 'success', 'id': pk})
+            response_data = {'status': 'success', 'message': 'Opening hour deleted successfully', 'id':pk}
+            print(response_data)
+            return JsonResponse(response_data)
 
 
 class OrderDetailView(View):
