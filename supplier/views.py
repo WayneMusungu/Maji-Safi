@@ -236,6 +236,7 @@ class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessag
 
 
 class OpeningHoursView(FormView, SupplierRoleRequiredMixin, ListView):
+    login_url = 'login'
     model = OpeningHour
     form_class = OpeningHourForm
     template_name = 'supplier/opening_hours.html'
