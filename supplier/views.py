@@ -235,7 +235,7 @@ class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessag
         return f'{self.object} has been removed from your dashboard'
 
 
-class OpeningHoursView(FormView, SupplierRoleRequiredMixin, ListView):
+class OpeningHoursView(LoginRequiredMixin, FormView, SupplierRoleRequiredMixin, ListView):
     login_url = 'login'
     model = OpeningHour
     form_class = OpeningHourForm
