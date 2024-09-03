@@ -157,36 +157,35 @@ class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMi
         return f' {self.object.water_type} has been removed from your dashboard'
 
 
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def add_product(request):
-    if request.method == 'POST':
-        form = WaterProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            """
-            Assign the supplier before storing the form
-            """
-            bottle_size = form.cleaned_data['bottle_size']
-            bttle_water = form.save(commit=False)
-            bttle_water.supplier = Supplier.objects.get(user=request.user)
-            bttle_water.slug = slugify(bottle_size)
-            form.save()
-
-            messages.success(request, f'{bottle_size} Water Product has been added successfully')
-            return redirect('water_by_type', bttle_water.type.id)
-        else:
-            print(form.errors)
-    else:
-        form = WaterProductForm()
+class AddProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, CreateView):
+    model = Product
+    form_class = WaterProductForm
+    template_name = 'supplier/add_product.html'
+    login_url = 'login'
+    
+    def form_valid(self, form):
         """
-        Create a function to modify the form fields to show only the type of water that belongs to a specific logged in Supplier
+        Assign the supplier before saving the form
         """
-        form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
-
-    context ={
-        'form':form,
-    }
-    return render (request, 'supplier/add_product.html', context)
+        bottle_size = form.cleaned_data['bottle_size']
+        bttle_water = form.save(commit=False)
+        bttle_water.supplier = Supplier.objects.get(user=self.request.user)
+        bttle_water.slug = slugify(bottle_size)
+        bttle_water.save()
+        
+        messages.success(self.request, f'{bottle_size} Water Product has been added successfully')
+        return super().form_valid(form)
+    
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        """
+        Modify the form fields to show only the type of water that belongs to a specific logged in Supplier
+        """
+        form.fields['type'].queryset = Type.objects.filter(supplier=Supplier.objects.get(user=self.request.user))
+        return form
+    
+    def get_success_url(self):
+        return reverse_lazy('water_by_type', kwargs={'pk': self.object.type.id})
 
 
 @login_required(login_url='login')
