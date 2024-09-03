@@ -1,4 +1,3 @@
-from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db import transaction
 from django.views import View

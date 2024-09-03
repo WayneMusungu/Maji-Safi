@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.views.generic.list import ListView
 from supplier.models import OpeningHour, Supplier
 from services.models import Type, Product
 from .models import Cart
@@ -15,17 +16,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class MarketPlaceView(View):
-    def get(self, request):
-        suppliers = Supplier.objects.filter(is_approved=True, user__is_active=True)
-        supplier_count = suppliers.count()
-        context = {
-            "suppliers":suppliers,
-            "supplier_count":supplier_count,
-        }
-        return render(request, 'marketplace/listings.html', context)
+class MarketPlaceView(ListView):
+    model = Supplier
+    template_name = 'marketplace/listings.html'
+    context_object_name = 'suppliers'
     
+    def get_queryset(self):
+        return Supplier.objects.filter(is_approved=True, user__is_active=True)
     
+    def  get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['supplier_count'] = self.get_queryset().count()
+        return context
+    
+
 class SupplierDetailView(View):
     def get(self, request, supplier_slug):
     
@@ -154,18 +158,17 @@ class DecreaseCartView(LoginRequiredMixin, View):
                 'status': 'Failed', 
                 'message': 'Invalid Request!'
             })    
-   
 
-class CartView(LoginRequiredMixin, View):
+
+class CartListView(LoginRequiredMixin, ListView):
     login_url = 'login'
+    model = Cart
+    template_name = 'marketplace/cart.html'
+    context_object_name = 'cart_items'
     
-    def get(self, request):
-        cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
-        context = {
-            "cart_items": cart_items,
-        }
-        return render(request, 'marketplace/cart.html', context)
-
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user).order_by('created_at')
+    
 
 class DeleteCartView(LoginRequiredMixin, View):
     login_url = 'login'

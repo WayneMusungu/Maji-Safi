@@ -11,18 +11,16 @@ from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
 from .utils import detectUser, send_email_verification, send_otp
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order
 from django.views.generic import View
-from django.utils.decorators import method_decorator
 from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin, SupplierRoleRequiredMixin
 from django.views.generic.edit import FormView, CreateView
+from django.views.generic import ListView
 
 
 class RegisterUserView(CreateView):
@@ -146,7 +144,7 @@ class LoginView(View):
             messages.warning(request, 'You are already logged in')
             return redirect('myAccount')
         
-        email = request.POST.get('email')
+        email = request.POST.get('email').strip().lower()
         password = request.POST.get('password')
         
         user = authenticate(request, email=email, password=password)
@@ -178,30 +176,23 @@ class MyAccountView(LoginRequiredMixin, View):
         redirectUrl = detectUser(user)
         return redirect(redirectUrl)
     
-
-class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, View):
+    
+class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListView):
+    model = Order
+    template_name = 'accounts/customerDashboard.html'
+    context_object_name = 'recent_orders'
     login_url = 'login'
     
-    def get(self, request, *args, **kwargs):
-        orders = Order.objects.filter(user=request.user, is_ordered=True)
-        recent_orders = orders[:6]  # Show only six recent orders
-        context = {
-            'orders': orders,
-            'orders_count': orders.count(),  # Count the number of orders made by the customer
-            'recent_orders': recent_orders,
-        }
-        return render(request, 'accounts/customerDashboard.html', context)
+    def get_queryset(self):
+        self.orders = Order.objects.filter(user=self.request.user, is_ordered=True)
+        recent_orders = self.orders[:6]  # Show only six recent orders
+        return recent_orders 
     
-    
-"""
-Restricting Supplier from accessing the customers page
-"""
-def check_role_supplier(user):
-    if user.role == 1:
-        return True
-    else: 
-        raise PermissionDenied
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders_count'] = self.orders.count()
+        return context
+
     
 class SupplierDashboardView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
     login_url = 'login'
