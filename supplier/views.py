@@ -251,6 +251,51 @@ class OpeningHoursView(LoginRequiredMixin, FormView, SupplierRoleRequiredMixin, 
     def get_queryset(self):
         self.supplier = get_object_or_404(Supplier, user=self.request.user)
         return OpeningHour.objects.filter(supplier=self.supplier)
+    
+    
+class AddOpeningHoursView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            day = request.POST.get('day')
+            from_hour = request.POST.get('from_hour')
+            to_hour = request.POST.get('to_hour')
+            is_closed = request.POST.get('is_closed')
+
+            try:
+                hour = OpeningHour.objects.create(
+                    supplier=get_supplier(request),
+                    day=day,
+                    from_hour=from_hour,
+                    to_hour=to_hour,
+                    is_closed=is_closed == 'True'
+                )
+                day = OpeningHour.objects.get(id=hour.id)
+                if day.is_closed:
+                    response = {
+                        'status': 'success',
+                        'id': hour.id,
+                        'day': day.get_day_display(),
+                        'is_closed': 'Closed'
+                    }
+                else:
+                    response = {
+                        'status': 'success',
+                        'id': hour.id,
+                        'day': day.get_day_display(),
+                        'from_hour': hour.from_hour,
+                        'to_hour': hour.to_hour
+                    }
+                return JsonResponse(response)
+            except IntegrityError:
+                response = {
+                    'status': 'failed',
+                    'message': f'{from_hour}-{to_hour} already exists for this day!'
+                }
+                return JsonResponse(response)
+        else:
+            return HttpResponse('Invalid request', status=400)
 
 
 def add_opening_hours(request):

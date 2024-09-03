@@ -23,7 +23,7 @@ urlpatterns = [
     
     # OPENING HOUR CRUD
     path('opening-hours/', views.OpeningHoursView.as_view(), name='opening_hours'),
-    path('opening-hours/add/', views.add_opening_hours, name='add_opening_hours'),
+    path('opening-hours/add/', views.AddOpeningHoursView.as_view(), name='add_opening_hours'),
     path('opening-hours/remove/<int:pk>/', views.RemoveOpeningHoursView.as_view(), name='remove_opening_hours'),
     
     # ORDER DETAIL
