@@ -2,7 +2,6 @@ import datetime
 import random
 from django.core.cache import cache
 from django.contrib.auth import update_session_auth_hash
-from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -12,7 +11,6 @@ from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
 from .utils import detectUser, send_email_verification, send_otp
-from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
@@ -195,16 +193,6 @@ class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListV
         context['orders_count'] = self.orders.count()
         return context
 
-    
-"""
-Restricting Supplier from accessing the customers page
-"""
-def check_role_supplier(user):
-    if user.role == 1:
-        return True
-    else: 
-        raise PermissionDenied
-    
     
 class SupplierDashboardView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
     login_url = 'login'

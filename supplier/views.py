@@ -15,8 +15,6 @@ from accounts.models import UserProfile
 from .models import Supplier, OpeningHour
 from services.models import Type, Product
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
-from accounts.views import check_role_supplier
 from django.template.defaultfilters import slugify
 from orders.models import Order, OrderedProduct
 from django.core.cache import cache
@@ -66,7 +64,6 @@ class SupplierProfileView(LoginRequiredMixin, View):
     
 class Services(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     login_url = 'login'
-    
     model = Type
     template_name = "supplier/services.html"
     context_object_name = "types"
@@ -93,7 +90,7 @@ class WaterByTypeView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
         return context
 
 
-class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, CreateView):
+class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, CreateView):
     model = Type
     form_class = WaterTypeForm
     template_name = 'supplier/add_type.html'
@@ -115,19 +112,23 @@ class AddType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin
         water.slug = slugify(water_type_name)+'-'+str(water.id) # mineral-water-15
         water.save()
         
-        return super().form_valid(form)
+        messages.success(self.request, f'{water_type_name} has been added to your dashboard')
         
-    def get_success_message(self, *args, **kwargs):
-        return f'{self.object.water_type} has been added to your dashboard'  
+        return super().form_valid(form)
 
 
-class EditType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, UpdateView):
+class EditType(LoginRequiredMixin, SupplierRoleRequiredMixin, UpdateView):
     model = Type
     form_class = WaterTypeForm
     template_name = 'supplier/edit_type.html'
     success_url = reverse_lazy('services')
     login_url = 'login'
     context_object_name = 'water_type_name'
+    
+    def get_object(self):
+        """Retrieve the Type instance based on the primary key"""
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Type, pk=pk)
     
     def form_valid(self, form):
         water_type_name = form.cleaned_data['water_type']
@@ -137,15 +138,10 @@ class EditType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixi
         water.slug = slugify(water_type_name) + '-' + str(water.id)
         water.save()
         
+        messages.success(self.request, f'{water_type_name} has been updated successfully')
+        
         return super().form_valid(form)
     
-    def get_success_message(self, *args, **kwargs):
-        return f'{self.object.water_type}  has been updated successfully'  
-    
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(Type, pk=pk)
-
 
 class DeleteType(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
     login_url = 'login'
@@ -163,6 +159,14 @@ class AddProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, CreateView):
     template_name = 'supplier/add_product.html'
     login_url = 'login'
     
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        """
+        Modify the form fields to show only the type of water that belongs to a specific logged in Supplier
+        """
+        form.fields['type'].queryset = Type.objects.filter(supplier=Supplier.objects.get(user=self.request.user))
+        return form
+    
     def form_valid(self, form):
         """
         Assign the supplier before saving the form
@@ -174,46 +178,49 @@ class AddProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, CreateView):
         bttle_water.save()
         
         messages.success(self.request, f'{bottle_size} Water Product has been added successfully')
+        
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('water_by_type', kwargs={'pk': self.object.type.id})
+    
+
+class EditProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, UpdateView):
+    model = Product
+    form_class = WaterProductForm
+    template_name = 'supplier/edit_product.html'
+    login_url = 'login'
+    context_object_name = 'product'
+    
+    def get_object(self):
+        """Retrieve the product instance based on the primary key"""
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Product, pk=pk)
     
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         """
-        Modify the form fields to show only the type of water that belongs to a specific logged in Supplier
+        Modify the form fields to show only the types of water that belong to a specific logged-in supplier.
         """
         form.fields['type'].queryset = Type.objects.filter(supplier=Supplier.objects.get(user=self.request.user))
         return form
     
+    def form_valid(self, form):
+        """
+        Assign the supplier and update the slug before saving the form.
+        """
+        bottlesize = form.cleaned_data['bottle_size']
+        product = form.save(commit=False)
+        product.supplier = Supplier.objects.get(user=self.request.user)
+        product.slug = slugify(bottlesize)
+        product.save()
+        
+        messages.success(self.request, f'{bottlesize} has been updated successfully')
+        
+        return super().form_valid(form)
+    
     def get_success_url(self):
         return reverse_lazy('water_by_type', kwargs={'pk': self.object.type.id})
-
-
-@login_required(login_url='login')
-@user_passes_test(check_role_supplier)
-def edit_product(request, pk=None):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
-        form = WaterProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            bottlesize = form.cleaned_data['bottle_size']
-            product = form.save(commit=False)
-            product.supplier = Supplier.objects.get(user=request.user)
-            product.slug = slugify(bottlesize)
-            form.save()
-
-            messages.success(request, f'{bottlesize} has been updated successfully')
-            return redirect('water_by_type', product.type.id)
-        else:
-            print(form.errors)
-    else:
-        form = WaterProductForm(instance=product)
-        form.fields['type'].queryset = Type.objects.filter(supplier = get_supplier(request))
-
-    context = {
-        'form': form,
-        'product' : product,
-    }
-    return render(request, 'supplier/edit_product.html', context)
 
 
 class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessageMixin, DeleteView):
@@ -227,11 +234,11 @@ class DeleteProduct(LoginRequiredMixin, SupplierRoleRequiredMixin, SuccessMessag
         context['return_url'] = self.request.GET.get('return_url', self.get_success_url())
         return context
 
-    def get_success_url(self):
-        return reverse_lazy("water_by_type", kwargs={"pk": self.object.type.pk})
-
     def get_success_message(self, *args, **kwargs):
         return f'{self.object} has been removed from your dashboard'
+    
+    def get_success_url(self):
+        return reverse_lazy("water_by_type", kwargs={"pk": self.object.type.pk})
 
 
 class OpeningHoursView(LoginRequiredMixin, FormView, SupplierRoleRequiredMixin, ListView):

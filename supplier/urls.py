@@ -17,7 +17,7 @@ urlpatterns = [
     
     # SERVICES PRODUCT CRUD
     path('services/product/add/', views.AddProductView.as_view(), name ='add_product'),
-    path('services/product/edit/<int:pk>/', views.edit_product ,name='edit_product'),
+    path('services/product/edit/<int:pk>/', views.EditProductView.as_view() ,name='edit_product'),
     path('services/product/ delete_product/<int:pk>/', views.DeleteProduct.as_view() ,name='delete_product'),
     
     
