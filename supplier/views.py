@@ -420,7 +420,9 @@ class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, Lis
     def get_queryset(self):
         supplier = get_object_or_404(Supplier, user=self.request.user)
 
-        # Query ordered products that belong to this supplier and count the occurrences of each water type
+        # Query ordered products that belong to this supplier
+        # .values() specifies we want to retrieve water_type from the Type model
+        # .annotate() specifies we want to count the occurrences of each water type
         return OrderedProduct.objects.filter(productitem__supplier=supplier)\
             .values('productitem__type__water_type')\
             .annotate(total_orders=Count('productitem__type__water_type'))\
