@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main-section">
+    {% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+
+                    <!-- LOAD SIDEBAR -->
+                    {% include 'includes/supplier_sidebar.html' %}
+
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            
+                            <!-- Back Button -->
+                            <button class="btn btn-secondary" onclick="history.back()">
+                                <i class="fa fa-angle-left" aria-hidden="true"></i> Back
+                            </button>
+                            <br><br>
+
+                            <!-- Water Type Orders Chart Section -->
+                            <div class="container">
+                                <h2 class="text-uppercase text-center">Water Type Orders</h2>
+                                
+                                <!-- Responsive Chart Container -->
+                                <div class="chart-container" style="position: relative; height:auto; width:100%;">
+                                    <canvas id="waterTypeChart"></canvas>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('waterTypeChart').getContext('2d');
+
+    // Generate unique gradient colors
+    var gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient1.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+    gradient1.addColorStop(1, 'rgba(255, 99, 132, 0.5)');
+
+    var gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient2.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+    gradient2.addColorStop(1, 'rgba(54, 162, 235, 0.5)');
+
+    var gradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient3.addColorStop(0, 'rgba(255, 206, 86, 0.8)');
+    gradient3.addColorStop(1, 'rgba(255, 206, 86, 0.5)');
+
+    var gradient4 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient4.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+    gradient4.addColorStop(1, 'rgba(75, 192, 192, 0.5)');
+
+    var gradient5 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient5.addColorStop(0, 'rgba(153, 102, 255, 0.8)');
+    gradient5.addColorStop(1, 'rgba(153, 102, 255, 0.5)');
+
+    var gradient6 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient6.addColorStop(0, 'rgba(255, 159, 64, 0.8)');
+    gradient6.addColorStop(1, 'rgba(255, 159, 64, 0.5)');
+
+    var waterTypeChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ water_types|safe }},
+            datasets: [{
+                label: 'Percentage of Orders',
+                data: {{ percentages|safe }},
+                backgroundColor: [
+                    gradient1,
+                    gradient2,
+                    gradient3,
+                    gradient4,
+                    gradient5,
+                    gradient6
+                ],
+                borderColor: 'rgba(255, 255, 255, 1)',
+                hoverOffset: 10,
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,  // Ensure the chart scales based on the container
+            maintainAspectRatio: false,  // Disable fixed aspect ratio to allow more flexibility
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#444',
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            var label = tooltipItem.label || '';
+                            var percentage = tooltipItem.raw.toFixed(2);
+                            return label + ': ' + percentage + '%';
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+</script>
+{% endblock %}
