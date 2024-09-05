@@ -18,8 +18,58 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify
 from orders.models import Order, OrderedProduct
 from django.core.cache import cache
+from django.db.models import Sum
+from django.db.models import Count
 
-# Create your views here.
+
+
+# def water_type_chart_data(request):
+#     # Aggregate the total quantities of ordered products grouped by water type
+#     water_type_data = (
+#         OrderedProduct.objects
+#         .values('productitem__type__water_type')
+#         .annotate(total_quantity=Sum('quantity'))
+#         .order_by('-total_quantity')
+#     )
+
+#     # Prepare data for Chart.js
+#     water_type_labels = [item['productitem__type__water_type'] for item in water_type_data]
+#     water_type_quantities = [item['total_quantity'] for item in water_type_data]
+
+#     context = {
+#         'water_type_labels': water_type_labels,
+#         'water_type_quantities': water_type_quantities,
+#     }
+    
+#     return render(request, 'supplier/water_type_chart.html', context)
+
+
+class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
+    template_name = 'supplier/water_type_chart.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        # Query ordered products and count the occurrences of each water type
+        return OrderedProduct.objects.values('productitem__type__water_type')\
+            .annotate(total_orders=Count('productitem__type__water_type'))\
+            .order_by('-total_orders')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        # Prepare data for Chart.js
+        water_types = [item['productitem__type__water_type'] for item in queryset]
+        order_counts = [item['total_orders'] for item in queryset]
+
+        # Calculate percentages
+        total_orders = sum(order_counts)
+        percentages = [(count / total_orders) * 100 for count in order_counts]
+
+        # Add data to context
+        context['water_types'] = water_types
+        context['percentages'] = percentages
+        return context
 
 class SupplierProfileView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -361,3 +411,34 @@ class MyOrdersView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
             cache.set(cache_key, orders, timeout=300)  # Cache timeout of 5 minutes
 
         return orders
+    
+    
+class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
+    template_name = 'supplier/water_type_chart.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        supplier = get_object_or_404(Supplier, user=self.request.user)
+
+        # Query ordered products that belong to this supplier and count the occurrences of each water type
+        return OrderedProduct.objects.filter(productitem__supplier=supplier)\
+            .values('productitem__type__water_type')\
+            .annotate(total_orders=Count('productitem__type__water_type'))\
+            .order_by('-total_orders')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        # Prepare data for Chart.js
+        water_types = [item['productitem__type__water_type'] for item in queryset]
+        order_counts = [item['total_orders'] for item in queryset]
+
+        # Calculate percentages
+        total_orders = sum(order_counts)
+        percentages = [(count / total_orders) * 100 for count in order_counts]
+
+        # Add data to context for use in the template
+        context['water_types'] = water_types
+        context['percentages'] = percentages
+        return context

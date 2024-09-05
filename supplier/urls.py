@@ -26,8 +26,12 @@ urlpatterns = [
     path('opening-hours/add/', views.AddOpeningHoursView.as_view(), name='add_opening_hours'),
     path('opening-hours/remove/<int:pk>/', views.RemoveOpeningHoursView.as_view(), name='remove_opening_hours'),
     
+    
     # ORDER DETAIL
     path('order_detail/<int:order_number>/', views.OrderDetailView.as_view(), name='supplier_order_detail'),
-    path('my_orders/', views.MyOrdersView.as_view(), name='supplier_my_orders'),    
+    path('my_orders/', views.MyOrdersView.as_view(), name='supplier_my_orders'), 
 
+
+    # CHART DATA
+    path('water-type-chart/', views.WaterTypeOrderChartView.as_view(), name='water_type_chart_data'),
 ]
