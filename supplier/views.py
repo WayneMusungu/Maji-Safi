@@ -22,28 +22,6 @@ from django.db.models import Sum
 from django.db.models import Count
 
 
-
-# def water_type_chart_data(request):
-#     # Aggregate the total quantities of ordered products grouped by water type
-#     water_type_data = (
-#         OrderedProduct.objects
-#         .values('productitem__type__water_type')
-#         .annotate(total_quantity=Sum('quantity'))
-#         .order_by('-total_quantity')
-#     )
-
-#     # Prepare data for Chart.js
-#     water_type_labels = [item['productitem__type__water_type'] for item in water_type_data]
-#     water_type_quantities = [item['total_quantity'] for item in water_type_data]
-
-#     context = {
-#         'water_type_labels': water_type_labels,
-#         'water_type_quantities': water_type_quantities,
-#     }
-    
-#     return render(request, 'supplier/water_type_chart.html', context)
-
-
 class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     template_name = 'supplier/water_type_chart.html'
     context_object_name = 'orders'
