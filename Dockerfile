@@ -1,17 +1,24 @@
 # Use the official Python base image
-FROM python:3.10.4-slim-bullseye
+FROM python:3.11-alpine
 
 # Set environment variables
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set the working directory
-WORKDIR /code
+WORKDIR /app
 
 # Install dependencies
-COPY ./requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Expose the port number
+EXPOSE 8000
+
+CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
