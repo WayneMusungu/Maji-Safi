@@ -14,7 +14,9 @@ django-countries==7.5.1
 django-debug-toolbar==4.3.0
 django-environ==0.11.2
 django-redis==5.4.0
+gunicorn==23.0.0
 kombu==5.3.7
+packaging==24.1
 Pillow==9.5.0
 prompt_toolkit==3.0.47
 psycopg2-binary==2.9.9
@@ -30,3 +32,4 @@ typing_extensions==4.5.0
 tzdata==2024.1
 vine==5.1.0
 wcwidth==0.2.13
+whitenoise==6.7.0
