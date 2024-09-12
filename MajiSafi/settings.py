@@ -36,7 +36,7 @@ else:
     DEBUG = False
     
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['https://default-origin.com'])
+CSRF_TRUSTED_ORIGINS = [ 'https://app-production-bad1.up.railway.app' ]
 
 
 # Application definition
