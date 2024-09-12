@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-import os
 from pathlib import Path
 import dj_database_url
 from environ import Env
@@ -36,8 +35,10 @@ if ENVIRONMENT == 'development':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'application-production-e74f.up.railway.app']
 
+
+CSRF_TRUSTED_ORIGINS = [ 'https://application-production-e74f.up.railway.app' ]
 
 # Application definition
 
@@ -56,6 +57,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Other Installations
+    'cloudinary_storage',
+    'cloudinary',
     "debug_toolbar",
 ]
 
@@ -168,7 +171,9 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR /'media'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# MEDIA_ROOT = BASE_DIR /'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -257,3 +262,9 @@ LOGGING = {
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='your_cloudinary_name'),
+    'API_KEY': env('CLOUDINARY_API_KEY', default='your_cloudinary_api_key'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default='your_cloudinary_secret_key'),
+}
