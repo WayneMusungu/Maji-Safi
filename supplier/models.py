@@ -13,6 +13,7 @@ class Supplier(models.Model):
     supplier_name = models.CharField(max_length=45)
     supplier_slug = models.CharField(max_length=100, unique=True)
     supplier_license = models.ImageField(upload_to='supplier/license')
+    qr_code = models.ImageField(upload_to='supplier/qr_codes')
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)

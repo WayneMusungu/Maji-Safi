@@ -26,6 +26,7 @@ Pillow==9.5.0
 prompt_toolkit==3.0.47
 psycopg2-binary==2.9.9
 pur==7.3.2
+PyQRCode==1.2.1
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 pytz==2023.3
