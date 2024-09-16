@@ -1,4 +1,8 @@
 import datetime
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from django.utils.text import slugify
 import random
 from django.core.cache import cache
 from django.contrib.auth import update_session_auth_hash
@@ -100,6 +104,17 @@ class RegisterSupplierView(View):
 
                     user_profile = UserProfile.objects.get(user=user)
                     supplier.user_profile = user_profile
+                    
+                    # Generate the QR code for the supplier's detail page URL
+                    supplier_detail_url = request.build_absolute_uri(f'/supplier/{supplier.supplier_slug}/')
+                    qr_image = qrcode.make(supplier_detail_url)
+                    
+                    # Save the QR code image
+                    buffer = BytesIO()
+                    qr_image.save(buffer, format='PNG')
+                    file_name = f'supplier_{supplier.user.id}_qr.png'
+                    supplier.qr_code.save(file_name, File(buffer), save=False)
+                    
                     supplier.save()
 
                     # Send Email Verification to the Registered Supplier
@@ -113,8 +128,8 @@ class RegisterSupplierView(View):
                     return redirect('registerSupplier')
 
             except Exception as e:
-                print('An error occurred during supplier registration:', e)
-                messages.error(request, "An error occurred during supplier registration. Please try again later.")
+                print(f'An error occurred during supplier registration: {str(e)}')
+                messages.error(request, f"An error occurred: {str(e)}. Please try again later.")
                 return redirect('registerSupplier')
         else:
             messages.error(request, "Invalid form")

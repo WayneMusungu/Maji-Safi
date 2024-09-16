@@ -34,4 +34,8 @@ urlpatterns = [
 
     # CHART DATA
     path('water-type-chart/', views.WaterTypeOrderChartView.as_view(), name='water_type_chart_data'),
+    
+    
+    # QR CODE
+    path('qr-code/', views.SupplierQRCodeView.as_view(), name='supplier_qr_code'),
 ]
