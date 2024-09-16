@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DeleteView, FormView, CreateView, UpdateView
+from django.views.generic import ListView, DeleteView, FormView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
@@ -21,33 +21,6 @@ from django.core.cache import cache
 from django.db.models import Sum
 from django.db.models import Count
 
-
-class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
-    template_name = 'supplier/water_type_chart.html'
-    context_object_name = 'orders'
-
-    def get_queryset(self):
-        # Query ordered products and count the occurrences of each water type
-        return OrderedProduct.objects.values('productitem__type__water_type')\
-            .annotate(total_orders=Count('productitem__type__water_type'))\
-            .order_by('-total_orders')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
-
-        # Prepare data for Chart.js
-        water_types = [item['productitem__type__water_type'] for item in queryset]
-        order_counts = [item['total_orders'] for item in queryset]
-
-        # Calculate percentages
-        total_orders = sum(order_counts)
-        percentages = [(count / total_orders) * 100 for count in order_counts]
-
-        # Add data to context
-        context['water_types'] = water_types
-        context['percentages'] = percentages
-        return context
 
 class SupplierProfileView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -341,8 +314,9 @@ class RemoveOpeningHoursView(LoginRequiredMixin, View):
             return JsonResponse(response_data)
 
 
-class OrderDetailView(SupplierRoleRequiredMixin, View):
+class OrderDetailView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
     template_name = 'supplier/order_detail.html'
+    login_url = 'login'
 
     def get(self, request, order_number):
         cache_key = f'order_detail_{order_number}'
@@ -391,7 +365,18 @@ class MyOrdersView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
         return orders
     
     
+class SupplierQRCodeView(LoginRequiredMixin, SupplierRoleRequiredMixin, DetailView):
+    model = Supplier
+    login_url = 'login'
+    template_name = 'supplier/qr_code.html'
+    context_object_name = 'supplier'
+    
+    def get_object(self):
+        return Supplier.objects.get(user=self.request.user)
+    
+    
 class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
+    login_url = 'login'
     template_name = 'supplier/water_type_chart.html'
     context_object_name = 'orders'
 
