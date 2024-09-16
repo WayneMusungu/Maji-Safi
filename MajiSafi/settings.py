@@ -10,14 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 import dj_database_url
-from environ import Env
-env = Env()
-Env.read_env()
-
-ENVIRONMENT  = env('ENVIRONMENT', default="development")
-ENVIRONMENT = "production"
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,16 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default="secret_key")
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'development':
-    DEBUG = True
-else:
-    DEBUG = False
-    
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
-CSRF_TRUSTED_ORIGINS = [ 'https://app-production-bad1.up.railway.app' ]
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -56,8 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Other Installations
-    'cloudinary_storage',
-    'cloudinary',
     "debug_toolbar",
 ]
 
@@ -71,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'orders.request_object.RequestObjectMiddleware', # Custom Middleware created to access the request object in modles.py
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'MajiSafi.urls'
@@ -107,25 +96,16 @@ WSGI_APPLICATION = 'MajiSafi.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-# Dockerize postgresdb
-if ENVIRONMENT == 'development':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'postgres',
-            'PORT': 5432,
-        }
-    }
-    # CELERY configuration docker
-    CELERY_BROKER_URL = "redis://redis:6379/0"
-else:
-    DATABASES = {
-        'default': dj_database_url.parse(env('DATABASE_URL', default='postgresql://'))
-    }
-    CELERY_BROKER_URL = env('REDIS_URL', default='redis://')
+DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': config('DB_NAME'),
+           'USER': config('DB_USER'),
+           'PASSWORD': config('DB_PASSWORD'),
+           'HOST': config('DB_HOST'),
+           'PORT': '5432',
+       }
+   }
 
 
 # Password validation
@@ -170,9 +150,7 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# MEDIA_ROOT = BASE_DIR /'media'
+MEDIA_ROOT = BASE_DIR /'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -186,53 +164,49 @@ MESSAGE_TAGS = {
 }
 
 
-EMAIL_BACKEND = env('EMAIL_BACKEND', default="your_default_email_backend")
-EMAIL_HOST = env('EMAIL_HOST', default="your_default_email_host")
-EMAIL_PORT = env('EMAIL_PORT', cast=int, default=587)  # Example default port
+# Email Configuration
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default="your_default_email_user")
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default="your_default_email_password")
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default="your_default_from_email")
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL=config('DEFAULT_FROM_EMAIL')
 
-GOOGLE_API_KEY = env('GOOGLE_API_KEY', default="your_default_google_api_key")
+
+GOOGLE_API_KEY=config('GOOGLE_API_KEY')
+
+#Configure GDAL
+
+os.environ['PATH'] = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeo') + ';' + os.environ['PATH']
+os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeodataproj') + ';' + os.environ['PATH']
+GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venvLibsite-packagesosgeogdal303.dll')
 
 # Paypal Configuration
-PAYPAL_CLIENT_ID= env('PAYPAL_CLIENT_ID', default="your_pay_pal_client_id")
+PAYPAL_CLIENT_ID= config('PAYPAL_CLIENT_ID')
 
 # Block pop-ups using 3rd party services
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 # CELERY Configuration
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Nairobi'
-CELERY_RESULT_EXTENDED = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-if ENVIRONMENT == 'development':
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://redis:6379/1",  # Use this in development
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": env('REDIS_URL', default='redis://127.0.0.1:6379/1'),  # Use this in production
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
-        }
-    }
-
-
+}
 # Logging Configurations
 LOGGING = {
     'version': 1,
@@ -257,13 +231,8 @@ LOGGING = {
         },
     },
 }
-# Django-debug toolbar
+
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='your_cloudinary_name'),
-    'API_KEY': env('CLOUDINARY_API_KEY', default='your_cloudinary_api_key'),
-    'API_SECRET': env('CLOUDINARY_API_SECRET', default='your_cloudinary_secret_key'),
-}
