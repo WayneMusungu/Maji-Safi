@@ -27,7 +27,7 @@
                                     </div>
                                     <div class="ml-md-4" style="font-size: 18px; color: #333;">
                                         <p>Scan this QR code to access your marketplace.</p>
-                                        <a href="#" class="btn btn-primary">Download QR Code</a>
+                                        <a href="{{ supplier.qr_code.url }}" download="qr_code_{{ supplier.supplier_name }}.png" class="btn btn-primary">Download QR Code</a>
                                     </div>
                                 {% else %}
                                     <p>No QR code available.</p>

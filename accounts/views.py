@@ -106,13 +106,13 @@ class RegisterSupplierView(View):
                     supplier.user_profile = user_profile
                     
                     # Generate the QR code for the supplier's detail page URL
-                    supplier_detail_url = request.build_absolute_uri(f'/supplier/{supplier.supplier_slug}/')
+                    supplier_detail_url = request.build_absolute_uri(f'/marketplace/{supplier.supplier_slug}/')
                     qr_image = qrcode.make(supplier_detail_url)
                     
                     # Save the QR code image
                     buffer = BytesIO()
                     qr_image.save(buffer, format='PNG')
-                    file_name = f'supplier_{supplier.user.id}_qr.png'
+                    file_name = f'{slugify(supplier_name)}_qr_code.png'
                     supplier.qr_code.save(file_name, File(buffer), save=False)
                     
                     supplier.save()
