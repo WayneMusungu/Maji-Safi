@@ -1,6 +1,4 @@
 import datetime
-import qrcode
-from io import BytesIO
 from django.core.files import File
 from django.utils.text import slugify
 import random
@@ -14,7 +12,7 @@ from .forms import ChangePasswordForm, ResetPasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
-from .utils import detectUser, send_email_verification, send_otp
+from .utils import detectUser, generate_qr_code, send_email_verification, send_otp
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
@@ -105,14 +103,11 @@ class RegisterSupplierView(View):
                     user_profile = UserProfile.objects.get(user=user)
                     supplier.user_profile = user_profile
                     
-                    # Generate the QR code for the supplier's detail page URL
+                    # Generate the QR code using the utility function
                     supplier_detail_url = request.build_absolute_uri(f'/marketplace/{supplier.supplier_slug}/')
-                    qr_image = qrcode.make(supplier_detail_url)
+                    buffer, file_name = generate_qr_code(supplier_detail_url, supplier_name)
                     
-                    # Save the QR code image
-                    buffer = BytesIO()
-                    qr_image.save(buffer, format='PNG')
-                    file_name = f'{slugify(supplier_name)}_qr_code.png'
+                    # Save the QR code to the Supplier model
                     supplier.qr_code.save(file_name, File(buffer), save=False)
                     
                     supplier.save()
