@@ -42,6 +42,7 @@ CSRF_TRUSTED_ORIGINS = [ 'https://app-production-bad1.up.railway.app' ]
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'accounts.apps.AccountsConfig',
     'supplier.apps.SupplierConfig',
     'services.apps.ServicesConfig',
@@ -267,3 +268,6 @@ CLOUDINARY_STORAGE = {
     'API_KEY': env('CLOUDINARY_API_KEY', default='your_cloudinary_api_key'),
     'API_SECRET': env('CLOUDINARY_API_SECRET', default='your_cloudinary_secret_key'),
 }
+
+
+SITE_ID = 1
