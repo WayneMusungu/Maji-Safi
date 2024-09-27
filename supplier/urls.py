@@ -38,4 +38,5 @@ urlpatterns = [
     
     # QR CODE
     path('qr-code/', views.SupplierQRCodeView.as_view(), name='supplier_qr_code'),
+    path('supplier/<str:supplier_slug>/download-qr-code/', views.DownloadQRCodeView.as_view(), name='download_qr_code'),
 ]

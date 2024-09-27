@@ -20,6 +20,8 @@ from orders.models import Order, OrderedProduct
 from django.core.cache import cache
 from django.db.models import Sum
 from django.db.models import Count
+import requests
+
 
 
 class SupplierProfileView(LoginRequiredMixin, View):
@@ -407,3 +409,33 @@ class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, Lis
         context['water_types'] = water_types
         context['percentages'] = percentages
         return context
+
+
+class DownloadQRCodeView(View):
+    def get(self, request, supplier_slug):
+        supplier = get_object_or_404(Supplier, supplier_slug=supplier_slug)
+        
+        if supplier.qr_code:
+            # Get the QR code URL from Cloudinary
+            qr_code_url = supplier.qr_code.url
+            
+            # Fetch the file content from the URL
+            response = requests.get(qr_code_url)
+            
+            if response.status_code == 200:
+                # Prepare the response to serve the file as a download
+                file_content = response.content
+                file_name = f'{supplier.supplier_slug}-qr-code.png'
+                
+                # Create the HTTP response with content-disposition as attachment
+                download_response = HttpResponse(file_content, content_type='image/png')
+                download_response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                
+                return download_response
+            else:
+                # Handle errors in fetching the file
+                messages.error(request, "Failed to download QR code.")
+                return redirect('download_qr_code')
+        else:
+            messages.error(request, "QR code not available for download.")
+            return redirect('download_qr_code')
