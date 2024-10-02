@@ -40,7 +40,6 @@ CSRF_TRUSTED_ORIGINS = [ 'https://app-production-bad1.up.railway.app' ]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.sites',
     'accounts.apps.AccountsConfig',
@@ -55,7 +54,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     #Other Installations
     'cloudinary_storage',
     'cloudinary',
@@ -171,9 +169,16 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# MEDIA_ROOT = BASE_DIR /'media'
+if ENVIRONMENT == 'development':
+    MEDIA_ROOT = BASE_DIR /'media'
+else:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='your_cloudinary_name'),
+    'API_KEY': env('CLOUDINARY_API_KEY', default='your_cloudinary_api_key'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default='your_cloudinary_secret_key'),
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -186,7 +191,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-
+# Environment configurations
 EMAIL_BACKEND = env('EMAIL_BACKEND', default="your_default_email_backend")
 EMAIL_HOST = env('EMAIL_HOST', default="your_default_email_host")
 EMAIL_PORT = env('EMAIL_PORT', cast=int, default=587)  # Example default port
@@ -194,10 +199,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default="your_default_email_user")
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default="your_default_email_password")
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default="your_default_from_email")
-
 GOOGLE_API_KEY = env('GOOGLE_API_KEY', default="your_default_google_api_key")
-
-# Paypal Configuration
 PAYPAL_CLIENT_ID= env('PAYPAL_CLIENT_ID', default="your_pay_pal_client_id")
 
 # Block pop-ups using 3rd party services
@@ -263,11 +265,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='your_cloudinary_name'),
-    'API_KEY': env('CLOUDINARY_API_KEY', default='your_cloudinary_api_key'),
-    'API_SECRET': env('CLOUDINARY_API_SECRET', default='your_cloudinary_secret_key'),
-}
 
 
 SITE_ID = 1
