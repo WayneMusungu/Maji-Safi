@@ -120,11 +120,14 @@ if ENVIRONMENT == 'development':
     }
     # CELERY configuration docker
     CELERY_BROKER_URL = "redis://redis:6379/0"
+    CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
 else:
     DATABASES = {
         'default': dj_database_url.parse(env('DATABASE_URL', default='postgresql://'))
     }
     CELERY_BROKER_URL = env('REDIS_URL', default='redis://')
+    CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://')
 
 
 # Password validation
@@ -206,7 +209,6 @@ PAYPAL_CLIENT_ID= env('PAYPAL_CLIENT_ID', default="your_pay_pal_client_id")
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 # CELERY Configuration
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
