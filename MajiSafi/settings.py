@@ -36,7 +36,10 @@ else:
     DEBUG = False
     
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
-CSRF_TRUSTED_ORIGINS = [ 'https://maji-safi-production.up.railway.app' ]
+
+SITE_DOMAIN = env('PUBLIC_DOMAIN', default='your_default_public_domain')
+
+CSRF_TRUSTED_ORIGINS = [ f'https://{SITE_DOMAIN}' ]
 
 
 # Application definition
@@ -58,6 +61,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     "debug_toolbar",
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -120,14 +124,12 @@ if ENVIRONMENT == 'development':
     }
     # CELERY configuration docker
     CELERY_BROKER_URL = "redis://redis:6379/0"
-    CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 else:
     DATABASES = {
         'default': dj_database_url.parse(env('DATABASE_URL', default='postgresql://'))
     }
     CELERY_BROKER_URL = env('REDIS_URL', default='redis://')
-    CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://')
 
 
 # Password validation
@@ -209,6 +211,7 @@ PAYPAL_CLIENT_ID= env('PAYPAL_CLIENT_ID', default="your_pay_pal_client_id")
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 # CELERY Configuration
+CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -267,6 +270,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+# SITE_ID = 1
 
-
-SITE_ID = 1
+if ENVIRONMENT == 'development':
+    SITE_ID = 1
+    
+else:
+    SITE_ID = 2

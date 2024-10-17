@@ -37,11 +37,15 @@ def send_email_verification_task(user_id, subject, email_template, domain):
 
         to_email = user.email
         mail = EmailMessage(subject, message, from_email, to=[to_email])
-        mail.content_subtype = 'html'  # send the HTML content inside the email
+        mail.content_subtype = 'html'  # Send the HTML content inside the email
         mail.send()
         logger.info(f"Email verification sent to {to_email}")
+
+        # Return success message for Flower result
+        return "Task Done!"
     except Exception as e:
         logger.error(f"Error in email verification task: {e}")
+        raise e
 
 
 @shared_task(name='accounts.tasks.send_otp_email_task')
@@ -62,5 +66,9 @@ def send_otp_email_task(user_id, subject, email_template, context):
         mail.content_subtype = 'html'  # Send the HTML content inside the email
         mail.send()
         logger.info(f"OTP email sent to {to_email}")
+
+        # Return success message for Flower result
+        return "OTP Sent!"
     except Exception as e:
         logger.error(f"Error in OTP email task: {e}")
+        raise e
