@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
 from supplier.utils import get_supplier
-from .forms import SupplierForm, OpeningHourForm
+from .forms import SupplierForm, OpeningHourForm, SupplierUpdateForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
@@ -31,7 +31,7 @@ class SupplierProfileView(LoginRequiredMixin, View):
         profile = get_object_or_404(UserProfile, user=request.user)
         supplier = get_object_or_404(Supplier, user=request.user)
         profile_form = UserProfileForm(instance=profile)
-        supplier_form = SupplierForm(instance=supplier)
+        supplier_form = SupplierUpdateForm(instance=supplier)
         
         context = {
             'profile_form': profile_form,
@@ -45,7 +45,7 @@ class SupplierProfileView(LoginRequiredMixin, View):
         profile = get_object_or_404(UserProfile, user=request.user)
         supplier = get_object_or_404(Supplier, user=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        supplier_form = SupplierForm(request.POST, request.FILES, instance=supplier)
+        supplier_form = SupplierUpdateForm(request.POST, request.FILES, instance=supplier)
 
         if profile_form.is_valid() and supplier_form.is_valid():
             profile_form.save()
