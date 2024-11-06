@@ -8,7 +8,16 @@ class SupplierForm(forms.ModelForm):
     class Meta:
         model = Supplier
         fields = ['supplier_name', 'supplier_license']
-
+        
+        
+class SupplierUpdateForm(forms.ModelForm):
+    supplier_license = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}), validators=[allow_only_images_valdators])
+    supplier_name = forms.CharField(disabled=True)
+    
+    class Meta:
+        model = Supplier
+        fields = ['supplier_name', 'supplier_license']
+        
 
 class OpeningHourForm(forms.ModelForm):
     class Meta:
