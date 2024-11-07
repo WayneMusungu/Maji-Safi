@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from accounts.mixins import SupplierRoleRequiredMixin
 from supplier.utils import get_supplier
-from .forms import SupplierForm, OpeningHourForm, SupplierUpdateForm
+from .forms import OpeningHourForm, SupplierUpdateForm
 from accounts.forms import UserProfileForm
 from services.forms import WaterProductForm, WaterTypeForm
 from django.db import IntegrityError
@@ -21,6 +21,8 @@ from django.core.cache import cache
 from django.db.models import Sum
 from django.db.models import Count
 import requests
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 
 
@@ -316,31 +318,24 @@ class RemoveOpeningHoursView(LoginRequiredMixin, View):
             return JsonResponse(response_data)
 
 
+@method_decorator(cache_page(60 * 10), name='dispatch')
 class OrderDetailView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
     template_name = 'supplier/order_detail.html'
     login_url = 'login'
 
     def get(self, request, order_number):
-        cache_key = f'order_detail_{order_number}'
-        context = cache.get(cache_key)
-
-        if context:
-            print("Retrieving from cache")
-        else:
-            print("Retrieving from database")
-            try:
-                order = Order.objects.get(order_number=order_number, is_ordered=True)
-                ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
-                context = {
-                    'order': order,
-                    'ordered_product': ordered_product,
-                    'subtotal': order.get_total_by_supplier()['subtotal'],
-                    'tax_data': order.get_total_by_supplier()['tax_dict'],
-                    'grand_total': order.get_total_by_supplier()['grand_total'],
-                }
-                cache.set(cache_key, context, timeout=300)  # Cache timeout of 5 minutes
-            except Order.DoesNotExist:
-                return redirect('supplier')
+        try:
+            order = Order.objects.get(order_number=order_number, is_ordered=True)
+            ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
+            context = {
+                'order': order,
+                'ordered_product': ordered_product,
+                'subtotal': order.get_total_by_supplier()['subtotal'],
+                'tax_data': order.get_total_by_supplier()['tax_dict'],
+                'grand_total': order.get_total_by_supplier()['grand_total'],
+            }
+        except Order.DoesNotExist:
+            return redirect('supplier')
         
         return render(request, self.template_name, context)
 
