@@ -32,8 +32,14 @@ SECRET_KEY = env('SECRET_KEY', default="secret_key")
 # SECURITY WARNING: don't run with debug turned on in production!
 if ENVIRONMENT == 'development':
     DEBUG = True
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: request.headers.get('x-requested-with') != 'XMLHttpRequest'
+    }
+    SITE_ID = 1
+    
 else:
     DEBUG = False
+    SITE_ID = 2
     
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
@@ -265,15 +271,3 @@ LOGGING = {
         },
     },
 }
-# Django-debug toolbar
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
-
-# SITE_ID = 1
-
-if ENVIRONMENT == 'development':
-    SITE_ID = 1
-    
-else:
-    SITE_ID = 2

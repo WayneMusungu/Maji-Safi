@@ -18,7 +18,7 @@ Create a dynamic function for both email verification and password reset
 def send_email_verification_task(user_id, subject, email_template, domain):
     logger.info(f"Starting email verification task for user_id: {user_id}")
     try:
-        sleep(20)
+        sleep(10)
         logger.info("Simulated delay completed")
 
         user = User.objects.get(pk=user_id)
