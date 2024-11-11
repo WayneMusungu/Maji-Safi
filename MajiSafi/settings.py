@@ -45,7 +45,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 SITE_DOMAIN = env('PUBLIC_DOMAIN', default='your_default_public_domain')
 
-CSRF_TRUSTED_ORIGINS = [ f'https://{SITE_DOMAIN}' ]
+CSRF_TRUSTED_ORIGINS = [ "https://maji-safi-production.up.railway.app"  ]
 
 
 # Application definition
@@ -271,3 +271,5 @@ LOGGING = {
         },
     },
 }
+
+CACHE_TTL = 60 * 5
