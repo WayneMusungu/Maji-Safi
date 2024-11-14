@@ -18,12 +18,14 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify
 from orders.models import Order, OrderedProduct
 from django.core.cache import cache
-from django.db.models import Sum
 from django.db.models import Count
 import requests
-from django.views.decorators.cache import cache_page
+from django.conf import settings
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 class SupplierProfileView(LoginRequiredMixin, View):
@@ -318,28 +320,36 @@ class RemoveOpeningHoursView(LoginRequiredMixin, View):
             return JsonResponse(response_data)
 
 
-@method_decorator(cache_page(60 * 10), name='dispatch')
 class OrderDetailView(LoginRequiredMixin, SupplierRoleRequiredMixin, View):
     template_name = 'supplier/order_detail.html'
     login_url = 'login'
 
     def get(self, request, order_number):
-        try:
-            order = Order.objects.get(order_number=order_number, is_ordered=True)
-            ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
-            context = {
-                'order': order,
-                'ordered_product': ordered_product,
-                'subtotal': order.get_total_by_supplier()['subtotal'],
-                'tax_data': order.get_total_by_supplier()['tax_dict'],
-                'grand_total': order.get_total_by_supplier()['grand_total'],
-            }
-        except Order.DoesNotExist:
-            return redirect('supplier')
+        cache_key = f'order_detail_{order_number}'
+        context = cache.get(cache_key)
+
+        if context:
+            print("Retrieving from cache")
+        else:
+            print("Retrieving from database")
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_product = OrderedProduct.objects.filter(order=order, productitem__supplier=get_supplier(request))
+                context = {
+                    'order': order,
+                    'ordered_product': ordered_product,
+                    'subtotal': order.get_total_by_supplier()['subtotal'],
+                    'tax_data': order.get_total_by_supplier()['tax_dict'],
+                    'grand_total': order.get_total_by_supplier()['grand_total'],
+                }
+                cache.set(cache_key, context, timeout=300)  # Cache timeout of 5 minutes
+            except Order.DoesNotExist:
+                return redirect('supplier')
         
         return render(request, self.template_name, context)
 
 
+@method_decorator(cache_page(CACHE_TTL), name='dispatch')
 class MyOrdersView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     login_url = 'login'
     template_name = 'supplier/my_orders.html'
@@ -347,21 +357,10 @@ class MyOrdersView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
 
     def get_queryset(self):
         supplier = Supplier.objects.get(user=self.request.user)
-        cache_key = f'my_orders_{self.request.user.username}_{supplier.id}'
-        orders = cache.get(cache_key)
-
-        if orders:
-            print("Retrieving from cache")
-            print(f"Cache key: {cache_key}")
-            print(f"Cached orders: {orders}")
-        else:
-            print("Retrieving from database")
-            orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
-            cache.set(cache_key, orders, timeout=300)  # Cache timeout of 5 minutes
-
+        orders = Order.objects.filter(suppliers__in=[supplier.id], is_ordered=True).order_by('-created_at')
         return orders
-    
-    
+
+
 class SupplierQRCodeView(LoginRequiredMixin, SupplierRoleRequiredMixin, DetailView):
     model = Supplier
     login_url = 'login'
@@ -370,8 +369,8 @@ class SupplierQRCodeView(LoginRequiredMixin, SupplierRoleRequiredMixin, DetailVi
     
     def get_object(self):
         return Supplier.objects.get(user=self.request.user)
-    
-    
+ 
+ 
 class WaterTypeOrderChartView(LoginRequiredMixin, SupplierRoleRequiredMixin, ListView):
     login_url = 'login'
     template_name = 'supplier/water_type_chart.html'
