@@ -48,3 +48,7 @@
 * Security
  - HSTS
  - ./manage.py --check deploy
+
+* System Design
+ - https://1337x.to/torrent/5037658/AlgoExpert-SystemsExpert-Course-FCO/
+
