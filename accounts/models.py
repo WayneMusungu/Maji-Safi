@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from accounts.enums import Roles
 
 
 # Create your models here.
@@ -65,7 +66,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     phone_number = models.CharField(max_length=15, blank=True)
 
-    role = models.PositiveSmallIntegerField(choices = ROLE_CHOICE, blank=True, null=True)
+    role = models.CharField(choices=Roles.choices, blank=True, null=True)
     
     
     date_joined = models.DateTimeField(auto_now_add=True)

@@ -1,9 +1,9 @@
 import datetime
 import simplejson as json
 
-def generate_order_number(pk):
+def generate_order_number():
     current_datetime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    order_number = current_datetime + str(pk)
+    order_number = current_datetime
     return order_number
 
 
