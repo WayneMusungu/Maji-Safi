@@ -23,6 +23,7 @@ from django.db import transaction
 from .mixins import CustomerRoleRequiredMixin, SupplierRoleRequiredMixin
 from django.views.generic.edit import FormView, CreateView
 from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class RegisterUserView(CreateView):
@@ -201,13 +202,11 @@ class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListV
     login_url = 'login'
 
     def get_queryset(self):
-        self.orders = Order.objects.filter(user=self.request.user, is_ordered=True)
-        recent_orders = self.orders[:6]  # Show only six recent orders
-        return recent_orders
+        return Order.objects.filter(user=self.request.user, is_ordered=True)[:6]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['orders_count'] = self.orders.count()
+        context['orders_count'] = self.get_queryset().count()
         return context
 
 
@@ -222,6 +221,7 @@ class SupplierDashboardView(LoginRequiredMixin, SupplierRoleRequiredMixin, View)
         current_month = datetime.datetime.now().month
         current_month_orders = orders.filter(suppliers__in=[supplier.id], created_at__month=current_month)
 
+        # Aggregate/Annotate
         current_month_revenue = sum(i.get_total_by_supplier()['grand_total'] for i in current_month_orders)
         total_revenue = sum(i.get_total_by_supplier()['grand_total'] for i in orders)
 

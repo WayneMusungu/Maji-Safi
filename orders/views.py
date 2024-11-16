@@ -79,10 +79,9 @@ def place_order(request):
             order.total_data = json.dumps(total_data)
             order.total_tax = total_tax    
             order.payment_method = request.POST['payment_method'] 
+            order.order_number = generate_order_number()
             order.save() #order id/pk is generated
-            order.order_number = generate_order_number(order.id)
             order.suppliers.add(*suppliers_ids) #Recursively add the data to ManyToMany Field
-            order.save()
             context = {
                 'order': order,
                 'cart_items': cart_items
@@ -90,6 +89,7 @@ def place_order(request):
             return render(request, 'orders/place_order.html', context)
         else:
             print(form.errors)
+            return form.invalid()
     
     # print(subtotal,total_tax,grand_total,tax_data)
     return render(request, 'orders/place_order.html')
@@ -129,6 +129,7 @@ class PaymentsView(LoginRequiredMixin, View):
 
             # Move the cart items to OrderedProduct model
             cart_items = Cart.objects.filter(user=request.user)
+            order_to_be_created = []
             for item in cart_items:
                 ordered_product = OrderedProduct(
                     order=order,
@@ -139,13 +140,13 @@ class PaymentsView(LoginRequiredMixin, View):
                     price=item.product.price,
                     amount=item.product.price * item.quantity,
                 )
-                ordered_product.save()
+                order_to_be_created.append(ordered_product)
 
+            ordered_product = OrderedProduct.objects.bulk_create(order_to_be_created)
             # Send order confirmation email to the customer
             subject = 'Thank you for making an order'
             email_template = 'orders/emails/order_confirmation_email.html'
             # Create access to Ordered Products and display it on order_confirmation_email.html
-            ordered_product = OrderedProduct.objects.filter(order=order)
             
             customer_subtotal = sum(item.price * item.quantity for item in ordered_product)
             tax_data = json.loads(order.tax_data)
