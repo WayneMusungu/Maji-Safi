@@ -1,0 +1,50 @@
+* Celery
+	- Celery Canvas
+		- celery groups
+		- chains/cords
+	- Broker failovers
+	- Redis vs Rabbitmq
+
+* Async Django (5.0+)
+ 	- channels
+	- websockets
+
+* DB
+	- Multiple DBs
+	- Neo4j
+	- Related names
+	- DB indexing (db_index=True)
+	- Custom Migrations (RunPython)
+	- DB Connection Pooling
+	- Aggregate/Annotate
+	- GeneratedField
+	- ORM (transactions/on-commit/Q/F)
+
+* Caching
+ - In memory
+ - Redis/Memcached
+ - django-cacheops/cachalot
+
+* Search
+  - Psql full-text search
+  - Elastic search
+
+* Misc
+ - cached_property (django.utils.functional)
+ - translations framework
+ - GeoDjango
+ - ContentTypes framework
+ - templatetags/templatefilters
+
+* Testing
+ - Factory boy
+ - Mocking
+
+* Infra
+ - docker
+ - CI/CD (GH Actions/Gitlab CI)
+ - k8s (minikube)
+
+* Security
+ - HSTS
+ - ./manage.py --check deploy
