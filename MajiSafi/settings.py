@@ -115,19 +115,18 @@ WSGI_APPLICATION = 'MajiSafi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-from decouple import config
 
 # Dockerize postgresdb
 if ENVIRONMENT == 'development':
     DATABASES = {
         'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': config('DB_NAME'),
-           'USER': config('DB_USER'),
-           'PASSWORD': config('DB_PASSWORD'),
-           'HOST': config('DB_HOST'),
-           'PORT': '5432',
-       }
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'postgres',
+            'PORT': 5432,
+        }
     }
     # CELERY configuration docker
     CELERY_BROKER_URL = "redis://redis:6379/0"
