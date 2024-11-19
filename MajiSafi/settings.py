@@ -45,7 +45,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 SITE_DOMAIN = env('PUBLIC_DOMAIN', default='your_default_public_domain')
 
-CSRF_TRUSTED_ORIGINS = [ "https://maji-safi-production.up.railway.app"  ]
+CSRF_TRUSTED_ORIGINS = [ f'https://{SITE_DOMAIN}' ]
 
 
 # Application definition
@@ -115,18 +115,19 @@ WSGI_APPLICATION = 'MajiSafi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+from decouple import config
 
 # Dockerize postgresdb
 if ENVIRONMENT == 'development':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'postgres',
-            'PORT': 5432,
-        }
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': config('DB_NAME'),
+           'USER': config('DB_USER'),
+           'PASSWORD': config('DB_PASSWORD'),
+           'HOST': config('DB_HOST'),
+           'PORT': '5432',
+       }
     }
     # CELERY configuration docker
     CELERY_BROKER_URL = "redis://redis:6379/0"

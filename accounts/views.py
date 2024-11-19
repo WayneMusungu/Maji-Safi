@@ -201,13 +201,11 @@ class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListV
     login_url = 'login'
 
     def get_queryset(self):
-        self.orders = Order.objects.filter(user=self.request.user, is_ordered=True)
-        recent_orders = self.orders[:6]  # Show only six recent orders
-        return recent_orders
-
+        return Order.objects.filter(user=self.request.user, is_ordered=True)[:6]
+ 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['orders_count'] = self.orders.count()
+        context['orders_count'] = self.get_queryset().count()
         return context
 
 
