@@ -1,4 +1,8 @@
 import logging
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from django.utils.text import slugify
 from time import sleep
 from celery import shared_task
 from django.core.mail import EmailMessage
@@ -71,4 +75,35 @@ def send_otp_email_task(user_id, subject, email_template, context):
         return "OTP Sent!"
     except Exception as e:
         logger.error(f"Error in OTP email task: {e}")
+        raise e
+
+    
+@shared_task(name='accounts.tasks.generate_qr_code_task')
+def generate_qr_code_task(supplier_id, url, supplier_name):
+    from supplier.models import Supplier
+    logger.info(f"Starting QR code generation task for supplier: {supplier_name}")
+    try:
+        sleep(60)
+
+        # Generate the QR code
+        qr_image = qrcode.make(url)
+        
+        # Save the QR code image to a BytesIO buffer
+        buffer = BytesIO()
+        qr_image.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        # Generate a file name for the QR code
+        file_name = f'{slugify(supplier_name)}_qr_code.png'
+
+        # Update the Supplier model with the generated QR code
+        supplier = Supplier.objects.get(id=supplier_id)
+        supplier.qr_code.save(file_name, File(buffer), save=True)
+
+        logger.info(f"QR Code for supplier '{supplier_name}' has been generated and saved.")
+        
+        # Return success message for Flower result
+        return "QR Code created"
+    except Exception as e:
+        logger.error(f"Error generating QR code for supplier '{supplier_name}': {e}")
         raise e

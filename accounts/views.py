@@ -7,12 +7,13 @@ from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from accounts.tasks import generate_qr_code_task
 from supplier.forms import SupplierForm
 from .forms import ChangePasswordForm, ResetPasswordForm, UserForm
 from .models import User, UserProfile
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, login
-from .utils import detectUser, generate_qr_code, send_email_verification, send_otp
+from .utils import detectUser, send_email_verification, send_otp
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from supplier.models import Supplier
@@ -102,16 +103,15 @@ class RegisterSupplierView(View):
 
                     user_profile = UserProfile.objects.get(user=user)
                     supplier.user_profile = user_profile
-                    
-                    # Generate the QR code using the utility function
-                    supplier_detail_url = request.build_absolute_uri(f'/marketplace/{supplier.supplier_slug}/')
-                    buffer, file_name = generate_qr_code(supplier_detail_url, supplier_name)
-                    
-                    # Save the QR code to the Supplier model
-                    supplier.qr_code.save(file_name, File(buffer), save=False)
-                    
                     supplier.save()
-
+                    
+                    # Trigger Celery task to generate QR code
+                    generate_qr_code_task.delay(
+                        supplier.id,
+                        request.build_absolute_uri(f'/marketplace/{supplier.supplier_slug}/'),
+                        supplier_name
+                    )
+                    
                     # Send Email Verification to the Registered Supplier
                     subject = 'Account Activation'
                     email_template = 'accounts/emails/account_email_verification.html'
@@ -201,13 +201,11 @@ class CustomerDashboardView(LoginRequiredMixin, CustomerRoleRequiredMixin, ListV
     login_url = 'login'
 
     def get_queryset(self):
-        self.orders = Order.objects.filter(user=self.request.user, is_ordered=True)
-        recent_orders = self.orders[:6]  # Show only six recent orders
-        return recent_orders
-
+        return Order.objects.filter(user=self.request.user, is_ordered=True)[:6]
+ 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['orders_count'] = self.orders.count()
+        context['orders_count'] = self.get_queryset().count()
         return context
 
 

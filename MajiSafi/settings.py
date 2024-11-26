@@ -47,7 +47,6 @@ SITE_DOMAIN = env('PUBLIC_DOMAIN', default='your_default_public_domain')
 
 CSRF_TRUSTED_ORIGINS = [ "https://maji-safi-production.up.railway.app"  ]
 
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.sites',

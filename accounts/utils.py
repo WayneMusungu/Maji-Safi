@@ -55,28 +55,3 @@ def send_otp(request, user, otp):
         'year': timezone.now().year,
     }
     send_otp_email_task.delay(user.id, subject, email_template, context)
-
-  
-def generate_qr_code(url, supplier_name):
-    """
-    Generates a QR code for a given URL and saves it as a file.
-    
-    Args:
-        url (str): The URL to encode in the QR code.
-        supplier_name (str): The name of the supplier used to generate the file name.
-
-    Returns:
-        tuple: (BytesIO buffer, filename) of the saved QR code image.
-    """
-    # Generate the QR code
-    qr_image = qrcode.make(url)
-    
-    # Save the QR code image to a BytesIO buffer
-    buffer = BytesIO()
-    qr_image.save(buffer, format='PNG')
-    buffer.seek(0)
-    
-    # Generate a file name for the QR code using the slugified supplier name
-    file_name = f'{slugify(supplier_name)}_qr_code.png'
-    
-    return buffer, file_name
