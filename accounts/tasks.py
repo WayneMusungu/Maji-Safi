@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import qrcode
 from io import BytesIO
@@ -107,3 +108,22 @@ def generate_qr_code_task(supplier_id, url, supplier_name):
     except Exception as e:
         logger.error(f"Error generating QR code for supplier '{supplier_name}': {e}")
         raise e
+    
+@shared_task(name='monthly_newsletter')
+def send_newsletter():
+    from supplier.models import Supplier
+    subject = "Your monthly newsletter"
+    suppliers = Supplier.objects.all()
+     
+    for supplier in suppliers:
+        body = render_to_string('accounts/emails/newsletter.html', {'name': supplier.supplier_name})
+        email = EmailMessage(subject, body, to=[supplier.user.email])
+        email.content_subtype = 'html' 
+        email.send()
+        
+    current_month = datetime.now().strftime('%B')
+    supplier_count = suppliers.count()
+    return f'{current_month} newsletter sent to {supplier_count} suppliers'
+        
+
+
