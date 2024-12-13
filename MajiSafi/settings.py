@@ -30,16 +30,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY', default="secret_key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'development':
-    DEBUG = True
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': lambda request: request.headers.get('x-requested-with') != 'XMLHttpRequest'
-    }
-    SITE_ID = 1
-    
-else:
-    DEBUG = False
-    SITE_ID = 2
     
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
@@ -65,12 +55,10 @@ INSTALLED_APPS = [
     #Other Installations
     'cloudinary_storage',
     'cloudinary',
-    "debug_toolbar",
     'django_celery_results',
 ]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -109,6 +97,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'MajiSafi.wsgi.application'
+
+
+if ENVIRONMENT == 'development':
+    DEBUG = True
+    INSTALLED_APPS += ["debug_toolbar"]
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: request.headers.get('x-requested-with') != 'XMLHttpRequest'
+    }
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+    INTERNAL_IPS = [
+        "localhost",
+        "127.0.0.1",
+    ]
+    SITE_ID = 1
+    
+else:
+    DEBUG = False
+    SITE_ID = 2
 
 
 # Database
