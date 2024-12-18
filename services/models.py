@@ -1,4 +1,5 @@
 from django.db import models
+from services.choices import BOTTLE_SIZE
 from supplier.models import Supplier
 
 # Create your models here.
@@ -32,8 +33,7 @@ class Type(models.Model):
 class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='products')
-    bottle_size = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=100)
+    bottle_size = models.CharField(max_length=50, choices=BOTTLE_SIZE)
     description = models.TextField(max_length=250, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='waterimages')
@@ -46,6 +46,3 @@ class Product(models.Model):
     
     def __str__(self):
         return f'{self.bottle_size}, for {self.price} ksh'
-    
-
-
