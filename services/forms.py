@@ -10,7 +10,6 @@ class WaterTypeForm(forms.ModelForm):
         
         
 class WaterProductForm(forms.ModelForm):
-    bottle_size = forms.CharField(widget=forms.TextInput(attrs={'placeholder': '1 Litre, 500-ml, 300-ml'}))
     price = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': '500 (Kenya Shillings)'}))
     image = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info w-100'}), validators=[allow_only_images_valdators])
 

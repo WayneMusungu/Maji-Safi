@@ -11,7 +11,6 @@ class TypeAdmin(admin.ModelAdmin):
     
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('bottle_size', 'type', 'supplier', 'price', 'is_available', 'updated_at')
-    prepopulated_fields = {'slug': ('bottle_size',)}
     search_fields = ('bottle_size', 'type__water_type', 'supplier__supplier_name', 'price')
     list_filter = ('is_available',)
 
@@ -19,4 +18,3 @@ class ProductAdmin(admin.ModelAdmin):
 
 admin.site.register(Type, TypeAdmin)
 admin.site.register(Product, ProductAdmin)
-

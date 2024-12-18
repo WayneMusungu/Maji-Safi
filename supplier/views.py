@@ -181,7 +181,6 @@ class AddProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, CreateView):
         bottle_size = form.cleaned_data['bottle_size']
         bttle_water = form.save(commit=False)
         bttle_water.supplier = Supplier.objects.get(user=self.request.user)
-        bttle_water.slug = slugify(bottle_size)
         bttle_water.save()
         
         messages.success(self.request, f'{bottle_size} Water Product has been added successfully')
@@ -214,12 +213,11 @@ class EditProductView(LoginRequiredMixin, SupplierRoleRequiredMixin, UpdateView)
     
     def form_valid(self, form):
         """
-        Assign the supplier and update the slug before saving the form.
+        Assign the supplier and save the form.
         """
         bottlesize = form.cleaned_data['bottle_size']
         product = form.save(commit=False)
         product.supplier = Supplier.objects.get(user=self.request.user)
-        product.slug = slugify(bottlesize)
         product.save()
         
         messages.success(self.request, f'{bottlesize} has been updated successfully')
