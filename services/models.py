@@ -19,7 +19,7 @@ class Type(models.Model):
     #     verbose_name = 'child'
     #     verbose_name_plural = "children"
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('water_type',)
     
     """
     Capitalize the name of the water type
