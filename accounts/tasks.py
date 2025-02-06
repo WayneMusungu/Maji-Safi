@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 """
 Create a dynamic function for both email verification and password reset
 """
+
+
 @shared_task(name='accounts.tasks.send_email_verification_task')
 def send_email_verification_task(user_id, subject, email_template, domain):
     logger.info(f"Starting email verification task for user_id: {user_id}")
@@ -78,22 +80,24 @@ def send_otp_email_task(user_id, subject, email_template, context):
         logger.error(f"Error in OTP email task: {e}")
         raise e
 
-    
+
 @shared_task(name='accounts.tasks.generate_qr_code_task')
 def generate_qr_code_task(supplier_id, url, supplier_name):
     from supplier.models import Supplier
-    logger.info(f"Starting QR code generation task for supplier: {supplier_name}")
+    logger.info(
+        f"Starting QR code generation task for supplier: {supplier_name}"
+    )
     try:
         sleep(60)
 
         # Generate the QR code
         qr_image = qrcode.make(url)
-        
+
         # Save the QR code image to a BytesIO buffer
         buffer = BytesIO()
         qr_image.save(buffer, format='PNG')
         buffer.seek(0)
-        
+
         # Generate a file name for the QR code
         file_name = f'{slugify(supplier_name)}_qr_code.png'
 
@@ -102,28 +106,28 @@ def generate_qr_code_task(supplier_id, url, supplier_name):
         supplier.qr_code.save(file_name, File(buffer), save=True)
 
         logger.info(f"QR Code for supplier '{supplier_name}' has been generated and saved.")
-        
+
         # Return success message for Flower result
         return "QR Code created"
     except Exception as e:
-        logger.error(f"Error generating QR code for supplier '{supplier_name}': {e}")
+        logger.error(
+            f"Error generating QR code for supplier '{supplier_name}': {e}"
+        )
         raise e
-    
+
+
 @shared_task(name='monthly_newsletter')
 def send_newsletter():
     from supplier.models import Supplier
     subject = "Your monthly newsletter"
     suppliers = Supplier.objects.all()
-     
+
     for supplier in suppliers:
         body = render_to_string('accounts/emails/newsletter.html', {'name': supplier.supplier_name})
         email = EmailMessage(subject, body, to=[supplier.user.email])
-        email.content_subtype = 'html' 
+        email.content_subtype = 'html'
         email.send()
-        
+
     current_month = datetime.now().strftime('%B')
     supplier_count = suppliers.count()
     return f'{current_month} newsletter sent to {supplier_count} suppliers'
-        
-
-

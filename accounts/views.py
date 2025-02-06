@@ -1,5 +1,4 @@
 import datetime
-from django.core.files import File
 from django.utils.text import slugify
 import random
 from django.core.cache import cache
